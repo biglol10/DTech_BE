@@ -4,6 +4,7 @@
 /.sequelizerc
 
 /node_modules
+/dist
 
 config.env
 package-lock.json

@@ -6,3 +6,5 @@ typescript options: https://geonlee.tistory.com/214
 <br/>
 Error: ER_NOT_SUPPORTED_AUTH_MODE: Client does not support authentication protocol requested by server; consider upgrading MySQL client
 => https://www.inflearn.com/questions/3637
+<br/>
+빌드 후 절대경로 에러 => https://medium.com/@jsh901220/typescript-node-absolute-path-5782b584e368
