@@ -1,0 +1,9 @@
+# ignore all . files and . folders
+
+/.env.local
+/.sequelizerc
+
+/node_modules
+
+config.env
+package-lock.json
