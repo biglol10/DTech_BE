@@ -10,7 +10,25 @@ export const getTestApi = asyncHandler(async (req, res, next) => {
 
 	resultData = await queryExecutorResult(sql);
 
-	res.status(200).json({ success: true, data: 'sampleData', resultData: ['asfd', 'wqer'] });
+	res.status(200).json({ success: true, data: 'sampleData', resultData });
+});
+
+const waitingTime = () => {
+	return new Promise((resolve) => {
+		setTimeout(() => {
+			resolve(`The api called and value is ${Math.random() * 100}`);
+		}, 2000);
+	});
+};
+
+export const getTestApi2 = asyncHandler(async (req, res, next) => {
+	// const resultData = await waitingTime();
+
+	res.status(200).json({
+		success: true,
+		data: 'sampleData',
+		resultData: '## this data is from server ##',
+	});
 });
 
 // export const testApiToFront = asyncHandler(async (req:))
