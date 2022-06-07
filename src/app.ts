@@ -7,7 +7,10 @@ const app = express();
 const PORT = 3066;
 
 conn.connect(function (err) {
-	if (err) throw err;
+	if (err) {
+		console.log(err);
+		throw err;
+	}
 	console.log('Connected!!');
 });
 

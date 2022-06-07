@@ -1,5 +1,9 @@
-// import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
-type AsyncHandler = (req: any, res: any, next: any) => Promise<any>;
+type AsyncHandler = (req: Request, res: Response, next: NextFunction) => Promise<any>;
 
-export { AsyncHandler };
+type GeneralTypeAsync = (
+	fn: (req: Request, res: Response, next: NextFunction) => Promise<void>,
+) => any;
+
+export { AsyncHandler, GeneralTypeAsync };
