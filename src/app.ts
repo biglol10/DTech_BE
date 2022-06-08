@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import conn from '@src/dbConn/dbConnection';
 import testRoute from '@src/routes/testRoute';
+import cors from 'cors';
 
 const app = express();
 
@@ -16,6 +17,9 @@ conn.connect(function (err) {
 
 // Body parser
 app.use(express.json());
+
+// Enable CORS
+app.use(cors());
 
 app.use('/api/testApi', testRoute);
 

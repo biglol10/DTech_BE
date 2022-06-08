@@ -22,12 +22,12 @@ const waitingTime = () => {
 };
 
 export const getTestApi2 = asyncHandler(async (req, res, next) => {
-	// const resultData = await waitingTime();
+	const resultData = await waitingTime();
 
 	res.status(200).json({
 		success: true,
 		data: 'sampleData',
-		resultData: '## this data is from server ##',
+		resultData,
 	});
 });
 
