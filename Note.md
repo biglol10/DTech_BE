@@ -8,3 +8,5 @@ Error: ER_NOT_SUPPORTED_AUTH_MODE: Client does not support authentication protoc
 => https://www.inflearn.com/questions/3637
 <br/>
 빌드 후 절대경로 에러 => https://medium.com/@jsh901220/typescript-node-absolute-path-5782b584e368
+<br/>
+RDS-MySQL 구성 => https://docs.aws.amazon.com/ko_kr/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html
