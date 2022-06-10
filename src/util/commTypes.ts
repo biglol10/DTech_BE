@@ -9,7 +9,7 @@ type GeneralTypeAsync = (
 interface IUserState {
 	userId: string;
 	pw: string;
-	role: string;
+	role: 'admin' | 'user';
 }
 
 interface IGetUserAuthInfoRequest extends Request {
