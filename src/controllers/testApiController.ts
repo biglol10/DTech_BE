@@ -1,5 +1,7 @@
+import { Request } from 'express';
 import asyncHandler from '@src/middleware/async';
 import queryExecutorResult from '@src/util/queryExecutorResult';
+import { IGetUserAuthInfoRequest } from '@src/util/commTypes';
 
 export const getTestApi = asyncHandler(async (req, res, next) => {
 	const sql = 'select * from ttable';
@@ -30,5 +32,20 @@ export const getTestApi2 = asyncHandler(async (req, res, next) => {
 		resultData,
 	});
 });
+
+export const postTestApiWithLogin = asyncHandler(
+	async (req: IGetUserAuthInfoRequest, res, next) => {
+		const resultData = await waitingTime();
+
+		console.log('req user is');
+		console.log(req.user);
+
+		res.status(200).json({
+			success: true,
+			data: 'Post login is successful',
+			resultData,
+		});
+	},
+);
 
 // export const testApiToFront = asyncHandler(async (req:))

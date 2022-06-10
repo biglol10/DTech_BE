@@ -6,4 +6,14 @@ type GeneralTypeAsync = (
 	fn: (req: Request, res: Response, next: NextFunction) => Promise<void>,
 ) => any;
 
-export { AsyncHandler, GeneralTypeAsync };
+interface IUserState {
+	userId: string;
+	pw: string;
+	role: string;
+}
+
+interface IGetUserAuthInfoRequest extends Request {
+	user?: IUserState;
+}
+
+export { AsyncHandler, GeneralTypeAsync, IGetUserAuthInfoRequest };

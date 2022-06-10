@@ -6,5 +6,7 @@
 /node_modules
 /dist
 
+/.vscode
+
 config.env
 package-lock.json

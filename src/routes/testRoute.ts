@@ -1,9 +1,12 @@
 import { Router } from 'express';
 
-import { getTestApi, getTestApi2 } from '@src/controllers/testApiController';
+import { getTestApi, getTestApi2, postTestApiWithLogin } from '@src/controllers/testApiController';
+import { protect } from '@src/middleware/auth';
 
 const router = Router();
 
-router.get('/', getTestApi2);
+router.route('/').get(getTestApi2);
+
+router.route('/').post(protect, postTestApiWithLogin);
 
 export default router;
