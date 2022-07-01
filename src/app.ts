@@ -7,16 +7,18 @@ const app = express();
 
 const PORT = 3066;
 
-// conn.connect(function (err) {
-// 	if (err) {
-// 		console.log(err);
-// 		throw err;
-// 	}
-// 	console.log('Connected!!');
-// });
+conn.connect(function (err) {
+	if (err) {
+		console.log(err);
+		throw err;
+	}
+	console.log('Connected!!');
+});
 
 // Body parser
 app.use(express.json());
+
+app.set('trust proxy', true);
 
 // Enable CORS
 app.use(cors());
