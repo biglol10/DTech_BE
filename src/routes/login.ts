@@ -1,9 +1,9 @@
-import express, { Request, Response, NextFunction } from 'express';
+import { Router } from 'express';
+import { Request, Response, NextFunction } from 'express';
+import { loginUser } from '@src/controllers/authController';
 
-const router = express.Router();
+const router = Router();
 
-router.post('/', (req: Request, res: Response) => {
-	console.log(req.body);
-});
+router.route('/loginUser').post(loginUser);
 
 export default router;

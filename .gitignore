@@ -1,12 +1,17 @@
-# ignore all . files and . folders
-
-/.env.local
-/.sequelizerc
-
+# dependencies
 /node_modules
+
+# production
 /dist
 
 /.vscode
 
+Dockerfile
+
 config.env
-package-lock.json
+
+/.env.local
+
+/.dockerignore
+
+/.vscode/settings.json
