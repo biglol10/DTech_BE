@@ -76,7 +76,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 		const time = dayjs();
 
 		return res.status(200).cookie('user_token', token, options).json({
-			name: selectedUser.NAME,
+			name: selectedUser[0].NAME,
 			userId,
 			time,
 			token,
