@@ -17,6 +17,13 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
 	const time = dayjs();
 
+	const regPassword = new RegExp('^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{6,})');
+	if (!regPassword.test(password)) {
+		return next(
+			new ErrorResponse('비밀번호는 최소 6자리, 숫자+특수문자를 포함해야 합니다', 401),
+		);
+	}
+
 	const salt = await bcrypt.genSalt(10);
 
 	const hashedPassword = await bcrypt.hash(password, salt);
