@@ -14,20 +14,21 @@ dayjs.extend(timezone);
 dayjs.tz.setDefault('Asia/Seoul');
 
 export const registerUser = asyncHandler(async (req, res, next) => {
-	const { name, userId, password } = req.body;
+	console.log(req.body);
+	const { name, user_id, passwd, team, title, phonenum, detail } = req.body;
 
 	const time = dayjs();
 
 	const salt = await bcrypt.genSalt(10);
 
-	const hashedPassword = await bcrypt.hash(password, salt);
+	const hashedPassword = await bcrypt.hash(passwd, salt);
 
-	const sql = `INSERT INTO USER(USER_ID, NAME, PASSWD, TEAM_CD, TITLE, REGISTER_DATE, ADMIN) VALUES ('${userId}', '${name}', '${hashedPassword}', 'TMN0000002', '선임', CURRENT_TIMESTAMP,  0)`;
+	const sql = `INSERT INTO USER(USER_ID, NAME, PASSWD, TEAM_CD, TITLE, PHONENUM, DETAIL, REGISTER_DATE, ADMIN) VALUES ('${user_id}', '${name}', '${hashedPassword}', '${team}', '${title}','${phonenum}', '${detail}', CURRENT_TIMESTAMP,  0)`;
 
 	const resultData = await queryExecutorResult(sql);
 
 	if (resultData.status === 'success' && process.env.JWT_SECRET) {
-		const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+		const token = jwt.sign({ id: user_id }, process.env.JWT_SECRET, {
 			expiresIn: process.env.JWT_EXPIRE,
 		});
 
@@ -47,7 +48,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
 		return res.status(200).cookie('token', token, options).json({
 			name,
-			userId,
+			user_id,
 			time,
 			token,
 			result: 'success',
@@ -56,6 +57,43 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 		return res.status(401).json({
 			result: 'fail',
 			message: 'User register failed',
+		});
+	}
+});
+
+export const idCheck = asyncHandler(async (req, res, next) => {
+	const { userId } = req.body;
+	const sql = `SELECT EXISTS (SELECT * FROM USER WHERE USER_ID = '${userId}') AS SUCCESS`;
+
+	const resultData = await queryExecutorResult(sql);
+	const foundId = resultData.queryResult[0].SUCCESS == 1 ? true : false;
+	// console.log(resultData.queryResult[0].SUCCESS);
+
+	if (resultData.status === 'success') {
+		return res.status(200).json({
+			result: 'success',
+			foundId,
+		});
+	} else {
+		return res.status(401).json({
+			result: 'fail',
+			message: 'Id Check failed',
+		});
+	}
+});
+
+export const getTeamList = asyncHandler(async (req, res, next) => {
+	const sql = 'SELECT * FROM TEAM';
+
+	const resultData = await queryExecutorResult(sql);
+	if (resultData.status === 'success') {
+		return res.status(200).json({
+			resultData,
+		});
+	} else {
+		return res.status(401).json({
+			resultData,
+			message: 'query execute failed',
 		});
 	}
 });
