@@ -12,6 +12,13 @@ dayjs.extend(timezone);
 
 dayjs.tz.setDefault('Asia/Seoul');
 
+export const loginTest = asyncHandler(async (req, res, next) => {
+	console.log(req);
+	return res.status(200).json({
+		success: true,
+	});
+});
+
 export const registerUser = asyncHandler(async (req, res, next) => {
 	const { name, userId, password } = req.body;
 

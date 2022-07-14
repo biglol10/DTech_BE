@@ -3,6 +3,7 @@ import conn from '@src/dbConn/dbConnection';
 import testRoute from '@src/routes/testRoute';
 import authRoute from '@src/routes/login';
 import cors from 'cors';
+import errorHandler from '@src/middleware/error';
 
 const app = express();
 
@@ -26,6 +27,8 @@ app.use(cors());
 
 app.use('/api/auth', authRoute);
 app.use('/api/testApi', testRoute);
+
+app.use(errorHandler);
 
 app.get('/welcome', (req: Request, res: Response, next: NextFunction) => {
 	res.send('welcome!');
