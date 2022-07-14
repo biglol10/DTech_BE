@@ -1,37 +1,45 @@
 import { Request } from 'express';
 import asyncHandler from '@src/middleware/async';
 import ErrorResponse from '@src/util/errorResponse';
-import { IGetUserAuthInfoRequest } from '@src/util/commTypes';
+import jwt from 'jsonwebtoken';
+import queryExecutorResult from '@src/util/queryExecutorResult';
 
-export const protect = asyncHandler(async (req: IGetUserAuthInfoRequest, res, next) => {
-	let token: string | null = null;
+interface IReqWithUser extends Request {
+	[name: string]: any;
+}
 
-	// if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-	// 	// Set token from Bearer token in header
-	// 	token = req.headers.authorization.split(' ')[1];
-	// 	// Set token from cookie
-	// } else if (req.cookies.token) {
-	// 	token = req.cookies.token;
-	// }
+export const protectedApi = asyncHandler(async (req: IReqWithUser, res, next) => {
+	let token;
 
-	// if (!token) {
-	// 	return next(new ErrorResponse('Not authorized to access this route', 401));
-	// }
+	if (req.headers.authorization) {
+		token = req.headers.authorization;
+	} else if (req.cookies.token) {
+		token = req.cookies.token;
+	}
 
-	console.log('req body is');
-	console.log(req.body);
+	if (!token) {
+		return next(new ErrorResponse('Not authorized to access this route', 401));
+	}
 
-	const userId = req.body.userId;
-	const pw = req.body.pw;
+	try {
+		const decoded: any = process.env.JWT_SECRET
+			? jwt.verify(token, process.env.JWT_SECRET)
+			: '';
+		if (decoded) {
+			const sql = `SELECT USER_ID, NAME, TEAM_CD, TITLE, ADMIN FROM USER WHERE USER_ID = '${decoded.id}'`;
+			const resultData = await queryExecutorResult(sql);
+			const { status: isQuerySuccess, queryResult: selectedUser } = await queryExecutorResult(
+				sql,
+			);
 
-	if (userId === 'biglol' && pw === '1234') {
-		req.user = {
-			userId,
-			pw,
-			role: 'admin',
-		};
-		next();
-	} else {
+			if (isQuerySuccess === 'success') {
+				req.user = selectedUser[0];
+				next();
+			} else {
+				return next(new ErrorResponse('Not authorized to access this route', 401));
+			}
+		}
+	} catch (error) {
 		return next(new ErrorResponse('Not authorized to access this route', 401));
 	}
 });
