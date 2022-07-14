@@ -27,7 +27,6 @@ export const protectedApi = asyncHandler(async (req: IReqWithUser, res, next) =>
 			: '';
 		if (decoded) {
 			const sql = `SELECT USER_ID, NAME, TEAM_CD, TITLE, ADMIN FROM USER WHERE USER_ID = '${decoded.id}'`;
-			const resultData = await queryExecutorResult(sql);
 			const { status: isQuerySuccess, queryResult: selectedUser } = await queryExecutorResult(
 				sql,
 			);
