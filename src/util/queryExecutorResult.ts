@@ -25,6 +25,7 @@ const queryExecutorResult = async (sql: string) => {
 			code: err.code,
 			errno: err.errno,
 			sqlMessage: err.sqlMessage,
+			queryResult: null,
 		};
 	}
 

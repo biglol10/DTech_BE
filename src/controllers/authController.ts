@@ -12,10 +12,10 @@ dayjs.extend(timezone);
 
 dayjs.tz.setDefault('Asia/Seoul');
 
-export const uploadTest = asyncHandler(async (req, res, next) => {
+export const uploadTest = asyncHandler(async (req: any, res, next) => {
 	console.log('uploadTest');
 
-	console.log(req.body);
+	console.log(req.file);
 	return res.status(200).json({
 		result: 'success',
 	});
