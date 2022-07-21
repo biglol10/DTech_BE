@@ -12,7 +12,7 @@ dayjs.extend(timezone);
 
 dayjs.tz.setDefault('Asia/Seoul');
 
-export const uploadTest = asyncHandler(async (req: any, res, next) => {
+export const uploadUserImg = asyncHandler(async (req: any, res, next) => {
 	console.log('uploadTest');
 
 	console.log(req.file);
@@ -27,12 +27,14 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
 	const time = dayjs();
 
-	const regPassword = new RegExp('^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{6,})');
-	if (!regPassword.test(passwd)) {
-		return next(
-			new ErrorResponse('비밀번호는 최소 6자리, 숫자+특수문자를 포함해야 합니다', 401),
-		);
-	}
+	// const regPassword = new RegExp('^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{6,})');
+	// if (!regPassword.test(passwd)) {
+	// 	return next(
+	// 		new ErrorResponse('비밀번호는 최소 6자리, 숫자+특수문자를 포함해야 합니다', 401),
+	// 	);
+	// }
+
+	console.log('pointBOBO');
 
 	const salt = await bcrypt.genSalt(10);
 
@@ -41,6 +43,9 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 	const sql = `INSERT INTO USER(USER_ID, NAME, PASSWD, TEAM_CD, TITLE, PHONENUM, DETAIL, REGISTER_DATE, ADMIN) VALUES ('${user_id}', '${name}', '${hashedPassword}', '${team}', '${title}','${phonenum}', '${detail}', CURRENT_TIMESTAMP,  0)`;
 
 	const resultData = await queryExecutorResult(sql);
+
+	console.log('resultData');
+	console.log(resultData);
 
 	if (resultData.status === 'success' && process.env.JWT_SECRET) {
 		// const token = jwt.sign({ id: user_id }, process.env.JWT_SECRET, {
@@ -54,6 +59,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
 		return res.status(200).cookie('user_token', token, options).json({
 			name,
+			title,
 			user_id,
 			time,
 			token,
