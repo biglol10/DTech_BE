@@ -37,9 +37,6 @@ export const postTestApiWithLogin = asyncHandler(
 	async (req: IGetUserAuthInfoRequest, res, next) => {
 		const resultData = await waitingTime();
 
-		console.log('req user is');
-		console.log(req.user);
-
 		res.status(200).json({
 			success: true,
 			data: 'Post login is successful',

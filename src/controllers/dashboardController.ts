@@ -50,6 +50,10 @@ export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
 				subject: 'Docker',
 				count: 4,
 			},
+			{
+				subject: 'ASPNET',
+				count: 2
+			}
 		],
 	});
 });

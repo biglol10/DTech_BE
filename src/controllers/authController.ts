@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import { Request, Response, NextFunction } from 'express';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -18,8 +19,7 @@ export const loginTest = asyncHandler(async (req, res, next) => {
 	});
 });
 
-export const getUserByToken = asyncHandler(async (req: any, res, next) => {
-	console.log('came to getUserByToken');
+export const getUserByToken = asyncHandler(async (req, res, next) => {
 	return res.status(200).json({
 		success: true,
 		user: req.user,
