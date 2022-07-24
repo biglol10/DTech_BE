@@ -10,8 +10,12 @@ Dockerfile
 
 config.env
 
+awsconfig.json
+
 /.env.local
 
 /.dockerignore
 
 /.vscode/settings.json
+
+/images/userImg
