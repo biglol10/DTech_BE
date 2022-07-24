@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import { Request, Response, NextFunction } from 'express';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -18,6 +19,13 @@ export const uploadUserImg = asyncHandler(async (req: any, res, next) => {
 	console.log(req.file);
 	return res.status(200).json({
 		result: 'success',
+	});
+});
+
+export const getUserByToken = asyncHandler(async (req, res, next) => {
+	return res.status(200).json({
+		success: true,
+		user: req.user,
 	});
 });
 

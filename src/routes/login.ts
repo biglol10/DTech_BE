@@ -6,6 +6,7 @@ import {
 	idCheck,
 	getTeamList,
 	uploadUserImg,
+	getUserByToken
 } from '@src/controllers/authController';
 import { protectedApi } from '@src/middleware/auth';
 
