@@ -18,9 +18,7 @@ const queryExecutorResult = async (sql: string) => {
 	let resultData: any = null;
 
 	try {
-		conn.connect();
 		resultData = await queryExecutor(sql);
-		conn.end();
 	} catch (err: any) {
 		resultData = {
 			status: 'error',
