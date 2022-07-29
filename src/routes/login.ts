@@ -6,7 +6,7 @@ import {
 	idCheck,
 	getTeamList,
 	uploadUserImg,
-	getUserByToken
+	getUserByToken,
 } from '@src/controllers/authController';
 import { protectedApi } from '@src/middleware/auth';
 
@@ -68,5 +68,7 @@ router.route('/idCheck').post(idCheck);
 router.route('/getTeamList').post(getTeamList);
 
 router.route('/uploadUserImg').post(upload.single('img'), uploadUserImg);
+
+router.post('/getLoggedInUserInfo', protectedApi, getUserByToken);
 
 export default router;
