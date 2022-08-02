@@ -7,6 +7,7 @@ import {
 	getTeamList,
 	uploadUserImg,
 	getUserByToken,
+	getTechList,
 } from '@src/controllers/authController';
 import { protectedApi } from '@src/middleware/auth';
 
@@ -73,6 +74,8 @@ router.route('/loginUser').post(loginUser);
 router.route('/idCheck').post(idCheck);
 
 router.route('/getTeamList').post(getTeamList);
+
+router.route('/getTechList').post(getTechList);
 
 router.route('/uploadUserImg').post(upload.single('img'), () => {
 	console.log('uploadUserImg');

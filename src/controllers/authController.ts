@@ -120,6 +120,22 @@ export const getTeamList = asyncHandler(async (req, res, next) => {
 	}
 });
 
+export const getTechList = asyncHandler(async (req, res, next) => {
+	const sql = 'SELECT * FROM TECH';
+
+	const resultData = await queryExecutorResult(sql);
+	if (resultData.status === 'success') {
+		return res.status(200).json({
+			resultData,
+		});
+	} else {
+		return res.status(401).json({
+			resultData,
+			message: 'query execute failed',
+		});
+	}
+});
+
 export const loginUser = asyncHandler(async (req, res, next) => {
 	const { userId, password } = req.body;
 
