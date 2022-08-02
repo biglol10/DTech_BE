@@ -7,9 +7,13 @@ import { Request, Response, NextFunction } from 'express';
 // 		Promise.resolve(fn(req, res, next)).catch(next);
 // 	};
 
+interface reqExtends extends Request {
+	[val: string]: any;
+}
+
 const asyncHandler =
-	(fn: (req: Request, res: Response, next: NextFunction) => any | Promise<void>) =>
-	async (req: Request, res: Response, next: NextFunction) => {
+	(fn: (req: reqExtends, res: Response, next: NextFunction) => any | Promise<void>) =>
+	async (req: reqExtends, res: Response, next: NextFunction) => {
 		Promise.resolve(fn(req, res, next)).catch(next);
 	};
 

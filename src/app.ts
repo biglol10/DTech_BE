@@ -1,7 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import conn from '@src/dbConn/dbConnection';
-import testRoute from '@src/routes/testRoute';
-import authRoute from '@src/routes/login';
+import { authRoute, dashboardRoute, testRoute } from '@src/routes/index';
 import cors from 'cors';
 import errorHandler from '@src/middleware/error';
 
@@ -26,6 +25,7 @@ app.set('trust proxy', true);
 app.use(cors());
 
 app.use('/api/auth', authRoute);
+app.use('/api/dashboard', dashboardRoute);
 app.use('/api/testApi', testRoute);
 
 app.use(errorHandler);
