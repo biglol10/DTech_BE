@@ -19,3 +19,4 @@ awsconfig.json
 /.vscode/settings.json
 
 /images/userImg
+package-lock.json
