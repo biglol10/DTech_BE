@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import { generateUID } from '@src/util/customFunc';
 import { Request, Response, NextFunction } from 'express';
 
 dayjs.extend(utc);
@@ -48,7 +49,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
 	const hashedPassword = await bcrypt.hash(passwd, salt);
 
-	const sql = `INSERT INTO USER(USER_ID, NAME, PASSWD, TEAM_CD, TITLE, PHONENUM, DETAIL, REGISTER_DATE, ADMIN) VALUES ('${user_id}', '${name}', '${hashedPassword}', '${team}', '${title}','${phonenum}', '${detail}', CURRENT_TIMESTAMP,  0)`;
+	const sql = `INSERT INTO USER(USER_UID, USER_ID, NAME, PASSWD, TEAM_CD, TITLE, PHONENUM, DETAIL, REGISTER_DATE, ADMIN) VALUES ('${generateUID()}', '${user_id}', '${name}', '${hashedPassword}', '${team}', '${title}','${phonenum}', '${detail}', CURRENT_TIMESTAMP,  0)`;
 
 	const resultData = await queryExecutorResult(sql);
 
