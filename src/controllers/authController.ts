@@ -42,7 +42,6 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 	const sql = `INSERT INTO USER(USER_UID, USER_ID, NAME, PASSWD, TEAM_CD, TITLE, PHONENUM, DETAIL, REGISTER_DATE, ADMIN) VALUES ('${uuid}', '${user_id}', '${name}', '${hashedPassword}', '${team}', '${title}','${phonenum}', '${detail}', CURRENT_TIMESTAMP,  0)`;
 
 	const resultData = await queryExecutorResult(sql);
-	console.log(resultData);
 	let resultData2 = { status: 'success' };
 	if (tech_list.length > 0 && resultData.status === 'success') {
 		console.log('tech_list!!');
@@ -55,8 +54,6 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 		const sql = `INSERT INTO USER_TECH(USER_UID,TECH_CD) VALUES ${techValues};`;
 		resultData2 = await queryExecutorResult(sql);
 	}
-	console.log(resultData.status);
-	console.log(resultData2.status);
 	if (
 		resultData.status === 'success' &&
 		resultData2.status === 'success' &&
@@ -96,7 +93,6 @@ export const idCheck = asyncHandler(async (req, res, next) => {
 
 	const resultData = await queryExecutorResult(sql);
 	const foundId = resultData.queryResult[0].SUCCESS == 1 ? true : false;
-	// console.log(resultData.queryResult[0].SUCCESS);
 
 	if (resultData.status === 'success') {
 		return res.status(200).json({
