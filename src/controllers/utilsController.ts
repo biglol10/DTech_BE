@@ -9,17 +9,17 @@ export const getMetadata = asyncHandler(async (req, res, next) => {
 
 	const metadataArr: any = [];
 
-	for (let index = 0; index < linkList.length; index++) {
-		const metadataResult = await axiosFetchMetadata(linkList[index]);
-		metadataArr.push(metadataResult);
-	}
-
-	// await linkList.map(async (url: string) => {
-	// 	const metadataResult = await axiosFetchMetadata(url);
+	// for (let index = 0; index < linkList.length; index++) {
+	// 	const metadataResult = await axiosFetchMetadata(linkList[index]);
 	// 	metadataArr.push(metadataResult);
-	// 	console.log('metadataArr after push is');
-	// 	console.log(metadataArr);
-	// });
+	// }
+
+	const axiosRequest = linkList.map(async (url: string) => {
+		const metadataResult = await axiosFetchMetadata(url);
+		metadataArr.push(metadataResult);
+	});
+
+	await Promise.all(axiosRequest);
 
 	return res.status(200).json({
 		metadataArr: metadataArr,
