@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import conn from '@src/dbConn/dbConnection';
-import { authRoute, dashboardRoute, testRoute } from '@src/routes/index';
+import { authRoute, dashboardRoute, testRoute, utilsRoute } from '@src/routes/index';
 import cors from 'cors';
 import errorHandler from '@src/middleware/error';
 
@@ -27,6 +27,7 @@ app.use(cors());
 app.use('/api/auth', authRoute);
 app.use('/api/dashboard', dashboardRoute);
 app.use('/api/testApi', testRoute);
+app.use('/api/utils', utilsRoute);
 
 app.use(errorHandler);
 
