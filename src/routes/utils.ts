@@ -3,6 +3,8 @@ import { getMetadata } from '@src/controllers/utilsController';
 
 const router = Router();
 
-router.get('/getMetadata', getMetadata);
+router.route('/getMetadata').get(getMetadata);
+
+// router.get('/getMetadata', getMetadata);
 
 export default router;
