@@ -32,31 +32,36 @@ export const getUserByToken = asyncHandler(async (req, res, next) => {
 
 export const registerUser = asyncHandler(async (req, res, next) => {
 	console.log(req.body);
-	const { name, user_id, passwd, team, title, phonenum, detail } = req.body;
+	const { name, user_id, passwd, team, title, phonenum, detail, tech_list } = req.body;
 
 	const time = dayjs();
-
-	// const regPassword = new RegExp('^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{6,})');
-	// if (!regPassword.test(passwd)) {
-	// 	return next(
-	// 		new ErrorResponse('비밀번호는 최소 6자리, 숫자+특수문자를 포함해야 합니다', 401),
-	// 	);
-	// }
-
-	console.log('pointBOBO');
-
 	const salt = await bcrypt.genSalt(10);
-
 	const hashedPassword = await bcrypt.hash(passwd, salt);
+	const uuid = generateUID();
 
-	const sql = `INSERT INTO USER(USER_UID, USER_ID, NAME, PASSWD, TEAM_CD, TITLE, PHONENUM, DETAIL, REGISTER_DATE, ADMIN) VALUES ('${generateUID()}', '${user_id}', '${name}', '${hashedPassword}', '${team}', '${title}','${phonenum}', '${detail}', CURRENT_TIMESTAMP,  0)`;
+	const sql = `INSERT INTO USER(USER_UID, USER_ID, NAME, PASSWD, TEAM_CD, TITLE, PHONENUM, DETAIL, REGISTER_DATE, ADMIN) VALUES ('${uuid}', '${user_id}', '${name}', '${hashedPassword}', '${team}', '${title}','${phonenum}', '${detail}', CURRENT_TIMESTAMP,  0)`;
 
 	const resultData = await queryExecutorResult(sql);
-
-	console.log('resultData');
 	console.log(resultData);
+	let resultData2 = { status: 'success' };
+	if (tech_list.length > 0 && resultData.status === 'success') {
+		console.log('tech_list!!');
+		let techValues = '';
+		for (var i in tech_list) {
+			techValues += `('${uuid}','${tech_list[i]}'),`;
+		}
+		techValues = techValues.slice(0, -1);
 
-	if (resultData.status === 'success' && process.env.JWT_SECRET) {
+		const sql = `INSERT INTO USER_TECH(USER_UID,TECH_CD) VALUES ${techValues};`;
+		resultData2 = await queryExecutorResult(sql);
+	}
+	console.log(resultData.status);
+	console.log(resultData2.status);
+	if (
+		resultData.status === 'success' &&
+		resultData2.status === 'success' &&
+		process.env.JWT_SECRET
+	) {
 		// const token = jwt.sign({ id: user_id }, process.env.JWT_SECRET, {
 		// 	expiresIn: process.env.JWT_EXPIRE,
 		// });
@@ -64,6 +69,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 		// const cookie_expire = process.env.COOKIE_EXPIRE
 		// 	? parseInt(process.env.COOKIE_EXPIRE, 10)
 		// 	: 30;
+
 		const { token, options } = tokenResponse(user_id, process.env.JWT_SECRET);
 
 		return res.status(200).cookie('user_token', token, options).json({
