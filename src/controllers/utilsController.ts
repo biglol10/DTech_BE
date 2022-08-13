@@ -3,16 +3,12 @@ import queryExecutorResult from '@src/util/queryExecutorResult';
 import axios from 'axios';
 import https from 'https';
 import cheerio from 'cheerio';
+import { metadataStorage } from '@src/util/memoryStorage';
 
 export const getMetadata = asyncHandler(async (req, res, next) => {
 	const linkList = req.query.linkList as string[];
 
 	const metadataArr: any = [];
-
-	// for (let index = 0; index < linkList.length; index++) {
-	// 	const metadataResult = await axiosFetchMetadata(linkList[index]);
-	// 	metadataArr.push(metadataResult);
-	// }
 
 	const axiosRequest = linkList.map(async (url: string) => {
 		const metadataResult = await axiosFetchMetadata(url);
@@ -27,6 +23,19 @@ export const getMetadata = asyncHandler(async (req, res, next) => {
 });
 
 const axiosFetchMetadata = async (url: string) => {
+	if (
+		Object.prototype.hasOwnProperty.call(metadataStorage, url) &&
+		metadataStorage[url].status === 'success'
+	) {
+		const { metadata_title, metadata_description, metadata_image } = metadataStorage[url];
+		return {
+			status: 'success',
+			url,
+			metadata_title: metadata_title,
+			metadata_description: metadata_description,
+			metadata_image: metadata_image,
+		};
+	}
 	const fetchedMedadata = await axios({
 		url,
 		method: 'GET',
@@ -58,6 +67,13 @@ const axiosFetchMetadata = async (url: string) => {
 			// 	$('meta[property="og:keywords"]').attr('content') ||
 			// 	$('meta[name="keywords"]').attr('content');
 
+			metadataStorage[url] = {
+				status: 'success',
+				metadata_title: title,
+				metadata_description: description,
+				metadata_image: image,
+			};
+
 			return {
 				status: 'success',
 				url,
@@ -67,6 +83,13 @@ const axiosFetchMetadata = async (url: string) => {
 			};
 		})
 		.catch((error: any) => {
+			metadataStorage[url] = {
+				status: 'fail',
+				metadata_title: '',
+				metadata_description: '',
+				metadata_image: '',
+			};
+
 			return {
 				status: 'fail',
 				url,
