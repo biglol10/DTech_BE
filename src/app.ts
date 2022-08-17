@@ -33,16 +33,22 @@ io.on('connection', (socket) => {
 
 	const interval = setInterval(() => {
 		socket.emit('connectedUsers', {
-			users: usersSocket,
-			// users: usersSocket.filter((user) => user.socketId !== socket.id),
+			// users: usersSocket,
+			users: usersSocket.filter((user) => user.socketId !== socket.id),
 		});
 	}, 10000);
 
 	socket.on('connectUser', async ({ userId }: { userId: string }) => {
 		await addUser(userId, socket.id);
+
+		socket.emit('connectedUsers', {
+			// users: usersSocket,
+			users: usersSocket.filter((user) => user.socketId !== socket.id),
+		});
 	});
 
 	socket.on('disconnect', async (obj) => {
+		console.log(`came to disconnectUser ${socket.id}`)
 		await removeUser(socket.id);
 		clearInterval(interval);
 	});
