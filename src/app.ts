@@ -3,10 +3,50 @@ import conn from '@src/dbConn/dbConnection';
 import { authRoute, dashboardRoute, testRoute, utilsRoute } from '@src/routes/index';
 import cors from 'cors';
 import errorHandler from '@src/middleware/error';
+import http from 'http';
+import { Server } from 'socket.io';
+import {
+	usersSocket,
+	addUser,
+	removeUser,
+	usersSocket2,
+	addUser2,
+	removeUser2,
+} from './util/memoryStorage';
 
 const app = express();
 
+const server = http.createServer(app);
+// const io = new Server(server);
+const io = new Server(server, {
+	cors: {
+		origin: ['http://localhost:3065', 'https://dev.example.com'],
+		allowedHeaders: ['my-custom-header'],
+		credentials: true,
+	},
+});
+
 const PORT = 3066;
+
+io.on('connection', (socket) => {
+	console.log(`a new user connected with socketId of ${socket.id}`);
+
+	const interval = setInterval(() => {
+		socket.emit('connectedUsers', {
+			users: usersSocket,
+			// users: usersSocket.filter((user) => user.socketId !== socket.id),
+		});
+	}, 10000);
+
+	socket.on('connectUser', async ({ userId }: { userId: string }) => {
+		await addUser(userId, socket.id);
+	});
+
+	socket.on('disconnect', async (obj) => {
+		await removeUser(socket.id);
+		clearInterval(interval);
+	});
+});
 
 // conn.connect(function (err) {
 // 	if (err) {
@@ -35,7 +75,7 @@ app.get('/welcome', (req: Request, res: Response, next: NextFunction) => {
 	res.send('welcome!');
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
 	console.log(`
   ################################################
   🛡️  Server listening on port: ${PORT}
