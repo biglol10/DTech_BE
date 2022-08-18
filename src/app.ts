@@ -48,7 +48,6 @@ io.on('connection', (socket) => {
 	});
 
 	socket.on('disconnect', async (obj) => {
-		console.log(`came to disconnectUser ${socket.id}`)
 		await removeUser(socket.id);
 		clearInterval(interval);
 	});
@@ -67,8 +66,12 @@ app.use(express.json());
 
 app.set('trust proxy', true);
 
+const corsOptions = {
+	origin: ['http://localhost:3065', 'https://dev.example.com'],
+};
+
 // Enable CORS
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use('/api/auth', authRoute);
 app.use('/api/dashboard', dashboardRoute);

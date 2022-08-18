@@ -184,6 +184,49 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 	}
 });
 
+export const getUsersStatus = asyncHandler(async (req, res, next) => {
+	const usersOnline = req.query.onlineUsers as string[];
+
+	if (!!usersOnline.length) {
+		let sqlScript = '';
+
+		const stringReduce = usersOnline.reduce((previouseValue, currentValue, idx) => {
+			if (idx === 1) {
+				return `\'${previouseValue}\', \'${currentValue}\'`;
+			}
+
+			return `${previouseValue}, \'${currentValue}\'`;
+		});
+
+		sqlScript = `SELECT USER_UID, USER_ID, NAME, TITLE, DETAIL, IMG_URL, 'ONLINE' AS ONLINE_STATUS FROM USER WHERE USER_ID IN (${
+			usersOnline.length === 1 ? `'${stringReduce}'` : `${stringReduce}`
+		}) UNION `;
+		sqlScript += `SELECT USER_UID, USER_ID, NAME, TITLE, DETAIL, IMG_URL, 'OFFLINE' AS ONLINE_STATUS FROM USER WHERE USER_ID NOT IN (${
+			usersOnline.length === 1 ? `'${stringReduce}'` : `${stringReduce}`
+		})`;
+
+		const { status: queryResultStatus, queryResult } = await queryExecutorResult(sqlScript);
+
+		if (queryResultStatus !== 'success') {
+			return next(new ErrorResponse('Error executing sql script', 401));
+		}
+
+		if (!queryResult || queryResult.length === 0) {
+			return next(new ErrorResponse('Error executing sql script', 401));
+		}
+
+		return res.status(200).json({
+			result: 'success',
+			usersStatus: queryResult,
+		});
+	} else {
+		res.status(200).json({
+			result: 'success',
+			usersStatus: [],
+		});
+	}
+});
+
 const matchPassword = async (enteredPassword: string, dbPassword: string) => {
 	return await bcrypt.compare(enteredPassword, dbPassword);
 };

@@ -1,5 +1,5 @@
 /** ****************************************************************************************
- * @설명 : Medata 저장소
+ * : Medata 저장소
  ********************************************************************************************/
 interface metadataStorageObj {
 	status: string;
@@ -15,15 +15,16 @@ interface metadataStorage {
 const metadataStorage: metadataStorage = {};
 
 /** ****************************************************************************************
- * @설명 : 유저 소캣 저장소
+ * : 유저 소캣 저장소
  ********************************************************************************************/
 
 interface IUserSocket {
 	userId: string;
 	socketId: string;
+	roomId?: string;
 }
 
-const usersSocket: IUserSocket[] = [];
+const usersSocket: Array<IUserSocket> = [];
 
 const addUser = async (userId: string, socketId: string) => {
 	// check if we have a user connected with this userId
@@ -38,15 +39,42 @@ const addUser = async (userId: string, socketId: string) => {
 		if (user && user.socketId !== socketId) {
 			await removeUser(user.socketId);
 		}
-		const newUser = { userId, socketId }; // ES6 syntax
+		const newUser = { userId, socketId };
 		usersSocket.push(newUser);
+		return usersSocket;
+	}
+};
+
+const addUserRoom = async (userId: string, socketId: string, roomId: string) => {
+	// check if we have a user connected with this userId and roomId
+	const user = usersSocket.find((user) => user.userId === userId && user.roomId === roomId);
+
+	if (user && user.socketId === socketId) {
+		return usersSocket;
+	} else {
+		if (user && user.socketId !== socketId) {
+			await removeUserRoom(user.socketId, roomId);
+		}
+		const newUserRoom = { userId, socketId, roomId };
+		usersSocket.push(newUserRoom);
 		return usersSocket;
 	}
 };
 
 const removeUser = async (socketId: string) => {
 	const indexOf = usersSocket.map((user) => user.socketId).indexOf(socketId);
-	await usersSocket.splice(indexOf, 1);
+	indexOf > -1 && (await usersSocket.splice(indexOf, 1));
+	return;
+};
+
+const removeUserRoom = async (socketId: string, roomId: string) => {
+	let indexOf: null | number = null;
+	usersSocket.map((user, idx) => {
+		if (user.socketId === socketId && user.roomId === roomId) {
+			indexOf = idx;
+		}
+	});
+	indexOf !== null && (await usersSocket.splice(indexOf, 1));
 	return;
 };
 
@@ -75,4 +103,14 @@ const removeUser2 = (socketId: string) => {
 	return;
 };
 
-export { metadataStorage, usersSocket, addUser, removeUser, usersSocket2, addUser2, removeUser2 };
+export {
+	metadataStorage,
+	usersSocket,
+	addUser,
+	removeUser,
+	usersSocket2,
+	addUser2,
+	removeUser2,
+	addUserRoom,
+	removeUserRoom,
+};
