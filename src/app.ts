@@ -68,6 +68,7 @@ app.set('trust proxy', true);
 
 const corsOptions = {
 	origin: ['http://localhost:3065', 'https://dev.example.com'],
+	credentials: true,
 };
 
 // Enable CORS
