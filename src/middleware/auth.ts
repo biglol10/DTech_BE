@@ -2,7 +2,7 @@ import { Request } from 'express';
 import asyncHandler from '@src/middleware/async';
 import ErrorResponse from '@src/util/errorResponse';
 import jwt from 'jsonwebtoken';
-import queryExecutorResult from '@src/util/queryExecutorResult';
+import { queryExecutorResult } from '@src/util/queryExecutorResult';
 
 interface IReqWithUser extends Request {
 	[name: string]: any;

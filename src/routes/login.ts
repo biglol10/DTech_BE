@@ -9,6 +9,7 @@ import {
 	getUserByToken,
 	getTechList,
 	getUsersStatus,
+	getUsersInfo,
 } from '@src/controllers/authController';
 import { protectedApi } from '@src/middleware/auth';
 
@@ -84,5 +85,7 @@ router.route('/uploadUserImg').post(upload.single('img'), uploadUserImg);
 router.post('/getLoggedInUserInfo', protectedApi, getUserByToken);
 
 router.get('/getUsersStatus', getUsersStatus);
+
+router.get('/getUsersInfo', getUsersInfo);
 
 export default router;

@@ -1,5 +1,5 @@
 import asyncHandler from '@src/middleware/async';
-import queryExecutorResult from '@src/util/queryExecutorResult';
+import { queryExecutorResult } from '@src/util/queryExecutorResult';
 import axios from 'axios';
 import https from 'https';
 import cheerio from 'cheerio';
