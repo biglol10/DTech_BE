@@ -1,5 +1,5 @@
 import asyncHandler from '@src/middleware/async';
-import queryExecutorResult from '@src/util/queryExecutorResult';
+import { queryExecutorResult } from '@src/util/queryExecutorResult';
 import ErrorResponse from '@src/util/errorResponse';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
@@ -8,6 +8,7 @@ import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { generateUID } from '@src/util/customFunc';
 import { Request, Response, NextFunction } from 'express';
+import { usersSocket } from '@src/util/memoryStorage';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -190,6 +191,98 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 		return res.status(401).json({
 			result: 'error',
 			message: 'User login failed',
+		});
+	}
+});
+
+export const getUsersStatus = asyncHandler(async (req, res, next) => {
+	const usersOnline = req.query.onlineUsers as string[];
+
+	if (!!usersOnline.length) {
+		let sqlScript = '';
+
+		const stringReduce = usersOnline.reduce((previouseValue, currentValue, idx) => {
+			if (idx === 1) {
+				return `'${previouseValue}', '${currentValue}'`;
+			}
+
+			return `${previouseValue}, '${currentValue}'`;
+		});
+
+		sqlScript = `SELECT USER_UID, USER_ID, NAME, TITLE, DETAIL, IMG_URL, 'ONLINE' AS ONLINE_STATUS FROM USER WHERE USER_ID IN (${
+			usersOnline.length === 1 ? `'${stringReduce}'` : `${stringReduce}`
+		}) UNION `;
+		sqlScript += `SELECT USER_UID, USER_ID, NAME, TITLE, DETAIL, IMG_URL, 'OFFLINE' AS ONLINE_STATUS FROM USER WHERE USER_ID NOT IN (${
+			usersOnline.length === 1 ? `'${stringReduce}'` : `${stringReduce}`
+		})`;
+
+		const { status: queryResultStatus, queryResult } = await queryExecutorResult(sqlScript);
+
+		if (queryResultStatus !== 'success') {
+			return next(new ErrorResponse('Error executing sql script', 401));
+		}
+
+		if (!queryResult || queryResult.length === 0) {
+			return next(new ErrorResponse('Error executing sql script', 401));
+		}
+
+		return res.status(200).json({
+			result: 'success',
+			usersStatus: queryResult,
+		});
+	} else {
+		res.status(200).json({
+			result: 'success',
+			usersStatus: [],
+		});
+	}
+});
+
+export const getUsersInfo = asyncHandler(async (req, res, next) => {
+	const usersParam = req.query.usersParam as string[];
+
+	if (!!usersParam.length) {
+		let sqlScript = '';
+
+		const stringReduce = usersParam.reduce((previouseValue, currentValue, idx) => {
+			if (idx === 1) {
+				return `'${previouseValue}', '${currentValue}'`;
+			}
+
+			return `${previouseValue}, '${currentValue}'`;
+		});
+
+		sqlScript = `SELECT USER_UID, USER_ID, NAME, TITLE, DETAIL, IMG_URL FROM USER WHERE USER_UID IN (${
+			usersParam.length === 1 ? `'${stringReduce}'` : `${stringReduce}`
+		})`;
+
+		const { status: queryResultStatus, queryResult } = await queryExecutorResult(sqlScript);
+
+		if (queryResultStatus !== 'success') {
+			return next(new ErrorResponse('Error executing sql script', 401));
+		}
+
+		if (!queryResult || queryResult.length === 0) {
+			return next(new ErrorResponse('Error executing sql script', 401));
+		}
+
+		return res.status(200).json({
+			result: 'success',
+			usersInfo: queryResult,
+			usersOnline: queryResult.map((item: any) => {
+				const user = usersSocket.find((user) => user.userId === item.USER_ID);
+				if (user && user.socketId) {
+					return { userUID: item.USER_UID, userId: item.USER_ID, status: 'online' };
+				} else {
+					return { userUID: item.USER_UID, userId: item.USER_ID, status: 'offline' };
+				}
+			}),
+		});
+	} else {
+		res.status(200).json({
+			result: 'success',
+			usersInfo: [],
+			usersOnline: ['offline'],
 		});
 	}
 });

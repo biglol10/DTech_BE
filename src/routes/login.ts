@@ -9,6 +9,8 @@ import {
 	uploadUserImgS3,
 	getUserByToken,
 	getTechList,
+	getUsersStatus,
+	getUsersInfo,
 } from '@src/controllers/authController';
 import { protectedApi } from '@src/middleware/auth';
 const image = require('../controllers/image');
@@ -55,5 +57,9 @@ router.post(
 );
 
 router.post('/getLoggedInUserInfo', protectedApi, getUserByToken);
+
+router.get('/getUsersStatus', getUsersStatus);
+
+router.get('/getUsersInfo', getUsersInfo);
 
 export default router;

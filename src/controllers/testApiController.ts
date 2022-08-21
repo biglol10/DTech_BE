@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import asyncHandler from '@src/middleware/async';
-import queryExecutorResult from '@src/util/queryExecutorResult';
+import { queryExecutorResult } from '@src/util/queryExecutorResult';
 import { IGetUserAuthInfoRequest } from '@src/util/commTypes';
 
 export const getTestApi = asyncHandler(async (req, res, next) => {
