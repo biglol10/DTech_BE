@@ -1,5 +1,5 @@
 import asyncHandler from '@src/middleware/async';
-import queryExecutorResult from '@src/util/queryExecutorResult';
+import { queryExecutorResult } from '@src/util/queryExecutorResult';
 
 export const setBoardLike = asyncHandler(async (req, res, next) => {
 	console.log('setBoardLike');
