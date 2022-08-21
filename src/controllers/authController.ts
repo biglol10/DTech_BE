@@ -23,6 +23,16 @@ export const uploadUserImg = asyncHandler(async (req: any, res, next) => {
 	});
 });
 
+export const uploadUserImgS3 = asyncHandler(async (req: any, res, next) => {
+	console.log('uploadTest!!!!!!!!!!!!!!!!!!');
+	console.log(req.files);
+
+	// console.log(req.files);
+	return res.status(200).json({
+		result: 'success',
+	});
+});
+
 export const getUserByToken = asyncHandler(async (req, res, next) => {
 	return res.status(200).json({
 		success: true,
