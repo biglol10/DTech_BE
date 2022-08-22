@@ -13,6 +13,7 @@ import {
 	usersSocket2,
 	addUser2,
 	removeUser2,
+	getConnectedUser,
 } from './util/memoryStorage';
 
 const app = express();
@@ -55,7 +56,16 @@ io.on('connection', (socket) => {
 
 	socket.on(
 		'sendPrivateMessage',
-		async ({ chatMessage, userUID, convId, imgList, linkList }: { [keys: string]: string }) => {
+		async ({
+			chatMessage,
+			userUID,
+			convId,
+			imgList,
+			linkList,
+			toUserId,
+		}: {
+			[keys: string]: string;
+		}) => {
 			const sendResult = await sendPrivateMessageFunction(
 				chatMessage,
 				userUID,
@@ -64,7 +74,11 @@ io.on('connection', (socket) => {
 				linkList,
 			);
 
-			if (sendResult.result === 'success') {
+			if (sendResult.result === 'success' && toUserId) {
+				const user = getConnectedUser(toUserId);
+				if (user) {
+					io.to(user.socketId);
+				}
 			}
 		},
 	);
