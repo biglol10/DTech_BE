@@ -64,7 +64,7 @@ const queryExecutorProcedure = (
 				}
 				const successResult: IResultData = {
 					status: 'success',
-					queryResult: result,
+					queryResult: result[0],
 				};
 				resolve(successResult);
 			});

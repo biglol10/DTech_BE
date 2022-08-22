@@ -5,6 +5,7 @@ import cors from 'cors';
 import errorHandler from '@src/middleware/error';
 import http from 'http';
 import { Server } from 'socket.io';
+import { sendPrivateMessageFunction } from './util/socketActions';
 import {
 	usersSocket,
 	addUser,
@@ -51,6 +52,22 @@ io.on('connection', (socket) => {
 		await removeUser(socket.id);
 		clearInterval(interval);
 	});
+
+	socket.on(
+		'sendPrivateMessage',
+		async ({ chatMessage, userUID, convId, imgList, linkList }: { [keys: string]: string }) => {
+			const sendResult = await sendPrivateMessageFunction(
+				chatMessage,
+				userUID,
+				convId,
+				imgList,
+				linkList,
+			);
+
+			if (sendResult.result === 'success') {
+			}
+		},
+	);
 });
 
 // conn.connect(function (err) {
