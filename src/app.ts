@@ -77,7 +77,7 @@ io.on('connection', (socket) => {
 			if (sendResult.result === 'success' && toUserId) {
 				const user = getConnectedUser(toUserId);
 				if (user) {
-					io.to(user.socketId);
+					io.to(user.socketId).emit('newMessageReceived');
 				}
 			}
 		},
