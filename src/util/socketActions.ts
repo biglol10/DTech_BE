@@ -32,10 +32,14 @@ export const sendPrivateMessageFunction = async (
 		};
 	}
 
-	const chatSql = `SELECT MESSAGE_ID, FROM_USERNAME, TO_USERNAME, MESSAGE_TEXT, IMG_LIST, LINK_LIST, SENT_DATETIME, USER_UID, CONVERSATION_ID FROM USER_CHAT WHERE CONVERSATION_ID = '${convId}' ORDER BY SENT_DATETIME`;
-	const resultChatList = await queryExecutorResult(chatSql);
+	const messageTransactionAfter = await queryExecutorResultProcedure('MessageTransactionAfter', [
+		userUID,
+		convId,
+	]);
 
-	if (resultChatList.status === 'error') {
+	const { status, queryResult } = messageTransactionAfter;
+
+	if (status === 'error') {
 		return {
 			result: 'error',
 		};
@@ -43,7 +47,7 @@ export const sendPrivateMessageFunction = async (
 
 	return {
 		result: 'success',
-		chatList: resultChatList.queryResult,
+		chatList: queryResult,
 		convId,
 	};
 };
