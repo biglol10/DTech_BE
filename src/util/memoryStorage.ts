@@ -103,6 +103,11 @@ const removeUser2 = (socketId: string) => {
 	return;
 };
 
+const getConnectedUser = (userId: string) => {
+	const user = usersSocket.find((item) => item.userId === userId);
+	return user;
+};
+
 export {
 	metadataStorage,
 	usersSocket,
@@ -113,4 +118,5 @@ export {
 	removeUser2,
 	addUserRoom,
 	removeUserRoom,
+	getConnectedUser,
 };

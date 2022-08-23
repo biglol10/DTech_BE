@@ -176,6 +176,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 			time,
 			token,
 			result: 'success',
+			userUID: selectedUser[0].USER_UID,
 		});
 	} else {
 		return res.status(401).json({

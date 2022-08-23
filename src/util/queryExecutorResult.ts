@@ -1,24 +1,33 @@
 import conn from '@src/dbConn/dbConnection';
 
-const queryExecutor = (sql: string) => {
+interface IResultData {
+	status: 'success' | 'error';
+	queryResult: null | any;
+	code?: any;
+	errno?: string | number;
+	sqlMessage?: string;
+}
+
+const queryExecutor = (sql: string): Promise<IResultData | any> => {
 	return new Promise((resolve, reject) => {
 		conn.query(sql, function (err, result, fields) {
-			if (err) {
+			if (err as any) {
 				reject(err);
 			}
-			resolve({
+			const successResult: IResultData = {
 				status: 'success',
 				queryResult: result,
-			});
+			};
+			resolve(successResult);
 		});
 	});
 };
 
-const queryExecutorResult = async (sql: string) => {
-	let resultData: any = null;
+const queryExecutorResult = async (sql: string): Promise<IResultData> => {
+	let resultData: IResultData | null = null;
 
 	try {
-		resultData = await queryExecutor(sql);
+		resultData = (await queryExecutor(sql)) as IResultData;
 	} catch (err: any) {
 		resultData = {
 			status: 'error',
@@ -37,7 +46,10 @@ const queryExecutorResult = async (sql: string) => {
  ********************************************************************************************
  * 예시: queryExecutorProcedure(프로시저 명, [param1, param2])
  ********************************************************************************************/
-const queryExecutorProcedure = (procedureName: string, param: null | (string | number)[]) => {
+const queryExecutorProcedure = (
+	procedureName: string,
+	param: null | (string | number)[],
+): Promise<IResultData | any> => {
 	return new Promise((resolve, reject) => {
 		if (param) {
 			const tempString = param.reduce((previouseValue, currentValue, currentIndex) => {
@@ -47,13 +59,14 @@ const queryExecutorProcedure = (procedureName: string, param: null | (string | n
 				return previouseValue + '?,';
 			}, '');
 			conn.query(`call ${procedureName}(${tempString})`, param, function (err, result) {
-				if (err) {
+				if (err as any) {
 					reject(err);
 				}
-				resolve({
+				const successResult: IResultData = {
 					status: 'success',
-					queryResult: result,
-				});
+					queryResult: result[0],
+				};
+				resolve(successResult);
 			});
 		} else {
 			conn.query(`call ${procedureName}`, function (err, result) {
@@ -72,11 +85,11 @@ const queryExecutorProcedure = (procedureName: string, param: null | (string | n
 const queryExecutorResultProcedure = async (
 	procedureName: string,
 	param: (string | number)[] | null = null,
-) => {
-	let resultData: any = null;
+): Promise<IResultData> => {
+	let resultData: IResultData | null = null;
 
 	try {
-		resultData = await queryExecutorProcedure(procedureName, param);
+		resultData = (await queryExecutorProcedure(procedureName, param)) as IResultData;
 	} catch (err: any) {
 		resultData = {
 			status: 'error',
