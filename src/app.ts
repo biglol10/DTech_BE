@@ -79,6 +79,8 @@ io.on('connection', (socket) => {
 				if (user) {
 					io.to(user.socketId).emit('newMessageReceived');
 				}
+
+				socket.emit('messageSendSuccess');
 			}
 		},
 	);
