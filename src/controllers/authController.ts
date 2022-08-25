@@ -53,6 +53,8 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 	const sql = `INSERT INTO USER(USER_UID, USER_ID, NAME, PASSWD, TEAM_CD, TITLE, PHONENUM, DETAIL, REGISTER_DATE, ADMIN) VALUES ('${uuid}', '${user_id}', '${name}', '${hashedPassword}', '${team}', '${title}','${phonenum}', '${detail}', CURRENT_TIMESTAMP,  0)`;
 
 	const resultData = await queryExecutorResult(sql);
+
+	console.log(resultData);
 	let resultData2 = { status: 'success' };
 	if (tech_list.length > 0 && resultData.status === 'success') {
 		console.log('tech_list!!');
