@@ -1,5 +1,4 @@
 import express, { Request, Response, NextFunction } from 'express';
-import conn from '@src/dbConn/dbConnection';
 import { authRoute, dashboardRoute, testRoute, utilsRoute, chatRoute } from '@src/routes/index';
 import cors from 'cors';
 import errorHandler from '@src/middleware/error';
@@ -79,9 +78,19 @@ io.on('connection', (socket) => {
 				if (user) {
 					io.to(user.socketId).emit('newMessageReceived');
 				}
+
+				socket.emit('messageSendSuccess');
 			}
 		},
 	);
+
+	require('./util/socketDefinition')(socket);
+
+	// return io;
+
+	// socket.on('textChangeNotification', ({ sendingUser }) => {
+	// 	socket.broadcast.emit('textChangeNotification', sendingUser);
+	// });
 });
 
 // conn.connect(function (err) {
