@@ -86,6 +86,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 			name,
 			title,
 			user_id,
+			uuid,
 			time,
 			token,
 			result: 'success',
@@ -136,6 +137,17 @@ export const getTeamList = asyncHandler(async (req, res, next) => {
 	}
 });
 
+export const setProfileImage = asyncHandler(async (req, res, next) => {
+	const upload = require('../middleware/multer');
+	upload.single('img')(req, res, (err: any) => {
+		console.log('setProfileImage');
+		console.log(req);
+		// console.log(`error~`, err);
+		return res.status(200).json({
+			result: 'success',
+		});
+	});
+});
 export const getTechList = asyncHandler(async (req, res, next) => {
 	const sql = 'SELECT * FROM TECH';
 

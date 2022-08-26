@@ -11,9 +11,10 @@ import {
 	getTechList,
 	getUsersStatus,
 	getUsersInfo,
+	setProfileImage,
 } from '@src/controllers/authController';
 import { protectedApi } from '@src/middleware/auth';
-const image = require('../controllers/image');
+// const image = require('../controllers/image');
 
 const multer = require('multer');
 
@@ -46,15 +47,7 @@ router.route('/getTeamList').post(getTeamList);
 
 router.route('/getTechList').post(getTechList);
 
-// router.route('/uploadUserImg').post(upload.single('img'), uploadUserImgS3);
-router.post(
-	'/uploadUserImg',
-	(req, res) =>
-		upload.single('img')(req, res, (err: any) => {
-			console.log(`error~`, err);
-		}),
-	image.post,
-);
+router.post('/uploadUserImg', setProfileImage);
 
 router.post('/getLoggedInUserInfo', protectedApi, getUserByToken);
 

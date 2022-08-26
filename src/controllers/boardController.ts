@@ -1,6 +1,32 @@
 import asyncHandler from '@src/middleware/async';
-import { queryExecutorResult } from '@src/util/queryExecutorResult';
+import { queryExecutorResult, queryExecutorResult2 } from '@src/util/queryExecutorResult';
 
+export const setSubmitBoard = asyncHandler(async (req, res, next) => {
+	const upload = require('../middleware/multer');
+	console.log('setSubmitBoard');
+	upload.array('imgs')(req, res, (err: any) => {
+		console.log('upload.array');
+		// console.log(req);
+	});
+	// console.log(req.body.content);
+	// console.log(req.body.content.imgList[0].imageFile);
+	// const sql = `INSERT INTO BOARD VALUES
+	// (NEXTVAL(\'BOARD\'),'49989168c6d2f00f1d6a',current_timestamp(),
+	// '제목',?,0,0, null,null);
+	// `;
+
+	// const resultData = await queryExecutorResult2(sql, [req.body.content.value]);
+
+	// console.log(resultData);
+	// if (resultData.status === 'success') {
+	// 	// const upload = require('../middleware/multer');
+	// } else {
+	// 	return res.status(401).json({
+	// 		resultData,
+	// 		message: 'query execute failed',
+	// 	});
+	// }
+});
 export const setBoardLike = asyncHandler(async (req, res, next) => {
 	console.log('setBoardLike');
 	console.log(req.body);

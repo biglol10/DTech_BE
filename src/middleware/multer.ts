@@ -12,11 +12,14 @@ const upload = multer({
 		contentType: multerS3.AUTO_CONTENT_TYPE,
 		key: function (req: any, file: any, cb: any) {
 			console.log('multers3');
-			console.log(file);
-			cb(null, `${Date.now()}_${file.originalname}`);
+			// console.log(req);
+			// console.log(file);
+			cb(null, `profile_img/${file.originalname}`);
 			// console.log('end');
 		},
 	}),
 });
+
+// const upload2 = ()
 
 module.exports = upload;
