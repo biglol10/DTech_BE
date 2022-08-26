@@ -22,7 +22,7 @@ export const getMetadata = asyncHandler(async (req, res, next) => {
 	});
 });
 
-const axiosFetchMetadata = async (url: string) => {
+export const axiosFetchMetadata = async (url: string) => {
 	if (
 		Object.prototype.hasOwnProperty.call(metadataStorage, url) &&
 		metadataStorage[url].status === 'success'
