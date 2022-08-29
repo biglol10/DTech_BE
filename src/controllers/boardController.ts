@@ -1,36 +1,53 @@
 import asyncHandler from '@src/middleware/async';
 import { queryExecutorResult, queryExecutorResult2 } from '@src/util/queryExecutorResult';
+import { uploadImg } from '@src/util/s3Connect';
 
 export const setSubmitBoard = asyncHandler(async (req, res, next) => {
-	const upload = require('../middleware/multer');
-	console.log('setSubmitBoard');
-	upload.array('imgs')(req, res, (err: any) => {
-		console.log('upload.array');
-		// console.log(req);
-	});
-	// console.log(req.body.content);
-	// console.log(req.body.content.imgList[0].imageFile);
-	// const sql = `INSERT INTO BOARD VALUES
-	// (NEXTVAL(\'BOARD\'),'49989168c6d2f00f1d6a',current_timestamp(),
-	// '제목',?,0,0, null,null);
-	// `;
+	let { type, title, uuid, tech, content, formData } = req.body;
+	if (tech === '') {
+		tech = null;
+	}
 
-	// const resultData = await queryExecutorResult2(sql, [req.body.content.value]);
+	const sql = `INSERT INTO BOARD VALUES
+	(NEXTVAL(\'BOARD\'),?,current_timestamp(),
+	?,?,?)`;
+	const resultData: any = await queryExecutorResult2(sql, [uuid, title, content, tech]);
 
-	// console.log(resultData);
-	// if (resultData.status === 'success') {
-	// 	// const upload = require('../middleware/multer');
-	// } else {
-	// 	return res.status(401).json({
-	// 		resultData,
-	// 		message: 'query execute failed',
-	// 	});
-	// }
+	if (resultData.status === 'success') {
+		const sql2 = `select BOARD_CD, title from BOARD 
+		where USER_UID=?
+		order by BDATE DESC
+		limit 1;`;
+		const resultData2 = await queryExecutorResult2(sql2, [uuid]);
+
+		if (resultData2.status === 'success') {
+			return res.status(200).json({
+				result: 'success',
+				resultData: resultData2,
+			});
+		} else {
+			return res.status(401).json({
+				resultData,
+				message: 'query2 execute failed',
+				status: resultData.status || 'err from node',
+			});
+		}
+	} else {
+		return res.status(401).json({
+			resultData,
+			message: 'query execute failed',
+			status: resultData.status || 'err from node',
+		});
+	}
 });
-export const setBoardLike = asyncHandler(async (req, res, next) => {
-	console.log('setBoardLike');
-	console.log(req.body);
 
+export const setBoardImage = asyncHandler(async (req, res, next) => {
+	// console.log('setBoardImg');
+	// console.log(req);
+	uploadImg(req, res, 'img', 'board/');
+});
+
+export const setBoardLike = asyncHandler(async (req, res, next) => {
 	let sql = '';
 	if (req.body.like === true) {
 		sql = `INSERT INTO BOARD_COMMENT VALUES(NEXTVAL('CMNT'),
@@ -46,8 +63,6 @@ export const setBoardLike = asyncHandler(async (req, res, next) => {
 	}
 
 	const resultData = await queryExecutorResult(sql);
-	console.log(resultData);
-
 	if (resultData.status === 'success') {
 		return res.status(200).json({
 			resultData,
@@ -79,7 +94,6 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
 
 	const sql2 = 'select BOARD_CD,URL_ORDER,URL as url from BOARD_URL where URL_TYPE="image"';
 	const resultImg = await queryExecutorResult(sql2);
-	// console.log(resultImg);
 
 	if (resultData.status === 'success' && resultImg.status === 'success') {
 		resultData.queryResult.map((board: any) => {
