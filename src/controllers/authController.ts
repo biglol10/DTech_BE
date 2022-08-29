@@ -9,6 +9,7 @@ import utc from 'dayjs/plugin/utc';
 import { generateUID } from '@src/util/customFunc';
 import { Request, Response, NextFunction } from 'express';
 import { usersSocket } from '@src/util/memoryStorage';
+import { io } from '@src/app';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -69,6 +70,8 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 		// 	: 30;
 
 		const { token, options } = tokenResponse(user_id, process.env.JWT_SECRET);
+
+		io.emit('newUserCreated');
 
 		return res.status(200).cookie('user_token', token, options).json({
 			name,
