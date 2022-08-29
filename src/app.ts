@@ -14,18 +14,13 @@ import {
 	removeUser2,
 	getConnectedUser,
 } from './util/memoryStorage';
+import ioInstance from './util/socketIO';
 
 const app = express();
 
 const server = http.createServer(app);
 // const io = new Server(server);
-const io = new Server(server, {
-	cors: {
-		origin: ['http://localhost:3065', 'https://dev.example.com'],
-		allowedHeaders: ['my-custom-header'],
-		credentials: true,
-	},
-});
+export const io = ioInstance(server);
 
 const PORT = 3066;
 
