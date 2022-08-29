@@ -24,18 +24,13 @@ import {
 	removeUser2,
 	getConnectedUser,
 } from './util/memoryStorage';
+import ioInstance from './util/socketIO';
 
 const app = express();
 
 const server = http.createServer(app);
 // const io = new Server(server);
-const io = new Server(server, {
-	cors: {
-		origin: ['http://localhost:3065', 'https://dev.example.com'],
-		allowedHeaders: ['my-custom-header'],
-		credentials: true,
-	},
-});
+export const io = ioInstance(server);
 
 const PORT = 3066;
 
@@ -86,10 +81,16 @@ io.on('connection', (socket) => {
 			if (sendResult.result === 'success' && toUserId) {
 				const user = getConnectedUser(toUserId);
 				if (user) {
-					io.to(user.socketId).emit('newMessageReceived');
+					io.to(user.socketId).emit('newMessageReceived', {
+						chatListSocket: sendResult.chatList,
+						convIdSocket: sendResult.convId,
+					});
 				}
 
-				socket.emit('messageSendSuccess');
+				socket.emit('messageSendSuccess', {
+					chatListSocket: sendResult.chatList,
+					convIdSocket: sendResult.convId,
+				});
 			}
 		},
 	);
