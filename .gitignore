@@ -10,8 +10,14 @@ Dockerfile
 
 config.env
 
+awsconfig.json
+
 /.env.local
 
 /.dockerignore
 
 /.vscode/settings.json
+
+/images/userImg
+package-lock.json
+package-lock.json

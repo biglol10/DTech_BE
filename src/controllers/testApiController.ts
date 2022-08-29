@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import asyncHandler from '@src/middleware/async';
-import queryExecutorResult from '@src/util/queryExecutorResult';
+import { queryExecutorResult } from '@src/util/queryExecutorResult';
 import { IGetUserAuthInfoRequest } from '@src/util/commTypes';
 
 export const getTestApi = asyncHandler(async (req, res, next) => {
@@ -36,9 +36,6 @@ export const getTestApi2 = asyncHandler(async (req, res, next) => {
 export const postTestApiWithLogin = asyncHandler(
 	async (req: IGetUserAuthInfoRequest, res, next) => {
 		const resultData = await waitingTime();
-
-		console.log('req user is');
-		console.log(req.user);
 
 		res.status(200).json({
 			success: true,
