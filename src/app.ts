@@ -76,10 +76,16 @@ io.on('connection', (socket) => {
 			if (sendResult.result === 'success' && toUserId) {
 				const user = getConnectedUser(toUserId);
 				if (user) {
-					io.to(user.socketId).emit('newMessageReceived');
+					io.to(user.socketId).emit('newMessageReceived', {
+						chatListSocket: sendResult.chatList,
+						convIdSocket: sendResult.convId,
+					});
 				}
 
-				socket.emit('messageSendSuccess');
+				socket.emit('messageSendSuccess', {
+					chatListSocket: sendResult.chatList,
+					convIdSocket: sendResult.convId,
+				});
 			}
 		},
 	);
