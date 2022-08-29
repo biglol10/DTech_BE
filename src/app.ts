@@ -1,10 +1,20 @@
 import express, { Request, Response, NextFunction } from 'express';
+
 import conn from '@src/dbConn/dbConnection';
-import { authRoute, boardRoute, dashboardRoute, testRoute, utilsRoute } from '@src/routes/index';
+import {
+	authRoute,
+	dashboardRoute,
+	testRoute,
+	utilsRoute,
+	chatRoute,
+	boardRoute,
+} from '@src/routes/index';
+
 import cors from 'cors';
 import errorHandler from '@src/middleware/error';
 import http from 'http';
 import { Server } from 'socket.io';
+import { sendPrivateMessageFunction } from './util/socketActions';
 import {
 	usersSocket,
 	addUser,
@@ -12,6 +22,7 @@ import {
 	usersSocket2,
 	addUser2,
 	removeUser2,
+	getConnectedUser,
 } from './util/memoryStorage';
 
 const app = express();
@@ -51,6 +62,45 @@ io.on('connection', (socket) => {
 		await removeUser(socket.id);
 		clearInterval(interval);
 	});
+
+	socket.on(
+		'sendPrivateMessage',
+		async ({
+			chatMessage,
+			userUID,
+			convId,
+			imgList,
+			linkList,
+			toUserId,
+		}: {
+			[keys: string]: string;
+		}) => {
+			const sendResult = await sendPrivateMessageFunction(
+				chatMessage,
+				userUID,
+				convId,
+				imgList,
+				linkList,
+			);
+
+			if (sendResult.result === 'success' && toUserId) {
+				const user = getConnectedUser(toUserId);
+				if (user) {
+					io.to(user.socketId).emit('newMessageReceived');
+				}
+
+				socket.emit('messageSendSuccess');
+			}
+		},
+	);
+
+	require('./util/socketDefinition')(socket);
+
+	// return io;
+
+	// socket.on('textChangeNotification', ({ sendingUser }) => {
+	// 	socket.broadcast.emit('textChangeNotification', sendingUser);
+	// });
 });
 
 // conn.connect(function (err) {
@@ -79,6 +129,7 @@ app.use('/api/dashboard', dashboardRoute);
 app.use('/api/testApi', testRoute);
 app.use('/api/utils', utilsRoute);
 app.use('/api/board', boardRoute);
+app.use('/api/chat', chatRoute);
 
 app.use(errorHandler);
 
