@@ -21,3 +21,5 @@ awsconfig.json
 /images/userImg
 package-lock.json
 package-lock.json
+
+/config/s3.json
