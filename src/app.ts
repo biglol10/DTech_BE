@@ -1,5 +1,15 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { authRoute, dashboardRoute, testRoute, utilsRoute, chatRoute } from '@src/routes/index';
+
+import conn from '@src/dbConn/dbConnection';
+import {
+	authRoute,
+	dashboardRoute,
+	testRoute,
+	utilsRoute,
+	chatRoute,
+	boardRoute,
+} from '@src/routes/index';
+
 import cors from 'cors';
 import errorHandler from '@src/middleware/error';
 import http from 'http';
@@ -119,6 +129,7 @@ app.use('/api/auth', authRoute);
 app.use('/api/dashboard', dashboardRoute);
 app.use('/api/testApi', testRoute);
 app.use('/api/utils', utilsRoute);
+app.use('/api/board', boardRoute);
 app.use('/api/chat', chatRoute);
 
 app.use(errorHandler);
