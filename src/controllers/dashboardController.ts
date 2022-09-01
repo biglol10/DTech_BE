@@ -17,95 +17,112 @@ export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
 	const memberDashboard = `SELECT T1.USER_UID, T1.USER_ID, T1.NAME AS USER_NAME, T1.TEAM_CD, T1.TITLE, T1.PHONENUM, T1.DETAIL, T1.IMG_URL, T1.GITHUB_URL, T1.DOMAIN, T1.PRJ_DETAIL, T2.TECH_CD, T3.NAME AS TECH_NAME FROM USER AS T1 LEFT JOIN USER_TECH AS T2 ON T1.USER_UID = T2.USER_UID LEFT JOIN TECH AS T3 ON T2.TECH_CD = T3.TECH_CD ORDER BY T1.TITLE DESC, T1.NAME;`;
 	const resultData2 = await queryExecutorResult(memberDashboard);
 
-	if (resultData1.status === 'error' || resultData2.status === 'error') {
+	const teamSkillCount = `SELECT T1.NAME AS SKILL_NM, T3.NAME AS USER_NM, T3.USER_UID, T3.TEAM_CD, T3.TITLE, T3.IMG_URL, T1.SKILL_CNT FROM (SELECT T2.NAME, T2.TECH_CD, COUNT(*) AS SKILL_CNT FROM USER_TECH AS T1 INNER JOIN TECH AS T2 ON T1.TECH_CD = T2.TECH_CD GROUP BY T2.NAME, T2.TECH_CD) AS T1 LEFT JOIN USER_TECH AS T2 ON T1.TECH_CD = T2.TECH_CD LEFT JOIN USER AS T3 ON T2.USER_UID = T3.USER_UID;`;
+	const resultData3 = await queryExecutorResult(teamSkillCount);
+
+	if (
+		resultData1.status === 'error' ||
+		resultData2.status === 'error' ||
+		resultData3.status === 'error'
+	) {
 		return next(new ErrorResponse('팀 스킬 조회에 실패했습니다', 403));
 	}
 
+	const skillObj: any = {};
+	resultData3.queryResult.map((item: any) => {
+		if (!skillObj[item.SKILL_NM]) {
+			skillObj[item.SKILL_NM] = resultData3.queryResult.filter(
+				(item2: any) => item2.SKILL_NM === item.SKILL_NM,
+			);
+		}
+	});
+
 	res.status(200).json({
 		teamSkillDashboard: resultData1.queryResult,
+		teamSkillCountArr: Object.keys(skillObj).map((item) => skillObj[item]),
 		userDashboard: userSkillReduce(resultData2.queryResult),
-		teamSkillData: [
-			{
-				subject: 'React',
-				count: 10,
-			},
-			{
-				subject: 'Node',
-				count: 6,
-			},
-			{
-				subject: 'Vue',
-				count: 3,
-			},
-			{
-				subject: 'Typescript',
-				count: 7,
-			},
-			{
-				subject: 'Spring',
-				count: 5,
-			},
-			{
-				subject: 'Express',
-				count: 8,
-			},
-			{
-				subject: 'SCSS',
-				count: 4,
-			},
-			{
-				subject: 'Jquery',
-				count: 2,
-			},
-			{
-				subject: 'Docker',
-				count: 4,
-			},
-			{
-				subject: 'ASPNET',
-				count: 2,
-			},
-			{
-				subject: 'React',
-				count: 10,
-			},
-			{
-				subject: 'Node',
-				count: 6,
-			},
-			{
-				subject: 'Vue',
-				count: 3,
-			},
-			{
-				subject: 'Typescript',
-				count: 7,
-			},
-			{
-				subject: 'Spring',
-				count: 5,
-			},
-			{
-				subject: 'Express',
-				count: 8,
-			},
-			{
-				subject: 'SCSS',
-				count: 4,
-			},
-			{
-				subject: 'Jquery',
-				count: 2,
-			},
-			{
-				subject: 'Docker',
-				count: 4,
-			},
-			{
-				subject: 'ASPNET',
-				count: 2,
-			},
-		],
+		// teamSkillData: [
+		// 	{
+		// 		subject: 'React',
+		// 		count: 10,
+		// 	},
+		// 	{
+		// 		subject: 'Node',
+		// 		count: 6,
+		// 	},
+		// 	{
+		// 		subject: 'Vue',
+		// 		count: 3,
+		// 	},
+		// 	{
+		// 		subject: 'Typescript',
+		// 		count: 7,
+		// 	},
+		// 	{
+		// 		subject: 'Spring',
+		// 		count: 5,
+		// 	},
+		// 	{
+		// 		subject: 'Express',
+		// 		count: 8,
+		// 	},
+		// 	{
+		// 		subject: 'SCSS',
+		// 		count: 4,
+		// 	},
+		// 	{
+		// 		subject: 'Jquery',
+		// 		count: 2,
+		// 	},
+		// 	{
+		// 		subject: 'Docker',
+		// 		count: 4,
+		// 	},
+		// 	{
+		// 		subject: 'ASPNET',
+		// 		count: 2,
+		// 	},
+		// 	{
+		// 		subject: 'React',
+		// 		count: 10,
+		// 	},
+		// 	{
+		// 		subject: 'Node',
+		// 		count: 6,
+		// 	},
+		// 	{
+		// 		subject: 'Vue',
+		// 		count: 3,
+		// 	},
+		// 	{
+		// 		subject: 'Typescript',
+		// 		count: 7,
+		// 	},
+		// 	{
+		// 		subject: 'Spring',
+		// 		count: 5,
+		// 	},
+		// 	{
+		// 		subject: 'Express',
+		// 		count: 8,
+		// 	},
+		// 	{
+		// 		subject: 'SCSS',
+		// 		count: 4,
+		// 	},
+		// 	{
+		// 		subject: 'Jquery',
+		// 		count: 2,
+		// 	},
+		// 	{
+		// 		subject: 'Docker',
+		// 		count: 4,
+		// 	},
+		// 	{
+		// 		subject: 'ASPNET',
+		// 		count: 2,
+		// 	},
+		// ],
 	});
 });
 
