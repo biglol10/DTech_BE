@@ -91,7 +91,6 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
     from BOARD B`;
 
 	const resultData = await queryExecutorResult2(sql);
-
 	const sql2 = 'select BOARD_CD,URL_ORDER,URL_ADDR as url from BOARD_URL where URL_TYPE="image"';
 	const resultImg = await queryExecutorResult2(sql2);
 
