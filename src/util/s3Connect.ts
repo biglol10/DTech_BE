@@ -17,8 +17,8 @@ const upload = multer({
 		acl: 'public-read-write',
 		contentType: multerS3.AUTO_CONTENT_TYPE,
 		key: function (req: any, file: any, cb: any) {
-			console.log('upload');
-			console.log(req.body);
+			// console.log('upload');
+			// console.log(req.body);
 			cb(null, `${DIR_PATH}${file.originalname}`);
 		},
 	}),

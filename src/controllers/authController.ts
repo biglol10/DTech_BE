@@ -61,10 +61,6 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 		detail,
 	]);
 
-	console.log('BOTEMP : resultData');
-	console.log(uuid);
-	console.log(resultData);
-
 	let resultData2 = { status: 'success' };
 	if (tech_list.length > 0 && resultData.status === 'success') {
 		let techValues = '';
@@ -75,9 +71,6 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
 		const sql = `INSERT INTO USER_TECH(TECH_UID,TECH_CD) VALUES ?`;
 		resultData2 = await queryExecutorResult2(sql, [techValues]);
-
-		console.log('BOTEMP : resultData2');
-		console.log(resultData2);
 	}
 	if (
 		resultData.status === 'success' &&
