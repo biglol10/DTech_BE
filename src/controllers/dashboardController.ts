@@ -39,7 +39,8 @@ export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
 
 	res.status(200).json({
 		teamSkillDashboard: resultData1.queryResult,
-		teamSkillCountArr: Object.keys(skillObj).map((item) => skillObj[item]),
+		teamSkillCountObj: skillObj,
+		// teamSkillCountArr: Object.keys(skillObj).map((item) => skillObj[item]),
 		userDashboard: userSkillReduce(resultData2.queryResult),
 		// teamSkillData: [
 		// 	{
