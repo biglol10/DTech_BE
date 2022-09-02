@@ -17,7 +17,8 @@ const upload = multer({
 		acl: 'public-read-write',
 		contentType: multerS3.AUTO_CONTENT_TYPE,
 		key: function (req: any, file: any, cb: any) {
-			// console.log(file);
+			console.log('upload');
+			console.log(req.body);
 			cb(null, `${DIR_PATH}${file.originalname}`);
 		},
 	}),
@@ -25,7 +26,8 @@ const upload = multer({
 
 const uploadImg = async (req: any, res: any, key: string, path: string) => {
 	DIR_PATH = path;
-
+	// console.log('result');
+	// console.log(req);
 	upload.array(key)(req, res, (err: any) => {
 		if (err !== undefined) {
 			console.log(`error~`, err);

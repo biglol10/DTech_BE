@@ -14,7 +14,7 @@ export const setSubmitBoard = asyncHandler(async (req, res, next) => {
 	const resultData: any = await queryExecutorResult2(sql, [uuid, title, content, tech]);
 
 	if (resultData.status === 'success') {
-		const sql2 = `select BOARD_CD, title from BOARD 
+		const sql2 = `select BOARD_CD, BOARD_TITLE from BOARD 
 		where USER_UID=?
 		order by BDATE DESC
 		limit 1;`;
@@ -52,17 +52,17 @@ export const setBoardLike = asyncHandler(async (req, res, next) => {
 	if (req.body.like === true) {
 		sql = `INSERT INTO BOARD_COMMENT VALUES(NEXTVAL('CMNT'),
     '${req.body.id}','like',
-    (select USER_UID from USER where USER_ID='${req.body.userId}'),
+    (select USER_UID from USER where USER_ID=?),
     null,null,current_timestamp()); 
     `;
 	} else {
 		sql = `delete from BOARD_COMMENT 
     WHERE BOARD_CD='${req.body.id}' 
-    AND USER_UID=(SELECT USER_UID FROM USER WHERE USER_ID='${req.body.userId}');
+    AND USER_UID=(SELECT USER_UID FROM USER WHERE USER_ID=?);
     `;
 	}
 
-	const resultData = await queryExecutorResult(sql);
+	const resultData = await queryExecutorResult2(sql, [req.body.userId]);
 	if (resultData.status === 'success') {
 		return res.status(200).json({
 			resultData,
@@ -90,10 +90,10 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
     ),0) as "LIKES_CNT"
     from BOARD B`;
 
-	const resultData = await queryExecutorResult(sql);
+	const resultData = await queryExecutorResult2(sql);
 
-	const sql2 = 'select BOARD_CD,URL_ORDER,URL as url from BOARD_URL where URL_TYPE="image"';
-	const resultImg = await queryExecutorResult(sql2);
+	const sql2 = 'select BOARD_CD,URL_ORDER,URL_ADDR as url from BOARD_URL where URL_TYPE="image"';
+	const resultImg = await queryExecutorResult2(sql2);
 
 	if (resultData.status === 'success' && resultImg.status === 'success') {
 		resultData.queryResult.map((board: any) => {

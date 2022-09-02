@@ -1,5 +1,5 @@
 import asyncHandler from '@src/middleware/async';
-import { queryExecutorResult } from '@src/util/queryExecutorResult';
+import { queryExecutorResult, queryExecutorResult2 } from '@src/util/queryExecutorResult';
 import ErrorResponse from '@src/util/errorResponse';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
@@ -45,9 +45,25 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 	const hashedPassword = await bcrypt.hash(passwd, salt);
 	const uuid = generateUID();
 
-	const sql = `INSERT INTO USER(USER_UID, USER_ID, NAME, PASSWD, TEAM_CD, TITLE, PHONENUM, DETAIL, REGISTER_DATE, ADMIN) VALUES ('${uuid}', '${user_id}', '${name}', '${hashedPassword}', '${team}', '${title}','${phonenum}', '${detail}', CURRENT_TIMESTAMP,  0)`;
+	const sql = `
+		INSERT INTO USER(USER_UID, USER_ID, USER_NM, USER_PW, USER_TEAM_CD, USER_TITLE, USER_PHONENUM, USER_DETAIL, REGISTER_DATE, USER_ADMIN_YN) 
+		VALUES (?, ?, ?, ?, ?, ?,?, ?, CURRENT_TIMESTAMP,  0)
+	`;
 
-	const resultData = await queryExecutorResult(sql);
+	const resultData: any = await queryExecutorResult2(sql, [
+		uuid,
+		user_id,
+		name,
+		hashedPassword,
+		team,
+		title,
+		phonenum,
+		detail,
+	]);
+
+	console.log('BOTEMP : resultData');
+	console.log(uuid);
+	console.log(resultData);
 
 	let resultData2 = { status: 'success' };
 	if (tech_list.length > 0 && resultData.status === 'success') {
@@ -57,8 +73,11 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 		}
 		techValues = techValues.slice(0, -1);
 
-		const sql = `INSERT INTO USER_TECH(USER_UID,TECH_CD) VALUES ${techValues};`;
-		resultData2 = await queryExecutorResult(sql);
+		const sql = `INSERT INTO USER_TECH(TECH_UID,TECH_CD) VALUES ?`;
+		resultData2 = await queryExecutorResult2(sql, [techValues]);
+
+		console.log('BOTEMP : resultData2');
+		console.log(resultData2);
 	}
 	if (
 		resultData.status === 'success' &&
@@ -90,9 +109,9 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
 export const idCheck = asyncHandler(async (req, res, next) => {
 	const { userId } = req.body;
-	const sql = `SELECT EXISTS (SELECT * FROM USER WHERE USER_ID = '${userId}') AS SUCCESS`;
+	const sql = `SELECT EXISTS (SELECT * FROM USER WHERE USER_ID = ?) AS SUCCESS`;
 
-	const resultData = await queryExecutorResult(sql);
+	const resultData = await queryExecutorResult2(sql, [userId]);
 	const foundId = resultData.queryResult[0].SUCCESS == 1 ? true : false;
 
 	if (resultData.status === 'success') {
@@ -111,7 +130,7 @@ export const idCheck = asyncHandler(async (req, res, next) => {
 export const getTeamList = asyncHandler(async (req, res, next) => {
 	const sql = 'SELECT * FROM TEAM';
 
-	const resultData = await queryExecutorResult(sql);
+	const resultData = await queryExecutorResult2(sql);
 	if (resultData.status === 'success') {
 		return res.status(200).json({
 			resultData,
@@ -130,7 +149,7 @@ export const setProfileImage = asyncHandler(async (req, res, next) => {
 export const getTechList = asyncHandler(async (req, res, next) => {
 	const sql = 'SELECT * FROM TECH';
 
-	const resultData = await queryExecutorResult(sql);
+	const resultData = await queryExecutorResult2(sql);
 	if (resultData.status === 'success') {
 		return res.status(200).json({
 			resultData,
