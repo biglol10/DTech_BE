@@ -170,7 +170,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('로그인에 실패했습니다', 401));
 	}
 
-	const isMatch = await matchPassword(password, selectedUser[0].PASSWD);
+	const isMatch = await matchPassword(password, selectedUser[0].USER_PW);
 
 	if (!isMatch) {
 		return next(new ErrorResponse('로그인에 실패했습니다', 401));
@@ -186,7 +186,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 		const time = dayjs();
 
 		return res.status(200).cookie('user_token', token, options).json({
-			name: selectedUser[0].NAME,
+			name: selectedUser[0].USER_NM,
 			userId,
 			time,
 			token,
@@ -215,10 +215,10 @@ export const getUsersStatus = asyncHandler(async (req, res, next) => {
 			return `${previouseValue}, '${currentValue}'`;
 		});
 
-		sqlScript = `SELECT USER_UID, USER_ID, NAME, TITLE, DETAIL, IMG_URL, 'ONLINE' AS ONLINE_STATUS FROM USER WHERE USER_ID IN (${
+		sqlScript = `SELECT USER_UID, USER_ID, USER_NM, USER_TITLE, USER_DETAIL, USER_IMG_URL, 'ONLINE' AS ONLINE_STATUS FROM USER WHERE USER_ID IN (${
 			usersOnline.length === 1 ? `'${stringReduce}'` : `${stringReduce}`
 		}) UNION `;
-		sqlScript += `SELECT USER_UID, USER_ID, NAME, TITLE, DETAIL, IMG_URL, 'OFFLINE' AS ONLINE_STATUS FROM USER WHERE USER_ID NOT IN (${
+		sqlScript += `SELECT USER_UID, USER_ID, USER_NM, USER_TITLE, USER_DETAIL, USER_IMG_URL, 'OFFLINE' AS ONLINE_STATUS FROM USER WHERE USER_ID NOT IN (${
 			usersOnline.length === 1 ? `'${stringReduce}'` : `${stringReduce}`
 		})`;
 
@@ -258,7 +258,7 @@ export const getUsersInfo = asyncHandler(async (req, res, next) => {
 			return `${previouseValue}, '${currentValue}'`;
 		});
 
-		sqlScript = `SELECT USER_UID, USER_ID, NAME, TITLE, DETAIL, IMG_URL FROM USER WHERE USER_UID IN (${
+		sqlScript = `SELECT USER_UID, USER_ID, USER_NM, USER_TITLE, USER_DETAIL, USER_IMG_URL FROM USER WHERE USER_UID IN (${
 			usersParam.length === 1 ? `'${stringReduce}'` : `${stringReduce}`
 		})`;
 
