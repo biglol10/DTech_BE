@@ -1,7 +1,7 @@
 import asyncHandler from '@src/middleware/async';
 import { queryExecutorResult, queryExecutorResultProcedure } from '@src/util/queryExecutorResult';
 import ErrorResponse from '@src/util/errorResponse';
-import { generateUID } from '@src/util/customFunc';
+import { generateUID, LinkArrFetchMetadata } from '@src/util/customFunc';
 import conn from '@src/dbConn/dbConnection';
 
 import { axiosFetchMetadata } from './utilsController';
@@ -29,24 +29,26 @@ export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('서버에서 에러가 발생했습니다', 400));
 	}
 
-	const metadataAxiosRequest = resultChatList.queryResult.map(async (item: any, idx: number) => {
-		if (item.LINK_LIST !== '[]') {
-			const linkArr = JSON.parse(item.LINK_LIST);
-			const metadataArr: any = [];
-			const metadataFetch = linkArr.map(async (url: string) => {
-				const metadataResult = await axiosFetchMetadata(url);
-				metadataArr.push(metadataResult);
-			});
+	resultChatList.queryResult = await LinkArrFetchMetadata(resultChatList.queryResult);
 
-			await Promise.all(metadataFetch);
+	// const metadataAxiosRequest = resultChatList.queryResult.map(async (item: any, idx: number) => {
+	// 	if (item.LINK_LIST !== '[]') {
+	// 		const linkArr = JSON.parse(item.LINK_LIST);
+	// 		const metadataArr: any = [];
+	// 		const metadataFetch = linkArr.map(async (url: string) => {
+	// 			const metadataResult = await axiosFetchMetadata(url);
+	// 			metadataArr.push(metadataResult);
+	// 		});
 
-			resultChatList.queryResult[idx].LINK_LIST = metadataArr;
-		} else {
-			resultChatList.queryResult[idx].LINK_LIST = [];
-		}
-	});
+	// 		await Promise.all(metadataFetch);
 
-	await Promise.all(metadataAxiosRequest);
+	// 		resultChatList.queryResult[idx].LINK_LIST = metadataArr;
+	// 	} else {
+	// 		resultChatList.queryResult[idx].LINK_LIST = [];
+	// 	}
+	// });
+
+	// await Promise.all(metadataAxiosRequest);
 
 	return res.status(200).json({
 		result: 'success',
