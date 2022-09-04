@@ -11,13 +11,13 @@ import ErrorResponse from '@src/util/errorResponse';
 // };
 
 export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
-	const teamSkillSetSql = `SELECT T1.TECH_CD, T2.NAME, T2.DETAIL, T2.PAGE_URL, count(*) AS COUNT from USER_TECH AS T1 INNER JOIN TECH T2 ON T1.TECH_CD = T2.TECH_CD GROUP BY TECH_CD;`;
+	const teamSkillSetSql = `SELECT T1.TECH_CD, T2.TECH_NM, T2.TECH_DETAIL, T2.TECH_PAGE_URL, count(*) AS TECH_CNT from USER_TECH AS T1 INNER JOIN TECH T2 ON T1.TECH_CD = T2.TECH_CD GROUP BY TECH_CD;`;
 	const resultData1 = await queryExecutorResult(teamSkillSetSql);
 
-	const memberDashboard = `SELECT T1.USER_UID, T1.USER_ID, T1.NAME AS USER_NAME, T1.TEAM_CD, T1.TITLE, T1.PHONENUM, T1.DETAIL, T1.IMG_URL, T1.GITHUB_URL, T1.DOMAIN, T1.PRJ_DETAIL, T2.TECH_CD, T3.NAME AS TECH_NAME FROM USER AS T1 LEFT JOIN USER_TECH AS T2 ON T1.USER_UID = T2.USER_UID LEFT JOIN TECH AS T3 ON T2.TECH_CD = T3.TECH_CD ORDER BY T1.TITLE DESC, T1.NAME;`;
+	const memberDashboard = `SELECT T1.USER_UID, T1.USER_ID, T1.USER_NM AS USER_NAME, T1.USER_TEAM_CD, T1.USER_TITLE, T1.USER_PHONENUM, T1.USER_DETAIL, T1.USER_IMG_URL, T1.GITHUB_URL, T1.USER_DOMAIN, T1.PRJ_DETAIL, T2.TECH_CD, T3.TECH_NM AS TECH_NAME FROM USER AS T1 LEFT JOIN USER_TECH AS T2 ON T1.USER_UID = T2.USER_UID LEFT JOIN TECH AS T3 ON T2.TECH_CD = T3.TECH_CD ORDER BY T1.USER_TITLE DESC, T1.USER_NM;`;
 	const resultData2 = await queryExecutorResult(memberDashboard);
 
-	const teamSkillCount = `SELECT T1.NAME AS SKILL_NM, T3.NAME AS USER_NM, T3.USER_UID, T3.TEAM_CD, T3.TITLE, T3.IMG_URL, T1.SKILL_CNT FROM (SELECT T2.NAME, T2.TECH_CD, COUNT(*) AS SKILL_CNT FROM USER_TECH AS T1 INNER JOIN TECH AS T2 ON T1.TECH_CD = T2.TECH_CD GROUP BY T2.NAME, T2.TECH_CD) AS T1 LEFT JOIN USER_TECH AS T2 ON T1.TECH_CD = T2.TECH_CD LEFT JOIN USER AS T3 ON T2.USER_UID = T3.USER_UID;`;
+	const teamSkillCount = `SELECT T1.TECH_NM, T3.USER_NM AS USER_NM, T3.USER_UID, T3.USER_TEAM_CD, T3.USER_TITLE, T3.USER_IMG_URL, T1.TECH_CNT FROM (SELECT T2.TECH_NM, T2.TECH_CD, COUNT(*) AS TECH_CNT FROM USER_TECH AS T1 INNER JOIN TECH AS T2 ON T1.TECH_CD = T2.TECH_CD GROUP BY T2.TECH_NM, T2.TECH_CD) AS T1 LEFT JOIN USER_TECH AS T2 ON T1.TECH_CD = T2.TECH_CD LEFT JOIN USER AS T3 ON T2.USER_UID = T3.USER_UID;`;
 	const resultData3 = await queryExecutorResult(teamSkillCount);
 
 	if (
@@ -30,9 +30,9 @@ export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
 
 	const skillObj: any = {};
 	resultData3.queryResult.map((item: any) => {
-		if (!skillObj[item.SKILL_NM]) {
-			skillObj[item.SKILL_NM] = resultData3.queryResult.filter(
-				(item2: any) => item2.SKILL_NM === item.SKILL_NM,
+		if (!skillObj[item.TECH_NM]) {
+			skillObj[item.TECH_NM] = resultData3.queryResult.filter(
+				(item2: any) => item2.TECH_NM === item.TECH_NM,
 			);
 		}
 	});
@@ -42,99 +42,17 @@ export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
 		teamSkillCountObj: skillObj,
 		// teamSkillCountArr: Object.keys(skillObj).map((item) => skillObj[item]),
 		userDashboard: userSkillReduce(resultData2.queryResult),
-		// teamSkillData: [
-		// 	{
-		// 		subject: 'React',
-		// 		count: 10,
-		// 	},
-		// 	{
-		// 		subject: 'Node',
-		// 		count: 6,
-		// 	},
-		// 	{
-		// 		subject: 'Vue',
-		// 		count: 3,
-		// 	},
-		// 	{
-		// 		subject: 'Typescript',
-		// 		count: 7,
-		// 	},
-		// 	{
-		// 		subject: 'Spring',
-		// 		count: 5,
-		// 	},
-		// 	{
-		// 		subject: 'Express',
-		// 		count: 8,
-		// 	},
-		// 	{
-		// 		subject: 'SCSS',
-		// 		count: 4,
-		// 	},
-		// 	{
-		// 		subject: 'Jquery',
-		// 		count: 2,
-		// 	},
-		// 	{
-		// 		subject: 'Docker',
-		// 		count: 4,
-		// 	},
-		// 	{
-		// 		subject: 'ASPNET',
-		// 		count: 2,
-		// 	},
-		// 	{
-		// 		subject: 'React',
-		// 		count: 10,
-		// 	},
-		// 	{
-		// 		subject: 'Node',
-		// 		count: 6,
-		// 	},
-		// 	{
-		// 		subject: 'Vue',
-		// 		count: 3,
-		// 	},
-		// 	{
-		// 		subject: 'Typescript',
-		// 		count: 7,
-		// 	},
-		// 	{
-		// 		subject: 'Spring',
-		// 		count: 5,
-		// 	},
-		// 	{
-		// 		subject: 'Express',
-		// 		count: 8,
-		// 	},
-		// 	{
-		// 		subject: 'SCSS',
-		// 		count: 4,
-		// 	},
-		// 	{
-		// 		subject: 'Jquery',
-		// 		count: 2,
-		// 	},
-		// 	{
-		// 		subject: 'Docker',
-		// 		count: 4,
-		// 	},
-		// 	{
-		// 		subject: 'ASPNET',
-		// 		count: 2,
-		// 	},
-		// ],
 	});
 });
 
 export const getUserSkillFilter = asyncHandler(async (req, res, next) => {
 	const { filterSkill, filterName } = req.body;
-	let userSkillFilterSql = `SELECT T1.USER_UID, T1.USER_ID, T1.NAME AS USER_NAME, T1.TEAM_CD, T1.TITLE, T1.PHONENUM, T1.DETAIL, T1.IMG_URL, T1.GITHUB_URL, T1.DOMAIN, T1.PRJ_DETAIL, T2.TECH_CD, T3.NAME AS TECH_NAME FROM USER AS T1 LEFT JOIN USER_TECH AS T2 ON T1.USER_UID = T2.USER_UID LEFT JOIN TECH AS T3 ON T2.TECH_CD = T3.TECH_CD WHERE 1 = 1`;
+	let userSkillFilterSql = `SELECT T1.USER_UID, T1.USER_ID, T1.USER_NM AS USER_NAME, T1.USER_TEAM_CD, T1.USER_TITLE, T1.USER_PHONENUM, T1.USER_DETAIL, T1.USER_IMG_URL, T1.GITHUB_URL, T1.USER_DOMAIN, T1.PRJ_DETAIL, T2.TECH_CD, T3.TECH_NM AS TECH_NAME FROM USER AS T1 LEFT JOIN USER_TECH AS T2 ON T1.USER_UID = T2.USER_UID LEFT JOIN TECH AS T3 ON T2.TECH_CD = T3.TECH_CD WHERE 1 = 1`;
 	if (filterSkill !== '전체') {
-		userSkillFilterSql += ` AND EXISTS (SELECT * FROM USER_TECH AS T4 INNER JOIN TECH AS T5 ON T4.TECH_CD = T5.TECH_CD AND T5.NAME = '${filterSkill}' AND T1.USER_UID = T4.USER_UID)`;
+		userSkillFilterSql += ` AND EXISTS (SELECT * FROM USER_TECH AS T4 INNER JOIN TECH AS T5 ON T4.TECH_CD = T5.TECH_CD AND T5.TECH_NM = '${filterSkill}' AND T1.USER_UID = T4.USER_UID)`;
 	}
 	if (filterName) {
-		userSkillFilterSql += ` AND T1.NAME LIKE '%${filterName}%'`;
+		userSkillFilterSql += ` AND T1.USER_NM LIKE '%${filterName}%'`;
 	}
 
 	const filterResult = await queryExecutorResult(userSkillFilterSql);
@@ -164,15 +82,14 @@ const userSkillReduce = (userDataResult: any) => {
 				USER_UID: item.USER_UID,
 				USER_ID: item.USER_ID,
 				USER_NAME: item.USER_NAME,
-				TEAM_CD: item.TEAM_CD,
-				TITLE: item.TITLE,
-				PHONENUM: item.PHONENUM,
-				DETAIL: item.DETAIL,
-				IMG_URL: item.IMG_URL,
+				USER_TEAM_CD: item.USER_TEAM_CD,
+				USER_TITLE: item.USER_TITLE,
+				USER_PHONENUM: item.USER_PHONENUM,
+				USER_DETAIL: item.USER_DETAIL,
+				USER_IMG_URL: item.USER_IMG_URL,
 				GITHUB_URL: item.GITHUB_URL,
-				DOMAIN: item.DOMAIN,
+				USER_DOMAIN: item.USER_DOMAIN,
 				PRJ_DETAIL: item.PRJ_DETAIL,
-				EMAIL: item.EMAIL,
 				TECH_ARR: skillsFilter,
 			};
 		}
