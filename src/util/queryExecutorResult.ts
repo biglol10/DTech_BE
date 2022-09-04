@@ -41,7 +41,7 @@ const queryExecutorResult = async (sql: string): Promise<IResultData> => {
 	return resultData;
 };
 
-const queryExecutor2 = (sql: string, val?: any) => {
+const queryExecutor2 = (sql: string, val?: (number | string)[]) => {
 	return new Promise((resolve, reject) => {
 		conn.query(sql, val, function (err, result, fields) {
 			if (err) {
@@ -55,7 +55,7 @@ const queryExecutor2 = (sql: string, val?: any) => {
 	});
 };
 
-const queryExecutorResult2 = async (sql: string, val?: any) => {
+const queryExecutorResult2 = async (sql: string, val?: (number | string)[]) => {
 	let resultData: any = null;
 
 	try {
