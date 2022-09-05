@@ -26,7 +26,7 @@ export const protectedApi = asyncHandler(async (req: IReqWithUser, res, next) =>
 			? jwt.verify(token, process.env.JWT_SECRET)
 			: '';
 		if (decoded) {
-			const sql = `SELECT USER_UID, USER_ID, USER_NM, USER_TEAM_CD, USER_TITLE, USER_ADMIN_YN FROM USER WHERE USER_ID = '${decoded.id}'`;
+			const sql = `SELECT USER_UID, USER_ID, USER_NM, TEAM_CD, USER_TITLE, USER_ADMIN_YN FROM USER WHERE USER_ID = '${decoded.id}'`;
 			const { status: isQuerySuccess, queryResult: selectedUser } = await queryExecutorResult(
 				sql,
 			);
