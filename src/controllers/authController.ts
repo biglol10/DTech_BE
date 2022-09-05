@@ -63,15 +63,20 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
 	let resultData2 = { status: 'success' };
 	if (tech_list.length > 0 && resultData.status === 'success') {
-		let techValues = '';
+		let techStr = '';
+		let techArr = [];
 		for (var i in tech_list) {
-			techValues += `('${uuid}','${tech_list[i]}'),`;
+			techStr += `(?,?),`;
+			techArr.push(uuid);
+			techArr.push(tech_list[i]);
 		}
-		techValues = techValues.slice(0, -1);
+		techStr = techStr.slice(0, -1);
 
-		const sql = `INSERT INTO USER_TECH(TECH_UID,TECH_CD) VALUES ?`;
-		resultData2 = await queryExecutorResult2(sql, [techValues]);
+		const sql = `INSERT INTO USER_TECH(USER_UID,TECH_CD) VALUES ` + techStr;
+
+		resultData2 = await queryExecutorResult2(sql, techArr);
 	}
+
 	if (
 		resultData.status === 'success' &&
 		resultData2.status === 'success' &&
