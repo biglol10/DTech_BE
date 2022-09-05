@@ -46,7 +46,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 	const uuid = generateUID();
 
 	const sql = `
-		INSERT INTO USER(USER_UID, USER_ID, USER_NM, USER_PW, USER_TEAM_CD, USER_TITLE, USER_PHONENUM, USER_DETAIL, REGISTER_DATE, USER_ADMIN_YN) 
+		INSERT INTO USER(USER_UID, USER_ID, USER_NM, USER_PW, TEAM_CD, USER_TITLE, USER_PHONENUM, USER_DETAIL, REGISTER_DATE, USER_ADMIN_YN) 
 		VALUES (?, ?, ?, ?, ?, ?,?, ?, CURRENT_TIMESTAMP,  0)
 	`;
 
