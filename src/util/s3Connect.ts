@@ -8,8 +8,6 @@ const s3 = new aws.S3();
 let DIR_PATH = '';
 let BOARD_ID = '';
 
-const upload2 = multer();
-
 const upload = multer({
 	storage: multerS3({
 		s3: s3,
@@ -17,8 +15,8 @@ const upload = multer({
 		acl: 'public-read-write',
 		contentType: multerS3.AUTO_CONTENT_TYPE,
 		key: function (req: any, file: any, cb: any) {
-			// console.log('upload');
-			// console.log(req.body);
+			console.log('upload');
+			console.log(req.body);
 			cb(null, `${DIR_PATH}${file.originalname}`);
 		},
 	}),
@@ -26,9 +24,14 @@ const upload = multer({
 
 const uploadImg = async (req: any, res: any, key: string, path: string) => {
 	DIR_PATH = path;
-	// console.log('result');
-	// console.log(req);
+	console.log('result');
+	console.log(req.body);
+	// upload2.single(key)(req, res, (err: any) => {
+	// 	console.log('upload2');
+	// 	console.log(JSON.parse(req.body.info[0]).content);
+	// });
 	upload.array(key)(req, res, (err: any) => {
+		console.log('array!!!');
 		if (err !== undefined) {
 			console.log(`error~`, err);
 		}
