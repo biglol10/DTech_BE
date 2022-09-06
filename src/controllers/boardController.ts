@@ -1,48 +1,47 @@
 import asyncHandler from '@src/middleware/async';
 import { queryExecutorResult2 } from '@src/util/queryExecutorResult';
 import { uploadImg } from '@src/util/s3Connect';
-const multer = require('multer');
 
-export const setSubmitBoard = asyncHandler(async (req, res, next) => {
-	let { type, title, uuid, tech, content, formData } = req.body;
-	if (tech === '') {
-		tech = null;
-	}
+// export const setSubmitBoard = asyncHandler(async (req, res, next) => {
+// 	let { type, title, uuid, tech, content, formData } = req.body;
+// 	if (tech === '') {
+// 		tech = null;
+// 	}
 
-	const sql = `INSERT INTO BOARD VALUES
-	(NEXTVAL(\'BOARD\'),?,current_timestamp(),
-	?,?,?)`;
-	const resultData: any = await queryExecutorResult2(sql, [uuid, title, content, tech]);
+// 	const sql = `INSERT INTO BOARD VALUES
+// 	(NEXTVAL(\'BOARD\'),?,current_timestamp(),
+// 	?,?,?)`;
+// 	const resultData: any = await queryExecutorResult2(sql, [uuid, title, content, tech]);
 
-	if (resultData.status === 'success') {
-		const sql2 = `select BOARD_CD, BOARD_TITLE from BOARD 
-		where BOARD_UID=?
-		order by BOARD_DATE DESC
-		limit 1;`;
-		const resultData2 = await queryExecutorResult2(sql2, [uuid]);
+// 	if (resultData.status === 'success') {
+// 		const sql2 = `select BOARD_CD, BOARD_TITLE from BOARD
+// 		where BOARD_UID=?
+// 		order by BOARD_DATE DESC
+// 		limit 1;`;
+// 		const resultData2 = await queryExecutorResult2(sql2, [uuid]);
 
-		if (resultData2.status === 'success') {
-			return res.status(200).json({
-				result: 'success',
-				resultData: resultData2,
-			});
-		} else {
-			return res.status(401).json({
-				resultData,
-				message: 'query2 execute failed',
-				status: resultData.status || 'err from node',
-			});
-		}
-	} else {
-		return res.status(401).json({
-			resultData,
-			message: 'query execute failed',
-			status: resultData.status || 'err from node',
-		});
-	}
-});
+// 		if (resultData2.status === 'success') {
+// 			return res.status(200).json({
+// 				result: 'success',
+// 				resultData: resultData2,
+// 			});
+// 		} else {
+// 			return res.status(401).json({
+// 				resultData,
+// 				message: 'query2 execute failed',
+// 				status: resultData.status || 'err from node',
+// 			});
+// 		}
+// 	} else {
+// 		return res.status(401).json({
+// 			resultData,
+// 			message: 'query execute failed',
+// 			status: resultData.status || 'err from node',
+// 		});
+// 	}
+// });
 
-export const setSubmitBoard2 = async (req: any, res: any, postData: any) => {
+export const setSubmitBoard2 = async (req: any, res: any, postData: any, imgArr?: any) => {
 	let { type, title, uuid, tech, content } = postData;
 	if (tech === '') {
 		tech = null;
@@ -52,79 +51,45 @@ export const setSubmitBoard2 = async (req: any, res: any, postData: any) => {
 	(NEXTVAL(\'BOARD\'),?,current_timestamp(),
 	?,?,?)`;
 	const resultData: any = await queryExecutorResult2(sql, [uuid, title, content, tech]);
-	console.log(resultData);
+
 	if (resultData.status === 'success') {
 		const sql2 = `select BOARD_CD, BOARD_TITLE from BOARD 
 		where BOARD_UID=?
 		order by BOARD_DATE DESC
 		limit 1;`;
 		const resultData2 = await queryExecutorResult2(sql2, [uuid]);
-		console.log(resultData2);
-		if (resultData2.status === 'success') {
-			// return res.status(200).json({
-			// 	result: 'success',
-			// 	resultData: resultData2,
-			// });
+		// console.log(resultData2);
+
+		if (resultData2.status === 'success' && imgArr.length > 0) {
+			let sql3 = 'INSERT INTO BOARD_URL VALUES ';
+			const s3Url = `https://dcx-tech.s3.ap-northeast-2.amazonaws.com/`;
+			for (let i = 0; i < imgArr.length; i++) {
+				sql3 += `('${resultData2.queryResult[0].BOARD_CD}',${i + 1},'image','${
+					s3Url + imgArr[i]
+				}'),`;
+			}
+			sql3 = sql3.slice(0, -1);
+			const resultData3 = await queryExecutorResult2(sql3, []);
+
+			return resultData3;
+
+			// if (resultData3.status === 'success') {
+			// 	return res.status(200).json({
+			// 		result: 'success',
+			// 		resultData: resultData2,
+			// 	});
+			// }
 		} else {
-			return res.status(401).json({
-				resultData,
-				message: 'query2 execute failed',
-				status: resultData.status || 'err from node',
-			});
+			return resultData2;
 		}
 	} else {
-		return res.status(401).json({
-			resultData,
-			message: 'query execute failed',
-			status: resultData.status || 'err from node',
-		});
+		return resultData;
 	}
 };
 
-const tempF = (req: any, res: any) => {
-	const ul = multer();
-	return new Promise((resolve, reject) => {
-		ul.single('postData')(req, res, async (err: any) => {
-			console.log('upload2');
-			// const { type, title, uuid, tech, content } = JSON.parse(req.body.img);
-			// console.log(type, title, uuid, tech, content);
-			console.log(req.body);
-			resolve(JSON.parse(req.body.postData));
-		});
-	});
-};
-
 export const setBoardImage = asyncHandler(async (req, res, next) => {
-	// console.log('setBoardImg');
-	// console.log(req.body);
-	// const ul = multer();
-	// return new Promise((resolve, reject) => {
-	// 	ul.single('img')(req, res, async (err: any) => {
-	// 		console.log('upload2');
-	// 		const { type, title, uuid, tech, content } = JSON.parse(req.body.img);
-	// 		console.log(type, title, uuid, tech, content);
-	// 		return { type, title, uuid, tech, content };
-	// 	});
-	// });
+	console.log('setBoardImg');
 	uploadImg(req, res, 'img', 'board/');
-	tempF(req, res).then((result) => {
-		console.log('async');
-		console.log(result);
-
-		setSubmitBoard2(req, res, result);
-	});
-
-	// ul.single('img')(req, res, async (err: any) => {
-	// 	console.log('upload2');
-	// 	const { type, title, uuid, tech, content } = JSON.parse(req.body.img);
-	// 	console.log(type, title, uuid, tech, content);
-	// 	return { type, title, uuid, tech, content };
-	// });
-
-	// console.log('TTTT');
-	// console.log(temp);
-	// const result = setSubmitBoard2({ type, title, uuid, tech, content }, req, res);
-	// 	console.log(result);
 });
 
 export const setBoardLike = asyncHandler(async (req, res, next) => {
