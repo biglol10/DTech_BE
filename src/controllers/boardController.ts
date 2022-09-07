@@ -1,9 +1,48 @@
 import asyncHandler from '@src/middleware/async';
-import { queryExecutorResult, queryExecutorResult2 } from '@src/util/queryExecutorResult';
+import { queryExecutorResult2 } from '@src/util/queryExecutorResult';
 import { uploadImg } from '@src/util/s3Connect';
 
-export const setSubmitBoard = asyncHandler(async (req, res, next) => {
-	let { type, title, uuid, tech, content, formData } = req.body;
+// export const setSubmitBoard = asyncHandler(async (req, res, next) => {
+// 	let { type, title, uuid, tech, content, formData } = req.body;
+// 	if (tech === '') {
+// 		tech = null;
+// 	}
+
+// 	const sql = `INSERT INTO BOARD VALUES
+// 	(NEXTVAL(\'BOARD\'),?,current_timestamp(),
+// 	?,?,?)`;
+// 	const resultData: any = await queryExecutorResult2(sql, [uuid, title, content, tech]);
+
+// 	if (resultData.status === 'success') {
+// 		const sql2 = `select BOARD_CD, BOARD_TITLE from BOARD
+// 		where BOARD_UID=?
+// 		order by BOARD_DATE DESC
+// 		limit 1;`;
+// 		const resultData2 = await queryExecutorResult2(sql2, [uuid]);
+
+// 		if (resultData2.status === 'success') {
+// 			return res.status(200).json({
+// 				result: 'success',
+// 				resultData: resultData2,
+// 			});
+// 		} else {
+// 			return res.status(401).json({
+// 				resultData,
+// 				message: 'query2 execute failed',
+// 				status: resultData.status || 'err from node',
+// 			});
+// 		}
+// 	} else {
+// 		return res.status(401).json({
+// 			resultData,
+// 			message: 'query execute failed',
+// 			status: resultData.status || 'err from node',
+// 		});
+// 	}
+// });
+
+export const setSubmitBoard2 = async (req: any, res: any, postData: any, imgArr?: any) => {
+	let { type, title, uuid, tech, content } = postData;
 	if (tech === '') {
 		tech = null;
 	}
@@ -15,35 +54,41 @@ export const setSubmitBoard = asyncHandler(async (req, res, next) => {
 
 	if (resultData.status === 'success') {
 		const sql2 = `select BOARD_CD, BOARD_TITLE from BOARD 
-		where USER_UID=?
-		order by BDATE DESC
+		where BOARD_UID=?
+		order by BOARD_DATE DESC
 		limit 1;`;
 		const resultData2 = await queryExecutorResult2(sql2, [uuid]);
+		// console.log(resultData2);
 
-		if (resultData2.status === 'success') {
-			return res.status(200).json({
-				result: 'success',
-				resultData: resultData2,
-			});
+		if (resultData2.status === 'success' && imgArr.length > 0) {
+			let sql3 = 'INSERT INTO BOARD_URL VALUES ';
+			const s3Url = `https://dcx-tech.s3.ap-northeast-2.amazonaws.com/`;
+			for (let i = 0; i < imgArr.length; i++) {
+				sql3 += `('${resultData2.queryResult[0].BOARD_CD}',${i + 1},'image','${
+					s3Url + imgArr[i]
+				}'),`;
+			}
+			sql3 = sql3.slice(0, -1);
+			const resultData3 = await queryExecutorResult2(sql3, []);
+
+			return resultData3;
+
+			// if (resultData3.status === 'success') {
+			// 	return res.status(200).json({
+			// 		result: 'success',
+			// 		resultData: resultData2,
+			// 	});
+			// }
 		} else {
-			return res.status(401).json({
-				resultData,
-				message: 'query2 execute failed',
-				status: resultData.status || 'err from node',
-			});
+			return resultData2;
 		}
 	} else {
-		return res.status(401).json({
-			resultData,
-			message: 'query execute failed',
-			status: resultData.status || 'err from node',
-		});
+		return resultData;
 	}
-});
+};
 
 export const setBoardImage = asyncHandler(async (req, res, next) => {
-	// console.log('setBoardImg');
-	// console.log(req);
+	console.log('setBoardImg');
 	uploadImg(req, res, 'img', 'board/');
 });
 
@@ -51,18 +96,17 @@ export const setBoardLike = asyncHandler(async (req, res, next) => {
 	let sql = '';
 	if (req.body.like === true) {
 		sql = `INSERT INTO BOARD_COMMENT VALUES(NEXTVAL('CMNT'),
-    '${req.body.id}','like',
-    (select USER_UID from USER where USER_ID=?),
-    null,null,current_timestamp()); 
+    ?,'like', ?, null,null,current_timestamp()); 
     `;
 	} else {
 		sql = `delete from BOARD_COMMENT 
-    WHERE BOARD_CD='${req.body.id}' 
-    AND USER_UID=(SELECT USER_UID FROM USER WHERE USER_ID=?);
+    WHERE BOARD_CD=? 
+    AND CMNT_UID=?;
     `;
 	}
 
-	const resultData = await queryExecutorResult2(sql, [req.body.userId]);
+	const resultData = await queryExecutorResult2(sql, [req.body.id, req.body.userUID]);
+
 	if (resultData.status === 'success') {
 		return res.status(200).json({
 			resultData,

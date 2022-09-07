@@ -144,6 +144,7 @@ export const getTeamList = asyncHandler(async (req, res, next) => {
 export const setProfileImage = asyncHandler(async (req, res, next) => {
 	uploadImg(req, res, 'img', 'profile_img/');
 });
+
 export const getTechList = asyncHandler(async (req, res, next) => {
 	const sql = 'SELECT * FROM TECH';
 

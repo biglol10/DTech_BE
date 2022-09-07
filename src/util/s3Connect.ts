@@ -1,14 +1,15 @@
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const aws = require('aws-sdk');
+import { setSubmitBoard2 } from '@src/controllers/boardController';
+import { getDateString } from '@src/util/dateFunc';
 aws.config.loadFromPath(__dirname + '/../config/s3.json');
 
 const s3 = new aws.S3();
 
 let DIR_PATH = '';
-let BOARD_ID = '';
-
-const upload2 = multer();
+let POSTDATA: any;
+let imgArr: any = [];
 
 const upload = multer({
 	storage: multerS3({
@@ -16,23 +17,42 @@ const upload = multer({
 		bucket: 'dcx-tech',
 		acl: 'public-read-write',
 		contentType: multerS3.AUTO_CONTENT_TYPE,
-		key: function (req: any, file: any, cb: any) {
+		key: async function (req: any, file: any, cb: any) {
 			// console.log('upload');
-			// console.log(req.body);
-			cb(null, `${DIR_PATH}${file.originalname}`);
+			POSTDATA = req.body.postData !== undefined ? JSON.parse(req.body.postData) : {};
+			// POSTDATA = JSON.parse(req.body.postData);
+			if (POSTDATA.type === 'BOARD_SUBMIT') {
+				imgArr.push(`${DIR_PATH}${getDateString()}_${file.originalname}`);
+				cb(null, `${DIR_PATH}${getDateString()}_${file.originalname}`);
+			} else {
+				imgArr.push(`${DIR_PATH}${file.originalname}`);
+				cb(null, `${DIR_PATH}${file.originalname}`);
+			}
 		},
 	}),
 });
 
 const uploadImg = async (req: any, res: any, key: string, path: string) => {
 	DIR_PATH = path;
-	// console.log('result');
-	// console.log(req);
-	upload.array(key)(req, res, (err: any) => {
+	imgArr = [];
+
+	// console.log('uploadImg');
+
+	upload.array(key)(req, res, async (err: any) => {
 		if (err !== undefined) {
 			console.log(`error~`, err);
+			return res.status(401).json({
+				result: 'error',
+			});
 		}
+		POSTDATA = req.body.postData !== undefined ? JSON.parse(req.body.postData) : {};
+		// console.log(POSTDATA);
 
+		if (POSTDATA.type === 'BOARD_SUBMIT') {
+			const result = await setSubmitBoard2(req, res, POSTDATA, imgArr);
+
+			// console.log(result);
+		}
 		return res.status(200).json({
 			result: 'success',
 		});
