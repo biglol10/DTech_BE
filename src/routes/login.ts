@@ -14,6 +14,7 @@ import {
 	setProfileImage,
 } from '@src/controllers/authController';
 import { protectedApi } from '@src/middleware/auth';
+import { uploadImg } from '@src/util/s3Connect';
 // const image = require('../controllers/image');
 
 const multer = require('multer');
@@ -47,7 +48,7 @@ router.route('/getTeamList').post(getTeamList);
 
 router.route('/getTechList').post(getTechList);
 
-router.post('/uploadUserImg', setProfileImage);
+router.post('/uploadUserImg', uploadImg, setProfileImage);
 
 router.post('/getLoggedInUserInfo', protectedApi, getUserByToken);
 

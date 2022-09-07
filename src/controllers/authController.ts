@@ -142,7 +142,10 @@ export const getTeamList = asyncHandler(async (req, res, next) => {
 });
 
 export const setProfileImage = asyncHandler(async (req, res, next) => {
-	uploadImg(req, res, 'img', 'profile_img/');
+	// uploadImg(req, res, 'img', 'profile_img/');
+	return res.status(200).json({
+		result: 'success',
+	});
 });
 
 export const getTechList = asyncHandler(async (req, res, next) => {
