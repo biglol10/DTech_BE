@@ -86,7 +86,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
 		io.emit('newUserCreated');
 
-		return res.status(200).cookie('user_token', token, options).json({
+		return res.status(200).cookie('token', token, options).json({
 			name,
 			title,
 			user_id,
@@ -194,7 +194,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 
 		const time = dayjs();
 
-		return res.status(200).cookie('user_token', token, options).json({
+		return res.status(200).cookie('token', token, options).json({
 			name: selectedUser[0].USER_NM,
 			userId,
 			time,
