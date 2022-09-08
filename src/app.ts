@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
 	const interval = setInterval(() => {
 		socket.emit('connectedUsers', {
 			// users: usersSocket,
-			users: usersSocket.filter((user) => user.socketId !== socket.id),
+			users: usersSocket,
 		});
 	}, 10000);
 
@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
 
 		socket.emit('connectedUsers', {
 			// users: usersSocket,
-			users: usersSocket.filter((user) => user.socketId !== socket.id),
+			users: usersSocket,
 		});
 	});
 
