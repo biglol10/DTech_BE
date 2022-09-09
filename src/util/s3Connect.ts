@@ -9,6 +9,7 @@ const s3 = new aws.S3();
 
 let POSTDATA: any;
 let imgArr: any = [];
+let DATE_STR: string;
 
 const upload = multer({
 	storage: multerS3({
@@ -24,8 +25,8 @@ const upload = multer({
 				imgArr.push(`${POSTDATA.dir}${file.originalname}`);
 				cb(null, `${POSTDATA.dir}${file.originalname}`);
 			} else {
-				imgArr.push(`${POSTDATA.dir}${getDateString()}_${file.originalname}`);
-				cb(null, `${POSTDATA.dir}${getDateString()}_${file.originalname}`);
+				imgArr.push(`${POSTDATA.dir}${DATE_STR}_${file.originalname}`);
+				cb(null, `${POSTDATA.dir}${DATE_STR}_${file.originalname}`);
 			}
 		},
 	}),
@@ -33,6 +34,7 @@ const upload = multer({
 
 const uploadImg = async (req: any, res: any, next: any) => {
 	imgArr = [];
+	DATE_STR = getDateString();
 
 	upload.array('img')(req, res, async (err: any) => {
 		if (err !== undefined) {

@@ -38,7 +38,8 @@ export const getUserByToken = asyncHandler(async (req, res, next) => {
 });
 
 export const registerUser = asyncHandler(async (req, res, next) => {
-	const { name, user_id, passwd, team, title, phonenum, detail, tech_list } = req.body;
+	const { name, user_id, passwd, team, title, phonenum, detail, tech_list, github, domain } =
+		req.body;
 
 	const time = dayjs();
 	const salt = await bcrypt.genSalt(10);
@@ -46,8 +47,10 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 	const uuid = generateUID();
 
 	const sql = `
-		INSERT INTO USER(USER_UID, USER_ID, USER_NM, USER_PW, TEAM_CD, USER_TITLE, USER_PHONENUM, USER_DETAIL, REGISTER_DATE, USER_ADMIN_YN) 
-		VALUES (?, ?, ?, ?, ?, ?,?, ?, CURRENT_TIMESTAMP,  0)
+		INSERT INTO USER(USER_UID, USER_ID, USER_NM, USER_PW, TEAM_CD,
+		USER_TITLE, USER_PHONENUM, USER_DETAIL, GITHUB_URL, USER_DOMAIN, 
+		REGISTER_DATE, USER_ADMIN_YN) 
+		VALUES (?, ?, ?, ?, ?, ?,?, ?,?,?, CURRENT_TIMESTAMP,  0)
 	`;
 
 	const resultData: any = await queryExecutorResult2(sql, [
@@ -59,10 +62,20 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 		title,
 		phonenum,
 		detail,
+		github,
+		domain,
 	]);
-
-	let resultData2 = { status: 'success' };
-	if (tech_list.length > 0 && resultData.status === 'success') {
+	if (resultData.status !== 'success') {
+		console.log(resultData);
+		return res.status(401).json({
+			result: 'fail',
+			message: 'resultData1 failed',
+			status: resultData.status,
+			sqlMessage: resultData.sqlMessage,
+		});
+	}
+	// let resultData2 = { status: 'success' };
+	if (tech_list.length > 0) {
 		let techStr = '';
 		let techArr = [];
 		for (var i in tech_list) {
@@ -74,14 +87,20 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
 		const sql = `INSERT INTO USER_TECH(USER_UID,TECH_CD) VALUES ` + techStr;
 
-		resultData2 = await queryExecutorResult2(sql, techArr);
+		let resultData2 = await queryExecutorResult2(sql, techArr);
+
+		if (resultData2.status !== 'success') {
+			console.log(resultData2);
+			return res.status(401).json({
+				result: 'fail',
+				message: 'resultData2 failed',
+				status: resultData.status,
+				sqlMessage: resultData.sqlMessage,
+			});
+		}
 	}
 
-	if (
-		resultData.status === 'success' &&
-		resultData2.status === 'success' &&
-		process.env.JWT_SECRET
-	) {
+	if (process.env.JWT_SECRET) {
 		const { token, options } = tokenResponse(user_id, process.env.JWT_SECRET);
 
 		io.emit('newUserCreated');
