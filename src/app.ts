@@ -85,6 +85,7 @@ io.on('connection', (socket) => {
 					io.to(user.socketId).emit('newMessageReceived', {
 						chatListSocket: sendResult.chatList,
 						convIdSocket: sendResult.convId,
+						fromUID: userUID,
 					});
 				}
 
