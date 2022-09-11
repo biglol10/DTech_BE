@@ -76,6 +76,7 @@ io.on('connection', (socket) => {
 				convId,
 				imgList,
 				linkList,
+				toUserId,
 			);
 
 			if (sendResult.result === 'success' && toUserId) {

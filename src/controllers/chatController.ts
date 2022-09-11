@@ -21,9 +21,9 @@ export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('서버에서 에러가 발생했습니다', 400));
 	}
 
-	// const chatSql = `SELECT MESSAGE_ID, FROM_USERNAME, TO_USERNAME, MESSAGE_TEXT, IMG_LIST, LINK_LIST, SENT_DATETIME, USER_UID, CONVERSATION_ID FROM USER_CHAT WHERE CONVERSATION_ID = '${convId}' ORDER BY SENT_DATETIME`;
-	const chatSql = `SELECT T1.MESSAGE_ID, T1.FROM_USERNAME, T1.TO_USERNAME, T1.MESSAGE_TEXT, T1.IMG_LIST, T1.LINK_LIST, T1.SENT_DATETIME, T1.USER_UID, T2.USER_NM, T2.USER_TITLE, T1.CONVERSATION_ID FROM USER_CHAT AS T1 INNER JOIN USER AS T2 ON T1.USER_UID = T2.USER_UID WHERE CONVERSATION_ID = '${convId}' ORDER BY SENT_DATETIME;`;
-	const resultChatList = await queryExecutorResult(chatSql);
+	const resultChatList = await queryExecutorResultProcedure('ReadChatList', [fromUID, convId]);
+	// const chatSql = `SELECT T1.MESSAGE_ID, T1.FROM_USERNAME, T1.TO_USERNAME, T1.MESSAGE_TEXT, T1.IMG_LIST, T1.LINK_LIST, T1.SENT_DATETIME, T1.USER_UID, T2.USER_NM, T2.USER_TITLE, T1.CONVERSATION_ID FROM USER_CHAT AS T1 INNER JOIN USER AS T2 ON T1.USER_UID = T2.USER_UID WHERE CONVERSATION_ID = '${convId}' ORDER BY SENT_DATETIME;`;
+	// const resultChatList = await queryExecutorResult(chatSql);
 
 	if (resultChatList.status === 'error') {
 		return next(new ErrorResponse('서버에서 에러가 발생했습니다', 400));
@@ -82,5 +82,23 @@ export const savePrivateChat = asyncHandler(async (req, res, next) => {
 		result: 'success',
 		chatList: resultChatList.queryResult,
 		convId,
+	});
+});
+
+export const getUnReadChatNoti = asyncHandler(async (req, res, next) => {
+	// const { fromUID } = req.body;
+	const { fromUID } = req.query;
+
+	const sql = `SELECT T1.CONVERSATION_ID, T1.USER_UID FROM GROUP_MEMBER AS T1 WHERE T1.USER_UID != '${fromUID}' AND EXISTS (SELECT * FROM GROUP_MEMBER AS T2 WHERE T2.USER_UID = '${fromUID}' AND T2.UNREAD_MESSAGE = 1 AND T1.CONVERSATION_ID = T2.CONVERSATION_ID);`;
+
+	const resultUnReadList = await queryExecutorResult(sql);
+
+	if (resultUnReadList.status === 'error') {
+		return next(new ErrorResponse('서버에서 에러가 발생했습니다', 500));
+	}
+
+	return res.status(200).json({
+		result: 'success',
+		unReadList: resultUnReadList.queryResult,
 	});
 });
