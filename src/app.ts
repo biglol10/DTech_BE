@@ -87,6 +87,10 @@ io.on('connection', (socket) => {
 						convIdSocket: sendResult.convId,
 						fromUID: userUID,
 					});
+
+					io.to(user.socketId).emit('newMessageReceivedSidebar', {
+						fromUID: userUID,
+					});
 				}
 
 				socket.emit('messageSendSuccess', {
