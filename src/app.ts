@@ -76,6 +76,7 @@ io.on('connection', (socket) => {
 				convId,
 				imgList,
 				linkList,
+				toUserId,
 			);
 
 			if (sendResult.result === 'success' && toUserId) {
@@ -84,6 +85,11 @@ io.on('connection', (socket) => {
 					io.to(user.socketId).emit('newMessageReceived', {
 						chatListSocket: sendResult.chatList,
 						convIdSocket: sendResult.convId,
+						fromUID: userUID,
+					});
+
+					io.to(user.socketId).emit('newMessageReceivedSidebar', {
+						fromUID: userUID,
 					});
 				}
 

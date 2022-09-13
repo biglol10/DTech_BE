@@ -220,6 +220,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 			token,
 			result: 'success',
 			userUID: selectedUser[0].USER_UID,
+			userProfileImg: selectedUser[0].USER_IMG_URL,
 		});
 	} else {
 		return res.status(401).json({
