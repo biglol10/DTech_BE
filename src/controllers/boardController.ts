@@ -121,9 +121,23 @@ export const setBoardLike = asyncHandler(async (req, res, next) => {
 	const resultData = await queryExecutorResult2(sql, [req.body.id, req.body.userUID]);
 
 	if (resultData.status === 'success') {
-		return res.status(200).json({
-			resultData,
-		});
+		let sql2 =
+			'UPDATE BOARD SET LIKE_CNT = LIKE_CNT' +
+			(req.body.like ? ' + ' : ' - ') +
+			'1 WHERE BOARD_CD=?';
+		const resultData2 = await queryExecutorResult2(sql2, [req.body.id]);
+
+		console.log(resultData2);
+		if (resultData2.status === 'success') {
+			return res.status(200).json({
+				resultData2,
+			});
+		} else {
+			return res.status(401).json({
+				resultData,
+				message: 'query2 execute failed',
+			});
+		}
 	} else {
 		return res.status(401).json({
 			resultData,
@@ -132,22 +146,22 @@ export const setBoardLike = asyncHandler(async (req, res, next) => {
 	}
 });
 export const getBoardList = asyncHandler(async (req, res, next) => {
-	const sql = `select B.*,
-    IFNULL((select COUNT(C.CMNT_CD) 
-    from BOARD_COMMENT C
-    where B.BOARD_CD = C.BOARD_CD
-    and C.CMNT_TYPE = "comment"
-    group by B.BOARD_CD
-    ),0) as "COMMENTS_CNT",
-    IFNULL((select COUNT(C.CMNT_CD)
-    from BOARD_COMMENT C
-    where B.BOARD_CD = C.BOARD_CD
-    and C.CMNT_TYPE = "like"
-    group by B.BOARD_CD
-    ),0) as "LIKES_CNT"
-    from BOARD B`;
+	let sqlParam = [req.body.uuid];
+	let sql = `SELECT B.*, COUNT(C.CMNT_CD) AS LIKED
+	FROM BOARD B LEFT JOIN 
+	(SELECT * FROM BOARD_COMMENT WHERE CMNT_UID=? AND CMNT_TYPE='like') C
+	ON B.BOARD_CD = C.BOARD_CD`;
+	if (req.body.brdId !== undefined) {
+		sql += ' WHERE B.BOARD_CD=?';
+		sqlParam.push(req.body.brdId);
+	}
+	sql += ' GROUP BY B.BOARD_CD';
+	// console.log('getBoardList');
+	// console.log(sql);
+	// console.log(sqlParam);
+	const resultData = await queryExecutorResult2(sql, sqlParam);
+	// console.log(resultData);
 
-	const resultData = await queryExecutorResult2(sql);
 	const sql2 = 'select BOARD_CD,URL_ORDER,URL_ADDR as url from BOARD_URL where URL_TYPE="image"';
 	const resultImg = await queryExecutorResult2(sql2);
 
