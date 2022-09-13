@@ -1,5 +1,15 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { authRoute, dashboardRoute, testRoute, utilsRoute, chatRoute } from '@src/routes/index';
+
+import conn from '@src/dbConn/dbConnection';
+import {
+	authRoute,
+	dashboardRoute,
+	testRoute,
+	utilsRoute,
+	chatRoute,
+	boardRoute,
+} from '@src/routes/index';
+
 import cors from 'cors';
 import errorHandler from '@src/middleware/error';
 import http from 'http';
@@ -14,18 +24,13 @@ import {
 	removeUser2,
 	getConnectedUser,
 } from './util/memoryStorage';
+import ioInstance from './util/socketIO';
 
 const app = express();
 
 const server = http.createServer(app);
 // const io = new Server(server);
-const io = new Server(server, {
-	cors: {
-		origin: ['http://localhost:3065', 'https://dev.example.com'],
-		allowedHeaders: ['my-custom-header'],
-		credentials: true,
-	},
-});
+export const io = ioInstance(server);
 
 const PORT = 3066;
 
@@ -35,7 +40,7 @@ io.on('connection', (socket) => {
 	const interval = setInterval(() => {
 		socket.emit('connectedUsers', {
 			// users: usersSocket,
-			users: usersSocket.filter((user) => user.socketId !== socket.id),
+			users: usersSocket,
 		});
 	}, 10000);
 
@@ -44,7 +49,7 @@ io.on('connection', (socket) => {
 
 		socket.emit('connectedUsers', {
 			// users: usersSocket,
-			users: usersSocket.filter((user) => user.socketId !== socket.id),
+			users: usersSocket,
 		});
 	});
 
@@ -71,6 +76,7 @@ io.on('connection', (socket) => {
 				convId,
 				imgList,
 				linkList,
+				toUserId,
 			);
 
 			if (sendResult.result === 'success' && toUserId) {
@@ -79,6 +85,11 @@ io.on('connection', (socket) => {
 					io.to(user.socketId).emit('newMessageReceived', {
 						chatListSocket: sendResult.chatList,
 						convIdSocket: sendResult.convId,
+						fromUID: userUID,
+					});
+
+					io.to(user.socketId).emit('newMessageReceivedSidebar', {
+						fromUID: userUID,
 					});
 				}
 
@@ -124,6 +135,7 @@ app.use('/api/auth', authRoute);
 app.use('/api/dashboard', dashboardRoute);
 app.use('/api/testApi', testRoute);
 app.use('/api/utils', utilsRoute);
+app.use('/api/board', boardRoute);
 app.use('/api/chat', chatRoute);
 
 app.use(errorHandler);

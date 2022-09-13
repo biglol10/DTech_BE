@@ -1,4 +1,4 @@
-import { generateUID } from '@src/util/customFunc';
+import { generateUID, LinkArrFetchMetadata } from '@src/util/customFunc';
 import conn from '@src/dbConn/dbConnection';
 import { queryExecutorResult, queryExecutorResultProcedure } from '@src/util/queryExecutorResult';
 
@@ -19,13 +19,22 @@ export const sendPrivateMessageFunction = async (
 	convId: string,
 	imgList: string,
 	linkList: string,
+	toUserId: string,
 ): Promise<errResult | succResult> => {
 	const message_uuid = `message_${generateUID()}`;
 	const sql = `INSERT INTO USER_CHAT VALUES('${message_uuid}', NULL, NULL, ${conn.escape(
 		chatMessage,
 	)}, ${conn.escape(imgList)}, ${conn.escape(linkList)}, SYSDATE(), '${userUID}', '${convId}')`;
 
-	const insertResult = await queryExecutorResult(sql);
+	const insertResult = await queryExecutorResultProcedure('SendUserPrivateChat', [
+		message_uuid,
+		chatMessage,
+		imgList,
+		linkList,
+		userUID,
+		convId,
+		toUserId,
+	]);
 
 	if (insertResult.status === 'error') {
 		return {
@@ -38,7 +47,9 @@ export const sendPrivateMessageFunction = async (
 		convId,
 	]);
 
-	const { status, queryResult } = messageTransactionAfter;
+	let { status, queryResult } = messageTransactionAfter;
+
+	queryResult = await LinkArrFetchMetadata(queryResult);
 
 	if (status === 'error') {
 		return {

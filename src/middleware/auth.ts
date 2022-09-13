@@ -11,8 +11,8 @@ interface IReqWithUser extends Request {
 export const protectedApi = asyncHandler(async (req: IReqWithUser, res, next) => {
 	let token;
 
-	if (req.headers.authorization) {
-		token = req.headers.authorization;
+	if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+		token = req.headers.authorization.split(' ')[1];
 	} else if (req.cookies.token) {
 		token = req.cookies.token;
 	}
@@ -26,7 +26,7 @@ export const protectedApi = asyncHandler(async (req: IReqWithUser, res, next) =>
 			? jwt.verify(token, process.env.JWT_SECRET)
 			: '';
 		if (decoded) {
-			const sql = `SELECT USER_UID, USER_ID, NAME, TEAM_CD, TITLE, ADMIN FROM USER WHERE USER_ID = '${decoded.id}'`;
+			const sql = `SELECT USER_UID, USER_ID, USER_NM, TEAM_CD, USER_TITLE, USER_ADMIN_YN, USER_IMG_URL FROM USER WHERE USER_ID = '${decoded.id}'`;
 			const { status: isQuerySuccess, queryResult: selectedUser } = await queryExecutorResult(
 				sql,
 			);

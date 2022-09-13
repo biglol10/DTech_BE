@@ -41,6 +41,38 @@ const queryExecutorResult = async (sql: string): Promise<IResultData> => {
 	return resultData;
 };
 
+const queryExecutor2 = (sql: string, val?: (number | string | null)[]) => {
+	return new Promise((resolve, reject) => {
+		conn.query(sql, val, function (err, result, fields) {
+			if (err) {
+				reject(err);
+			}
+			resolve({
+				status: 'success',
+				queryResult: result,
+			});
+		});
+	});
+};
+
+const queryExecutorResult2 = async (sql: string, val?: (number | string | null)[]) => {
+	let resultData: any = null;
+
+	try {
+		resultData = await queryExecutor2(sql, val);
+	} catch (err: any) {
+		resultData = {
+			status: 'error',
+			code: err.code,
+			errno: err.errno,
+			sqlMessage: err.sqlMessage,
+			queryResult: null,
+		};
+	}
+
+	return resultData;
+};
+
 /** ****************************************************************************************
  * @설명 : App layout
  ********************************************************************************************
@@ -103,4 +135,4 @@ const queryExecutorResultProcedure = async (
 	return resultData;
 };
 
-export { queryExecutorResult, queryExecutorResultProcedure };
+export { queryExecutorResult, queryExecutorResultProcedure, queryExecutorResult2 };
