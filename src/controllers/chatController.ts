@@ -30,6 +30,11 @@ export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 	}
 
 	resultChatList.queryResult = await LinkArrFetchMetadata(resultChatList.queryResult);
+	resultChatList.queryResult.map((item: any, idx: number) => {
+		resultChatList.queryResult[idx].IMG_LIST = JSON.parse(
+			resultChatList.queryResult[idx].IMG_LIST,
+		);
+	});
 
 	// const metadataAxiosRequest = resultChatList.queryResult.map(async (item: any, idx: number) => {
 	// 	if (item.LINK_LIST !== '[]') {
