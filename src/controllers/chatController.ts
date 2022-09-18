@@ -3,6 +3,7 @@ import { queryExecutorResult, queryExecutorResultProcedure } from '@src/util/que
 import ErrorResponse from '@src/util/errorResponse';
 import { generateUID, LinkArrFetchMetadata } from '@src/util/customFunc';
 import conn from '@src/dbConn/dbConnection';
+import { IOSocket } from '@src/app';
 
 import { axiosFetchMetadata } from './utilsController';
 
@@ -35,6 +36,8 @@ export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 			resultChatList.queryResult[idx].IMG_LIST,
 		);
 	});
+
+	// console.log(IOSocket);
 
 	// const metadataAxiosRequest = resultChatList.queryResult.map(async (item: any, idx: number) => {
 	// 	if (item.LINK_LIST !== '[]') {
@@ -105,5 +108,11 @@ export const getUnReadChatNoti = asyncHandler(async (req, res, next) => {
 	return res.status(200).json({
 		result: 'success',
 		unReadList: resultUnReadList.queryResult,
+	});
+});
+
+export const uploadChatImg = asyncHandler(async (req, res, next) => {
+	return res.status(200).json({
+		bodyObj: req.body,
 	});
 });
