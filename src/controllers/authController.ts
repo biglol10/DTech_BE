@@ -161,7 +161,25 @@ export const getTeamList = asyncHandler(async (req, res, next) => {
 });
 
 export const setProfileImage = asyncHandler(async (req, res, next) => {
-	// uploadImg(req, res, 'img', 'profile_img/');
+	const imgUrl = 'https://dcx-tech.s3.ap-northeast-2.amazonaws.com/' + req.body.imgArr[0];
+
+	const sql = `
+	UPDATE USER SET USER_IMG_URL=?  
+	WHERE USER_UID = ?`;
+
+	const resultData = await queryExecutorResult2(sql, [imgUrl, req.body.postData.uuid]);
+
+	if (resultData.status === 'success') {
+		return res.status(200).json({
+			resultData,
+		});
+	} else {
+		return res.status(401).json({
+			resultData,
+			message: 'query execute failed',
+		});
+	}
+
 	return res.status(200).json({
 		result: 'success',
 	});
