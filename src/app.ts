@@ -88,9 +88,11 @@ io.on('connection', (socket) => {
 						fromUID: userUID,
 					});
 
-					io.to(user.socketId).emit('newMessageReceivedSidebar', {
-						fromUID: userUID,
-					});
+					setTimeout(() => {
+						io.to(user.socketId).emit('newMessageReceivedSidebar', {
+							fromUID: userUID,
+						});
+					}, 1000);
 				}
 
 				socket.emit('messageSendSuccess', {
