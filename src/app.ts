@@ -31,11 +31,14 @@ const app = express();
 const server = http.createServer(app);
 // const io = new Server(server);
 export const io = ioInstance(server);
+export let IOSocket: any = null;
 
 const PORT = 3066;
 
 io.on('connection', (socket) => {
 	console.log(`a new user connected with socketId of ${socket.id}`);
+
+	IOSocket = socket;
 
 	const interval = setInterval(() => {
 		socket.emit('connectedUsers', {
