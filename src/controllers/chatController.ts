@@ -1,8 +1,13 @@
 import asyncHandler from '@src/middleware/async';
-import { queryExecutorResult, queryExecutorResultProcedure } from '@src/util/queryExecutorResult';
+import {
+	queryExecutorResult,
+	queryExecutorResult2,
+	queryExecutorResultProcedure,
+} from '@src/util/queryExecutorResult';
 import ErrorResponse from '@src/util/errorResponse';
 import { generateUID, LinkArrFetchMetadata } from '@src/util/customFunc';
 import conn from '@src/dbConn/dbConnection';
+import { IOSocket } from '@src/app';
 
 import { axiosFetchMetadata } from './utilsController';
 
@@ -22,33 +27,17 @@ export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 	}
 
 	const resultChatList = await queryExecutorResultProcedure('ReadChatList', [fromUID, convId]);
-	// const chatSql = `SELECT T1.MESSAGE_ID, T1.FROM_USERNAME, T1.TO_USERNAME, T1.MESSAGE_TEXT, T1.IMG_LIST, T1.LINK_LIST, T1.SENT_DATETIME, T1.USER_UID, T2.USER_NM, T2.USER_TITLE, T1.CONVERSATION_ID FROM USER_CHAT AS T1 INNER JOIN USER AS T2 ON T1.USER_UID = T2.USER_UID WHERE CONVERSATION_ID = '${convId}' ORDER BY SENT_DATETIME;`;
-	// const resultChatList = await queryExecutorResult(chatSql);
 
 	if (resultChatList.status === 'error') {
 		return next(new ErrorResponse('서버에서 에러가 발생했습니다', 400));
 	}
 
 	resultChatList.queryResult = await LinkArrFetchMetadata(resultChatList.queryResult);
-
-	// const metadataAxiosRequest = resultChatList.queryResult.map(async (item: any, idx: number) => {
-	// 	if (item.LINK_LIST !== '[]') {
-	// 		const linkArr = JSON.parse(item.LINK_LIST);
-	// 		const metadataArr: any = [];
-	// 		const metadataFetch = linkArr.map(async (url: string) => {
-	// 			const metadataResult = await axiosFetchMetadata(url);
-	// 			metadataArr.push(metadataResult);
-	// 		});
-
-	// 		await Promise.all(metadataFetch);
-
-	// 		resultChatList.queryResult[idx].LINK_LIST = metadataArr;
-	// 	} else {
-	// 		resultChatList.queryResult[idx].LINK_LIST = [];
-	// 	}
-	// });
-
-	// await Promise.all(metadataAxiosRequest);
+	resultChatList.queryResult.map((item: any, idx: number) => {
+		resultChatList.queryResult[idx].IMG_LIST = JSON.parse(
+			resultChatList.queryResult[idx].IMG_LIST,
+		);
+	});
 
 	return res.status(200).json({
 		result: 'success',
@@ -57,6 +46,7 @@ export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 	});
 });
 
+// unused
 export const savePrivateChat = asyncHandler(async (req, res, next) => {
 	const { chatMessage, imgList, linkList, userUID, convId } = req.body;
 
@@ -89,9 +79,13 @@ export const getUnReadChatNoti = asyncHandler(async (req, res, next) => {
 	// const { fromUID } = req.body;
 	const { fromUID } = req.query;
 
+	// const sql = `SELECT T1.CONVERSATION_ID, T1.USER_UID FROM GROUP_MEMBER AS T1 WHERE T1.USER_UID != '${fromUID}' AND EXISTS (SELECT * FROM GROUP_MEMBER AS T2 WHERE T2.USER_UID = '${fromUID}' AND T2.UNREAD_MESSAGE = 1 AND T1.CONVERSATION_ID = T2.CONVERSATION_ID);`;
 	const sql = `SELECT T1.CONVERSATION_ID, T1.USER_UID FROM GROUP_MEMBER AS T1 WHERE T1.USER_UID != '${fromUID}' AND EXISTS (SELECT * FROM GROUP_MEMBER AS T2 WHERE T2.USER_UID = '${fromUID}' AND T2.UNREAD_MESSAGE = 1 AND T1.CONVERSATION_ID = T2.CONVERSATION_ID);`;
 
-	const resultUnReadList = await queryExecutorResult(sql);
+	const resultUnReadList = await queryExecutorResult2(sql, [
+		fromUID as string,
+		fromUID as string,
+	]);
 
 	if (resultUnReadList.status === 'error') {
 		return next(new ErrorResponse('서버에서 에러가 발생했습니다', 500));
@@ -100,5 +94,11 @@ export const getUnReadChatNoti = asyncHandler(async (req, res, next) => {
 	return res.status(200).json({
 		result: 'success',
 		unReadList: resultUnReadList.queryResult,
+	});
+});
+
+export const uploadChatImg = asyncHandler(async (req, res, next) => {
+	return res.status(200).json({
+		bodyObj: req.body,
 	});
 });
