@@ -155,17 +155,69 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
 	}
 });
 
+// function js_traverse(o: any) {
+// 	var type = typeof o;
+// 	if (type == 'object') {
+// 		for (var key in o) {
+// 			if (key == 'UPPER_CMNT_CD') {
+// 				console.log('key: ', key);
+// 			}
+
+// 			js_traverse(o[key]);
+// 		}
+// 	} else {
+// 		console.log(o);
+// 	}
+// }
+
+export const setDelCmnt = asyncHandler(async (req, res, next) => {
+	console.log('setDelCmnt');
+	console.log(req.body);
+
+	console.log(req.body.params.cmntCd);
+
+	const sql = 'DELETE FROM BOARD_COMMENT WHERE CMNT_CD=?';
+
+	const resultData = await queryExecutorResult2(sql, req.body.params.cmntCd);
+
+	if (resultData.status === 'success') {
+		const sql2 = 'UPDATE BOARD SET CMNT_CNT = CMNT_CNT-1 WHERE BOARD_CD=?';
+		const resultData2 = await queryExecutorResult2(sql2, req.body.params.boardCd);
+
+		if (resultData2.status === 'success') {
+			return res.status(200).json({
+				resultData,
+			});
+		} else {
+			return res.status(401).json({
+				resultData,
+				message: 'query2 execute failed',
+			});
+		}
+	} else {
+		return res.status(401).json({
+			resultData,
+			message: 'query execute failed',
+		});
+	}
+});
+
 export const getComments = asyncHandler(async (req, res, next) => {
-	console.log('getComments');
+	// console.log('getComments');
 	// console.log(req.body);
 
 	const reqParam = [req.body.brdId];
-	const sql = `SELECT A.*, B.USER_NM, B.USER_TITLE 
+	const sql = `SELECT A.*, B.USER_NM, B.USER_TITLE
 	FROM BOARD_COMMENT A LEFT JOIN USER B
 	ON A.USER_UID = B.USER_UID WHERE BOARD_CD = ?`;
-	const resultData = await queryExecutorResult2(sql, reqParam);
+	// const sql = `SELECT A.*, B.CMNT_CD as 'a', B.BOARD_CMNT as 'b'
+	// from BOARD_COMMENT A LEFT JOIN BOARD_COMMENT B
+	// ON A.CMNT_CD = B.UPPER_CMNT_CD
+	// WHERE A.BOARD_CD=?`;
 
-	console.log(resultData);
+	const resultData = await queryExecutorResult2(sql, reqParam);
+	// console.log(resultData);
+
 	if (resultData.status === 'success') {
 		return res.status(200).json({
 			resultData,
@@ -195,7 +247,9 @@ export const setComment = asyncHandler(async (req, res, next) => {
 		const resultData2 = await queryExecutorResult2(sql2, reqParam2);
 		if (resultData2.status === 'success') {
 			const reqParam3 = [req.body.brdId];
-			const sql3 = 'SELECT * FROM BOARD_COMMENT WHERE BOARD_CD = ?';
+			const sql3 = `SELECT A.*, B.USER_NM, B.USER_TITLE
+			FROM BOARD_COMMENT A LEFT JOIN USER B
+			ON A.USER_UID = B.USER_UID WHERE BOARD_CD = ?`;
 			const resultData3 = await queryExecutorResult2(sql3, reqParam3);
 			if (resultData3.status === 'success') {
 				return res.status(200).json({

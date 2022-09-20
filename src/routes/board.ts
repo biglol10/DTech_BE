@@ -5,6 +5,7 @@ import {
 	setSubmitBoard,
 	getComments,
 	setComment,
+	setDelCmnt,
 } from '@src/controllers/boardController';
 import { uploadImg } from '@src/util/s3Connect';
 
@@ -17,5 +18,6 @@ router.route('/setBoardLike').post(setBoardLike);
 router.post('/uploadBoard', uploadImg, setSubmitBoard);
 router.post('/getComments', getComments);
 router.post('/setComment', setComment);
+router.post('/deleteCmnt', setDelCmnt);
 
 export default router;
