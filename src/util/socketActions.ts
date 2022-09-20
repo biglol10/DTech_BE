@@ -22,9 +22,6 @@ export const sendPrivateMessageFunction = async (
 	toUserId: string,
 ): Promise<errResult | succResult> => {
 	const message_uuid = `message_${generateUID()}`;
-	const sql = `INSERT INTO USER_CHAT VALUES('${message_uuid}', NULL, NULL, ${conn.escape(
-		chatMessage,
-	)}, ${conn.escape(imgList)}, ${conn.escape(linkList)}, SYSDATE(), '${userUID}', '${convId}')`;
 
 	const insertResult = await queryExecutorResultProcedure('SendUserPrivateChat', [
 		message_uuid,
