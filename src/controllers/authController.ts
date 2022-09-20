@@ -190,9 +190,10 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('아이디/비밀번호를 입력해주세요', 400));
 	}
 
-	const userFindSql = `SELECT * FROM USER WHERE USER_ID = '${userId}'`;
+	// const userFindSql = `SELECT * FROM USER WHERE USER_ID = '${userId}'`;
+	const userFindSql = `SELECT * FROM USER WHERE USER_ID = ?`;
 
-	const { queryResult: selectedUser } = await queryExecutorResult(userFindSql);
+	const { queryResult: selectedUser } = await queryExecutorResult2(userFindSql, [userId]);
 
 	if (selectedUser.length === 0) {
 		return next(new ErrorResponse('로그인에 실패했습니다', 401));
@@ -204,9 +205,10 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('로그인에 실패했습니다', 401));
 	}
 
-	const updateUserLoginSql = `UPDATE USER SET REGISTER_DATE = SYSDATE() WHERE USER_ID = '${userId}'`;
+	// const updateUserLoginSql = `UPDATE USER SET REGISTER_DATE = SYSDATE() WHERE USER_ID = '${userId}'`;
+	const updateUserLoginSql = `UPDATE USER SET REGISTER_DATE = SYSDATE() WHERE USER_ID = ?`;
 
-	const { queryResult: updateResult } = await queryExecutorResult(updateUserLoginSql);
+	const { queryResult: updateResult } = await queryExecutorResult2(updateUserLoginSql, [userId]);
 
 	if (updateResult.affectedRows && process.env.JWT_SECRET) {
 		const { token, options } = tokenResponse(userId, process.env.JWT_SECRET);
