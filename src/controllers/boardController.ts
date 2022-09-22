@@ -114,10 +114,9 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
 	const orderType = req.body.orderType;
 
 	let sqlParam = [req.body.uuid];
-	let sql = `SELECT B.*, COUNT(C.CMNT_CD) AS LIKED
-	FROM BOARD B LEFT JOIN 
-	(SELECT * FROM BOARD_COMMENT WHERE USER_UID=? AND CMNT_TYPE='like') C
-	ON B.BOARD_CD = C.BOARD_CD`;
+	let sql = `SELECT B.*, T.*
+	FROM BOARD B LEFT JOIN TECH T
+	ON B.TECH_CD = T.TECH_CD`;
 	if (req.body.brdId !== undefined) {
 		sql += ' WHERE B.BOARD_CD=?';
 		sqlParam.push(req.body.brdId);
@@ -132,6 +131,8 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
 	}
 
 	const resultData = await queryExecutorResult2(sql, sqlParam);
+	console.log('boardController');
+	console.log(resultData);
 
 	const sql2 = 'select BOARD_CD,URL_ORDER,URL_ADDR as url from BOARD_URL where URL_TYPE="image"';
 	const resultImg = await queryExecutorResult2(sql2);
