@@ -70,6 +70,7 @@ io.on('connection', (socket) => {
 			imgList,
 			linkList,
 			toUserId,
+			toUserUID,
 		}: {
 			[keys: string]: string;
 		}) => {
@@ -101,6 +102,7 @@ io.on('connection', (socket) => {
 				socket.emit('messageSendSuccess', {
 					chatListSocket: sendResult.chatList,
 					convIdSocket: sendResult.convId,
+					toUserUID,
 				});
 			}
 		},

@@ -13,6 +13,7 @@ import { axiosFetchMetadata } from './utilsController';
 
 export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 	const { fromUID, toUID } = req.body;
+	console.log(`fromUID is ${fromUID} and toUID is ${toUID}`);
 	const chat_uuid = `conv_private_${generateUID()}`;
 
 	const resultChatId = await queryExecutorResultProcedure('CheckAndReturnConvId', [
@@ -43,6 +44,8 @@ export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 		result: 'success',
 		chatList: resultChatList.queryResult,
 		convId,
+		fromUID,
+		toUID,
 	});
 });
 
