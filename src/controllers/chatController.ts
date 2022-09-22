@@ -13,7 +13,6 @@ import { axiosFetchMetadata } from './utilsController';
 
 export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 	const { fromUID, toUID } = req.body;
-	console.log(`fromUID is ${fromUID} and toUID is ${toUID}`);
 	const chat_uuid = `conv_private_${generateUID()}`;
 
 	const resultChatId = await queryExecutorResultProcedure('CheckAndReturnConvId', [
@@ -46,6 +45,31 @@ export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 		convId,
 		fromUID,
 		toUID,
+	});
+});
+
+export const getGroupChatList = asyncHandler(async (req, res, next) => {
+	const { chatRoomId } = req.body;
+
+	const sql = `SELECT T1.MESSAGE_ID, T1.FROM_USERNAME, T1.TO_USERNAME, T1.MESSAGE_TEXT, T1.IMG_LIST, T1.LINK_LIST, T1.SENT_DATETIME, T1.USER_UID, T2.USER_NM, T2.USER_TITLE, T1.CONVERSATION_ID FROM USER_CHAT AS T1 INNER JOIN USER AS T2 ON T1.USER_UID = T2.USER_UID WHERE CONVERSATION_ID = '${chatRoomId}' ORDER BY SENT_DATETIME;`;
+
+	const resultChatList = await queryExecutorResult2(sql, [chatRoomId]);
+
+	if (resultChatList.status === 'error') {
+		return next(new ErrorResponse('서버에서 에러가 발생했습니다', 400));
+	}
+
+	resultChatList.queryResult = await LinkArrFetchMetadata(resultChatList.queryResult);
+	resultChatList.queryResult.map((item: any, idx: number) => {
+		resultChatList.queryResult[idx].IMG_LIST = JSON.parse(
+			resultChatList.queryResult[idx].IMG_LIST,
+		);
+	});
+
+	return res.status(200).json({
+		result: 'success',
+		chatList: resultChatList.queryResult,
+		chatRoomId,
 	});
 });
 
@@ -83,7 +107,7 @@ export const getUnReadChatNoti = asyncHandler(async (req, res, next) => {
 	const { fromUID } = req.query;
 
 	// const sql = `SELECT T1.CONVERSATION_ID, T1.USER_UID FROM GROUP_MEMBER AS T1 WHERE T1.USER_UID != '${fromUID}' AND EXISTS (SELECT * FROM GROUP_MEMBER AS T2 WHERE T2.USER_UID = '${fromUID}' AND T2.UNREAD_MESSAGE = 1 AND T1.CONVERSATION_ID = T2.CONVERSATION_ID);`;
-	const sql = `SELECT T1.CONVERSATION_ID, T1.USER_UID FROM GROUP_MEMBER AS T1 WHERE T1.USER_UID != '${fromUID}' AND EXISTS (SELECT * FROM GROUP_MEMBER AS T2 WHERE T2.USER_UID = '${fromUID}' AND T2.UNREAD_MESSAGE = 1 AND T1.CONVERSATION_ID = T2.CONVERSATION_ID);`;
+	const sql = `SELECT T1.CONVERSATION_ID, T1.USER_UID FROM GROUP_MEMBER AS T1 WHERE T1.USER_UID != ? AND EXISTS (SELECT * FROM GROUP_MEMBER AS T2 WHERE T2.USER_UID = ? AND T2.UNREAD_MESSAGE = 1 AND T1.CONVERSATION_ID = T2.CONVERSATION_ID);`;
 
 	const resultUnReadList = await queryExecutorResult2(sql, [
 		fromUID as string,
