@@ -60,3 +60,49 @@ export const sendPrivateMessageFunction = async (
 		convId,
 	};
 };
+
+export const sendGroupMessageFunction = async (
+	chatMessage: string,
+	userUID: string,
+	convId: string,
+	imgList: string,
+	linkList: string,
+): Promise<errResult | succResult> => {
+	const message_uuid = `message_${generateUID()}`;
+
+	const insertResult = await queryExecutorResultProcedure('SendGroupChat', [
+		message_uuid,
+		chatMessage,
+		imgList,
+		linkList,
+		userUID,
+		convId,
+	]);
+
+	if (insertResult.status === 'error') {
+		return {
+			result: 'error',
+		};
+	}
+
+	const messageTransactionAfter = await queryExecutorResultProcedure('MessageTransactionAfter', [
+		userUID,
+		convId,
+	]);
+
+	let { status, queryResult } = messageTransactionAfter;
+
+	queryResult = await LinkArrFetchMetadata(queryResult);
+
+	if (status === 'error') {
+		return {
+			result: 'error',
+		};
+	}
+
+	return {
+		result: 'success',
+		chatList: queryResult,
+		convId,
+	};
+};

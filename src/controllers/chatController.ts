@@ -50,11 +50,12 @@ export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 });
 
 export const getGroupChatList = asyncHandler(async (req, res, next) => {
-	const { chatRoomId } = req.body;
+	const { chatRoomId, readingUser } = req.body;
 
-	const sql = `SELECT T1.MESSAGE_ID, T1.FROM_USERNAME, T1.TO_USERNAME, T1.MESSAGE_TEXT, T1.IMG_LIST, T1.LINK_LIST, T1.SENT_DATETIME, T1.USER_UID, T2.USER_NM, T2.USER_TITLE, T1.CONVERSATION_ID FROM USER_CHAT AS T1 INNER JOIN USER AS T2 ON T1.USER_UID = T2.USER_UID WHERE CONVERSATION_ID = '${chatRoomId}' ORDER BY SENT_DATETIME;`;
-
-	const resultChatList = await queryExecutorResult2(sql, [chatRoomId]);
+	const resultChatList = await queryExecutorResultProcedure('ReadGroupChatList', [
+		readingUser,
+		chatRoomId,
+	]);
 
 	if (resultChatList.status === 'error') {
 		return next(new ErrorResponse('서버에서 에러가 발생했습니다', 400));
@@ -104,14 +105,9 @@ export const savePrivateChat = asyncHandler(async (req, res, next) => {
 });
 
 export const getUnReadChatNoti = asyncHandler(async (req, res, next) => {
-	// const { fromUID } = req.body;
 	const { fromUID } = req.query;
 
-	// const sql = `SELECT T1.CONVERSATION_ID, T1.USER_UID FROM GROUP_MEMBER AS T1 WHERE T1.USER_UID != '${fromUID}' AND EXISTS (SELECT * FROM GROUP_MEMBER AS T2 WHERE T2.USER_UID = '${fromUID}' AND T2.UNREAD_MESSAGE = 1 AND T1.CONVERSATION_ID = T2.CONVERSATION_ID);`;
-	const sql = `SELECT T1.CONVERSATION_ID, T1.USER_UID FROM GROUP_MEMBER AS T1 WHERE T1.USER_UID != ? AND EXISTS (SELECT * FROM GROUP_MEMBER AS T2 WHERE T2.USER_UID = ? AND T2.UNREAD_MESSAGE = 1 AND T1.CONVERSATION_ID = T2.CONVERSATION_ID);`;
-
-	const resultUnReadList = await queryExecutorResult2(sql, [
-		fromUID as string,
+	const resultUnReadList = await queryExecutorResultProcedure('GetUnReadChatNoti', [
 		fromUID as string,
 	]);
 
