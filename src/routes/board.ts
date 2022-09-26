@@ -6,6 +6,7 @@ import {
 	getComments,
 	setComment,
 	setDelCmnt,
+	deleteBoard,
 } from '@src/controllers/boardController';
 import { uploadImg } from '@src/util/s3Connect';
 
@@ -19,5 +20,6 @@ router.post('/uploadBoard', uploadImg, setSubmitBoard);
 router.post('/getComments', getComments);
 router.post('/setComment', setComment);
 router.post('/deleteCmnt', setDelCmnt);
+router.post('/deleteBoard', deleteBoard);
 
 export default router;

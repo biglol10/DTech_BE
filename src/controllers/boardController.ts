@@ -111,12 +111,16 @@ export const setBoardLike = asyncHandler(async (req, res, next) => {
 });
 
 export const getBoardList = asyncHandler(async (req, res, next) => {
-	const orderType = req.body.orderType;
+	const orderType = req.body.orderType ? req.body.orderType : 'new';
 
 	let sqlParam = [req.body.uuid];
-	let sql = `SELECT B.*, T.*
+	let sql = `SELECT B.*, T.*, COUNT(C.CMNT_CD) as LIKED
 	FROM BOARD B LEFT JOIN TECH T
-	ON B.TECH_CD = T.TECH_CD`;
+	ON B.TECH_CD = T.TECH_CD
+	LEFT OUTER JOIN BOARD_COMMENT C
+	ON B.BOARD_CD = C.BOARD_CD
+	AND C.USER_UID=?
+	AND C.CMNT_TYPE='like'`;
 	if (req.body.brdId !== undefined) {
 		sql += ' WHERE B.BOARD_CD=?';
 		sqlParam.push(req.body.brdId);
@@ -129,9 +133,10 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
 	} else if (orderType === 'hot') {
 		sql += 'ORDER BY B.CMNT_CNT DESC';
 	}
-
 	const resultData = await queryExecutorResult2(sql, sqlParam);
-	console.log('boardController');
+
+	// console.log(sql);
+	// console.log(sqlParam);
 	console.log(resultData);
 
 	const sql2 = 'select BOARD_CD,URL_ORDER,URL_ADDR as url from BOARD_URL where URL_TYPE="image"';
@@ -222,6 +227,25 @@ export const getComments = asyncHandler(async (req, res, next) => {
 	if (resultData.status === 'success') {
 		return res.status(200).json({
 			resultData,
+		});
+	} else {
+		return res.status(401).json({
+			resultData,
+			message: 'query execute failed',
+		});
+	}
+});
+
+export const deleteBoard = asyncHandler(async (req, res, next) => {
+	console.log('deleteBoard');
+	console.log(req.body);
+	const sql = 'DELETE FROM BOARD WHERE BOARD_CD=? ';
+	const reqParam = [req.body.brdId];
+	const resultData = await queryExecutorResult2(sql, reqParam);
+	console.log(resultData);
+	if (resultData.status === 'success') {
+		return res.status(200).json({
+			resultData: resultData,
 		});
 	} else {
 		return res.status(401).json({
