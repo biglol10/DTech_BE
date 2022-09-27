@@ -112,6 +112,7 @@ export const setBoardLike = asyncHandler(async (req, res, next) => {
 
 export const getBoardList = asyncHandler(async (req, res, next) => {
 	const orderType = req.body.orderType ? req.body.orderType : 'new';
+	// console.log(req.body.filterType);
 
 	let sqlParam = [req.body.uuid];
 	let sql = `SELECT B.*, T.*, COUNT(C.CMNT_CD) as LIKED
@@ -120,10 +121,15 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
 	LEFT OUTER JOIN BOARD_COMMENT C
 	ON B.BOARD_CD = C.BOARD_CD
 	AND C.USER_UID=?
-	AND C.CMNT_TYPE='like'`;
+	AND C.CMNT_TYPE='like'
+	WHERE 1=1`;
 	if (req.body.brdId !== undefined) {
-		sql += ' WHERE B.BOARD_CD=?';
+		sql += ' AND B.BOARD_CD=?';
 		sqlParam.push(req.body.brdId);
+	}
+	if (req.body.filterType !== undefined && req.body.filterType !== null) {
+		sql += ' AND B.TECH_CD=?';
+		sqlParam.push(req.body.filterType);
 	}
 	sql += ' GROUP BY B.BOARD_CD ';
 	if (orderType === 'new') {
@@ -137,7 +143,7 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
 
 	// console.log(sql);
 	// console.log(sqlParam);
-	console.log(resultData);
+	// console.log(resultData);
 
 	const sql2 = 'select BOARD_CD,URL_ORDER,URL_ADDR as url from BOARD_URL where URL_TYPE="image"';
 	const resultImg = await queryExecutorResult2(sql2);
