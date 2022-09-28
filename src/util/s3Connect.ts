@@ -35,6 +35,7 @@ const upload = multer({
 });
 
 const uploadImg = async (req: any, res: any, next: any) => {
+	// console.log('uploadImg');
 	imgArr = [];
 	DATE_STR = getDateString();
 
@@ -43,7 +44,7 @@ const uploadImg = async (req: any, res: any, next: any) => {
 			console.log(`error~`, err);
 			return next(new ErrorResponse('AWS s3 upload failed', 401));
 		}
-		req.body.postData = POSTDATA;
+		req.body.postData = req.body.postData !== undefined ? JSON.parse(req.body.postData) : {};
 		req.body.imgArr = imgArr;
 		next();
 	});
