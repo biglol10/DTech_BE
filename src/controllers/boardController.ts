@@ -1,9 +1,7 @@
 import asyncHandler from '@src/middleware/async';
 import { queryExecutorResult2 } from '@src/util/queryExecutorResult';
-import { uploadImg } from '@src/util/s3Connect';
 
 export const setSubmitBoard = asyncHandler(async (req, res, next) => {
-	// console.log('setSubmitBoard');
 	let { type, title, uuid, tech, content, formData } = req.body.postData;
 	const imgArr = req.body.imgArr;
 
@@ -167,24 +165,9 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
 	}
 });
 
-// function js_traverse(o: any) {
-// 	var type = typeof o;
-// 	if (type == 'object') {
-// 		for (var key in o) {
-// 			if (key == 'UPPER_CMNT_CD') {
-// 				console.log('key: ', key);
-// 			}
-
-// 			js_traverse(o[key]);
-// 		}
-// 	} else {
-// 		console.log(o);
-// 	}
-// }
-
 export const setDelCmnt = asyncHandler(async (req, res, next) => {
 	console.log('setDelCmnt');
-	console.log(req.body);
+	// console.log(req.body);
 
 	console.log(req.body.params.cmntCd);
 
