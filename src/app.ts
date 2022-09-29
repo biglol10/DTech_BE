@@ -14,7 +14,7 @@ import cors from 'cors';
 import errorHandler from '@src/middleware/error';
 import http from 'http';
 import { Server } from 'socket.io';
-import { sendPrivateMessageFunction } from './util/socketActions';
+import { sendPrivateMessageFunction, sendGroupMessageFunction } from './util/socketActions';
 import {
 	usersSocket,
 	addUser,
@@ -23,6 +23,10 @@ import {
 	addUser2,
 	removeUser2,
 	getConnectedUser,
+	addUserRoom,
+	removeUserRoom,
+	getConnectedUserRoom,
+	getAllConnectedUsersRoom,
 } from './util/memoryStorage';
 import ioInstance from './util/socketIO';
 
@@ -105,6 +109,55 @@ io.on('connection', (socket) => {
 					toUserUID,
 				});
 			}
+		},
+	);
+
+	socket.on(
+		'sendGroupMessage',
+		async ({ chatMessage, userUID, convId, imgList, linkList }: { [keys: string]: string }) => {
+			const sendResult = await sendGroupMessageFunction(
+				chatMessage,
+				userUID,
+				convId,
+				imgList,
+				linkList,
+			);
+
+			if (sendResult.result === 'success') {
+				socket.emit('messageGroupSendSuccess', {
+					chatListSocket: sendResult.chatList,
+				});
+
+				socket.broadcast.to(convId).emit('newMessageGroupReceived', {
+					chatListSocket: sendResult.chatList,
+					fromUID: userUID,
+					convId,
+				});
+
+				setTimeout(() => {
+					socket.broadcast.to(convId).emit('newMessageGroupReceivedSidebar', {
+						fromUID: convId,
+					});
+				}, 1000);
+			}
+		},
+	);
+
+	socket.on(
+		'joinRoom',
+		async ({ roomID, joinedUser }: { roomID: string; joinedUser: string }) => {
+			await addUserRoom(joinedUser, socket.id, roomID);
+
+			socket.join(roomID);
+		},
+	);
+
+	socket.on(
+		'leaveRoom',
+		async ({ roomID, joinedUser }: { roomID: string; joinedUser: string }) => {
+			await removeUserRoom(socket.id, roomID);
+
+			socket.leave(roomID);
 		},
 	);
 
