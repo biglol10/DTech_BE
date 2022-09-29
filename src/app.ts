@@ -62,6 +62,7 @@ io.on('connection', (socket) => {
 
 	socket.on('disconnect', async (obj) => {
 		await removeUser(socket.id);
+		// await removeUserRoom()
 		clearInterval(interval);
 	});
 
