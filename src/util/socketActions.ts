@@ -10,6 +10,7 @@ interface succResult {
 	result: 'success';
 	chatList: any;
 	convId: string;
+	usersToNotify?: string[];
 }
 
 /** @설명: 개인메시지 보내는 함수. INSERT 문까지 프로시저에 넣으면 '이 앞뒤에 들어가는 문제가 발생하여 INSERT문만 따로 빼냄 */
@@ -100,9 +101,12 @@ export const sendGroupMessageFunction = async (
 		};
 	}
 
+	const usersToNotify = insertResult.queryResult.map((item: any) => item.USER_ID);
+
 	return {
 		result: 'success',
 		chatList: queryResult,
 		convId,
+		usersToNotify,
 	};
 };

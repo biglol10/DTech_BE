@@ -62,6 +62,7 @@ io.on('connection', (socket) => {
 
 	socket.on('disconnect', async (obj) => {
 		await removeUser(socket.id);
+		// await removeUserRoom()
 		clearInterval(interval);
 	});
 
@@ -135,9 +136,15 @@ io.on('connection', (socket) => {
 				});
 
 				setTimeout(() => {
-					socket.broadcast.to(convId).emit('newMessageGroupReceivedSidebar', {
-						fromUID: convId,
-					});
+					sendResult.usersToNotify &&
+						sendResult.usersToNotify.map((userString) => {
+							const user = getConnectedUser(userString);
+							if (user) {
+								io.to(user.socketId).emit('newMessageGroupReceivedSidebar', {
+									fromUID: convId,
+								});
+							}
+						});
 				}, 1000);
 			}
 		},
