@@ -85,7 +85,7 @@ interface IUserSocket2 {
 const usersSocket2: IUserSocket2 = {};
 
 const addUser2 = (userId: string, socketId: string) => {
-	const userSocketValue = Object.prototype.hasOwnProperty(userId) ? usersSocket2[userId] : null;
+	const userSocketValue = userId ? usersSocket2[userId] : null;
 
 	if (userSocketValue && userSocketValue === socketId) {
 		return usersSocket2;

@@ -1,11 +1,10 @@
 import asyncHandler from '@src/middleware/async';
-import { queryExecutorResult } from '@src/util/queryExecutorResult';
 import axios from 'axios';
 import https from 'https';
 import cheerio from 'cheerio';
 import { metadataStorage } from '@src/util/memoryStorage';
 
-export const getMetadata = asyncHandler(async (req, res, next) => {
+export const getMetadata = asyncHandler(async (req, res) => {
 	const linkList = req.query.linkList as string[];
 
 	const metadataArr: any = [];
@@ -82,7 +81,7 @@ export const axiosFetchMetadata = async (url: string) => {
 				metadata_image: image,
 			};
 		})
-		.catch((error: any) => {
+		.catch(() => {
 			metadataStorage[url] = {
 				status: 'fail',
 				metadata_title: '',
