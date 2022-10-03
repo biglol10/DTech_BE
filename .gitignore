@@ -16,7 +16,7 @@ awsconfig.json
 
 /.dockerignore
 
-/.vscode/settings.json
+# /.vscode/settings.json
 
 /images/userImg
 package-lock.json

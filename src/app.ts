@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import express, { Request, Response, NextFunction } from 'express';
 
 import conn from '@src/dbConn/dbConnection';
