@@ -1,14 +1,6 @@
 import asyncHandler from '@src/middleware/async';
-import { queryExecutorResult, queryExecutorResult2 } from '@src/util/queryExecutorResult';
+import { queryExecutorResult2 } from '@src/util/queryExecutorResult';
 import ErrorResponse from '@src/util/errorResponse';
-
-// const waitingTime = () => {
-// 	return new Promise((resolve) => {
-// 		setTimeout(() => {
-// 			resolve(`The api called and value is ${Math.random() * 100}`);
-// 		}, 1000);
-// 	});
-// };
 
 export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
 	const teamSkillSetSql = `SELECT T1.TECH_CD, T2.TECH_NM, T2.TECH_DETAIL, T2.TECH_PAGE_URL, count(*) AS TECH_CNT from USER_TECH AS T1 INNER JOIN TECH T2 ON T1.TECH_CD = T2.TECH_CD GROUP BY TECH_CD;`;
@@ -40,7 +32,6 @@ export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
 	res.status(200).json({
 		teamSkillDashboard: resultData1.queryResult,
 		teamSkillCountObj: skillObj,
-		// teamSkillCountArr: Object.keys(skillObj).map((item) => skillObj[item]),
 		userDashboard: userSkillReduce(resultData2.queryResult),
 	});
 });

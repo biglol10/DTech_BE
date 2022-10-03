@@ -10,8 +10,6 @@ import conn from '@src/dbConn/dbConnection';
 import { IOSocket, io } from '@src/app';
 import { getConnectedUser } from '@src/util/memoryStorage';
 
-import { axiosFetchMetadata } from './utilsController';
-
 export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 	const { fromUID, toUID } = req.body;
 	const chat_uuid = `conv_private_${generateUID()}`;
@@ -121,7 +119,7 @@ export const getUnReadChatNoti = asyncHandler(async (req, res, next) => {
 	});
 });
 
-export const uploadChatImg = asyncHandler(async (req, res, next) => {
+export const uploadChatImg = asyncHandler(async (req, res) => {
 	return res.status(200).json({
 		bodyObj: req.body,
 	});

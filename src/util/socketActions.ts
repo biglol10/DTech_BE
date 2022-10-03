@@ -1,5 +1,4 @@
 import { generateUID, LinkArrFetchMetadata } from '@src/util/customFunc';
-import conn from '@src/dbConn/dbConnection';
 import { queryExecutorResult, queryExecutorResultProcedure } from '@src/util/queryExecutorResult';
 
 interface errResult {
@@ -45,7 +44,8 @@ export const sendPrivateMessageFunction = async (
 		convId,
 	]);
 
-	let { status, queryResult } = messageTransactionAfter;
+	let { queryResult } = messageTransactionAfter;
+	const { status } = messageTransactionAfter;
 
 	queryResult = await LinkArrFetchMetadata(queryResult);
 
@@ -91,7 +91,8 @@ export const sendGroupMessageFunction = async (
 		convId,
 	]);
 
-	let { status, queryResult } = messageTransactionAfter;
+	let { queryResult } = messageTransactionAfter;
+	const { status } = messageTransactionAfter;
 
 	queryResult = await LinkArrFetchMetadata(queryResult);
 

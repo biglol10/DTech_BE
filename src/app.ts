@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import express, { Request, Response, NextFunction } from 'express';
 
-import conn from '@src/dbConn/dbConnection';
 import {
 	authRoute,
 	dashboardRoute,
@@ -14,20 +13,14 @@ import {
 import cors from 'cors';
 import errorHandler from '@src/middleware/error';
 import http from 'http';
-import { Server } from 'socket.io';
 import { sendPrivateMessageFunction, sendGroupMessageFunction } from './util/socketActions';
 import {
 	usersSocket,
 	addUser,
 	removeUser,
-	usersSocket2,
-	addUser2,
-	removeUser2,
 	getConnectedUser,
 	addUserRoom,
 	removeUserRoom,
-	getConnectedUserRoom,
-	getAllConnectedUsersRoom,
 } from './util/memoryStorage';
 import ioInstance from './util/socketIO';
 
@@ -41,8 +34,6 @@ export let IOSocket: any = null;
 const PORT = 3066;
 
 io.on('connection', (socket) => {
-	console.log(`a new user connected with socketId of ${socket.id}`);
-
 	IOSocket = socket;
 
 	const interval = setInterval(() => {
@@ -61,9 +52,8 @@ io.on('connection', (socket) => {
 		});
 	});
 
-	socket.on('disconnect', async (obj) => {
+	socket.on('disconnect', async () => {
 		await removeUser(socket.id);
-		// await removeUserRoom()
 		clearInterval(interval);
 	});
 
@@ -160,31 +150,14 @@ io.on('connection', (socket) => {
 		},
 	);
 
-	socket.on(
-		'leaveRoom',
-		async ({ roomID, joinedUser }: { roomID: string; joinedUser: string }) => {
-			await removeUserRoom(socket.id, roomID);
+	socket.on('leaveRoom', async ({ roomID }: { roomID: string; joinedUser: string }) => {
+		await removeUserRoom(socket.id, roomID);
 
-			socket.leave(roomID);
-		},
-	);
+		socket.leave(roomID);
+	});
 
 	require('./util/socketDefinition')(socket);
-
-	// return io;
-
-	// socket.on('textChangeNotification', ({ sendingUser }) => {
-	// 	socket.broadcast.emit('textChangeNotification', sendingUser);
-	// });
 });
-
-// conn.connect(function (err) {
-// 	if (err) {
-// 		console.log(err);
-// 		throw err;
-// 	}
-// 	console.log('Connected!!');
-// });
 
 // Body parser
 app.use(express.json());
@@ -208,7 +181,7 @@ app.use('/api/chat', chatRoute);
 
 app.use(errorHandler);
 
-app.get('/welcome', (req: Request, res: Response, next: NextFunction) => {
+app.get('/welcome', (req: Request, res: Response) => {
 	res.send('welcome!');
 });
 
