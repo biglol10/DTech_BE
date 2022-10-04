@@ -17,3 +17,5 @@ awsconfig.json
 /images/userImg
 
 /config/s3.json
+
+/.vscode
