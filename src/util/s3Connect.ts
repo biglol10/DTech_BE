@@ -18,15 +18,12 @@ const upload = multer({
 		acl: 'public-read-write',
 		contentType: multerS3.AUTO_CONTENT_TYPE,
 		key: async function (req: any, file: any, cb: any) {
-			// console.log('upload');
 			POSTDATA = req.body.postData !== undefined ? JSON.parse(req.body.postData) : {};
-			// POSTDATA = JSON.parse(req.body.postData);
+
 			if (POSTDATA.type === 'REGISTER_USER') {
 				imgArr.push(`${POSTDATA.dir}${file.originalname}`);
 				cb(null, `${POSTDATA.dir}${file.originalname}`);
 			} else {
-				// imgArr.push(`${POSTDATA.dir}${DATE_STR}_${file.originalname}`);
-				// cb(null, `${POSTDATA.dir}${DATE_STR}_${file.originalname}`);
 				imgArr.push(`${POSTDATA.dir}${file.originalname}`);
 				cb(null, `${POSTDATA.dir}${file.originalname}`);
 			}
@@ -35,13 +32,11 @@ const upload = multer({
 });
 
 const uploadImg = async (req: any, res: any, next: any) => {
-	// console.log('uploadImg');
 	imgArr = [];
 	DATE_STR = getDateString();
 
 	upload.array('img')(req, res, async (err: any) => {
 		if (err !== undefined) {
-			console.log(`error~`, err);
 			return next(new ErrorResponse('AWS s3 upload failed', 401));
 		}
 		req.body.postData = req.body.postData !== undefined ? JSON.parse(req.body.postData) : {};

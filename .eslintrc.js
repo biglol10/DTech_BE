@@ -38,6 +38,6 @@ module.exports = {
 		'no-use-before-define': ['error', { variables: false }], // ? If this is true, the rule warns every reference to a variable before the variable declaration
 		'no-console': 'warn', // ? console.log 경고
 		'consistent-return': 'off', // ? 굳이 꼭 무언가를 리턴할 필요가 없게끔 설정
-		'@typescript-eslint/no-explicit-any': 'warn',
+		'@typescript-eslint/no-explicit-any': 'off',
 	},
 };

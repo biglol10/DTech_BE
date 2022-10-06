@@ -2,7 +2,9 @@ import asyncHandler from '@src/middleware/async';
 import { queryExecutorResult2 } from '@src/util/queryExecutorResult';
 
 export const setSubmitBoard = asyncHandler(async (req, res, next) => {
-	let { type, title, uuid, tech, content, formData } = req.body.postData;
+	let { tech } = req.body.postData;
+	const { title, uuid, content } = req.body.postData;
+
 	const imgArr = req.body.imgArr;
 
 	if (tech === '') {
@@ -10,7 +12,7 @@ export const setSubmitBoard = asyncHandler(async (req, res, next) => {
 	}
 
 	const sql = `INSERT INTO BOARD VALUES
-	(NEXTVAL(\'BOARD\'),?,current_timestamp(),
+	(NEXTVAL('BOARD'),?,current_timestamp(),
 	?,?,?,0,0)`;
 	const resultData: any = await queryExecutorResult2(sql, [uuid, title, content, tech]);
 
@@ -83,13 +85,12 @@ export const setBoardLike = asyncHandler(async (req, res, next) => {
 	const resultData = await queryExecutorResult2(sql, [req.body.id, req.body.userUID]);
 
 	if (resultData.status === 'success') {
-		let sql2 =
+		const sql2 =
 			'UPDATE BOARD SET LIKE_CNT = LIKE_CNT' +
 			(req.body.like ? ' + ' : ' - ') +
 			'1 WHERE BOARD_CD=?';
 		const resultData2 = await queryExecutorResult2(sql2, [req.body.id]);
 
-		console.log(resultData2);
 		if (resultData2.status === 'success') {
 			return res.status(200).json({
 				resultData2,
@@ -110,9 +111,8 @@ export const setBoardLike = asyncHandler(async (req, res, next) => {
 
 export const getBoardList = asyncHandler(async (req, res, next) => {
 	const orderType = req.body.orderType ? req.body.orderType : 'new';
-	// console.log(req.body.filterType);
 
-	let sqlParam = [req.body.uuid];
+	const sqlParam = [req.body.uuid];
 	let sql = `SELECT B.*, T.*, COUNT(C.CMNT_CD) as LIKED
 	FROM BOARD B LEFT JOIN TECH T
 	ON B.TECH_CD = T.TECH_CD
@@ -139,10 +139,6 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
 	}
 	const resultData = await queryExecutorResult2(sql, sqlParam);
 
-	// console.log(sql);
-	// console.log(sqlParam);
-	// console.log(resultData);
-
 	const sql2 = 'select BOARD_CD,URL_ORDER,URL_ADDR as url from BOARD_URL where URL_TYPE="image"';
 	const resultImg = await queryExecutorResult2(sql2);
 
@@ -166,11 +162,6 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
 });
 
 export const setDelCmnt = asyncHandler(async (req, res, next) => {
-	console.log('setDelCmnt');
-	// console.log(req.body);
-
-	console.log(req.body.params.cmntCd);
-
 	const sql = 'DELETE FROM BOARD_COMMENT WHERE CMNT_CD=?';
 
 	const resultData = await queryExecutorResult2(sql, req.body.params.cmntCd);
@@ -198,20 +189,12 @@ export const setDelCmnt = asyncHandler(async (req, res, next) => {
 });
 
 export const getComments = asyncHandler(async (req, res, next) => {
-	// console.log('getComments');
-	// console.log(req.body);
-
 	const reqParam = [req.body.brdId];
 	const sql = `SELECT A.*, B.USER_NM, B.USER_TITLE
 	FROM BOARD_COMMENT A LEFT JOIN USER B
 	ON A.USER_UID = B.USER_UID WHERE BOARD_CD = ?`;
-	// const sql = `SELECT A.*, B.CMNT_CD as 'a', B.BOARD_CMNT as 'b'
-	// from BOARD_COMMENT A LEFT JOIN BOARD_COMMENT B
-	// ON A.CMNT_CD = B.UPPER_CMNT_CD
-	// WHERE A.BOARD_CD=?`;
 
 	const resultData = await queryExecutorResult2(sql, reqParam);
-	// console.log(resultData);
 
 	if (resultData.status === 'success') {
 		return res.status(200).json({
@@ -226,12 +209,10 @@ export const getComments = asyncHandler(async (req, res, next) => {
 });
 
 export const deleteBoard = asyncHandler(async (req, res, next) => {
-	console.log('deleteBoard');
-	console.log(req.body);
 	const sql = 'DELETE FROM BOARD WHERE BOARD_CD=? ';
 	const reqParam = [req.body.brdId];
 	const resultData = await queryExecutorResult2(sql, reqParam);
-	console.log(resultData);
+
 	if (resultData.status === 'success') {
 		return res.status(200).json({
 			resultData: resultData,
@@ -245,8 +226,6 @@ export const deleteBoard = asyncHandler(async (req, res, next) => {
 });
 
 export const setComment = asyncHandler(async (req, res, next) => {
-	console.log('setComment');
-	console.log(req.body);
 	const reqParam = [req.body.brdId, req.body.uuid, req.body.commentArea];
 	const sql = `INSERT INTO BOARD_COMMENT VALUES
 	(NEXTVAL('CMNT'),?,'comment',?,
