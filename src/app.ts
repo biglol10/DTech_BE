@@ -8,6 +8,7 @@ import {
 	utilsRoute,
 	chatRoute,
 	boardRoute,
+	infoRoute,
 } from '@src/routes/index';
 
 import cors from 'cors';
@@ -178,6 +179,7 @@ app.use('/api/testApi', testRoute);
 app.use('/api/utils', utilsRoute);
 app.use('/api/board', boardRoute);
 app.use('/api/chat', chatRoute);
+app.use('/api/info', infoRoute);
 
 app.use(errorHandler);
 

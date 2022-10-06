@@ -163,12 +163,11 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
 
 export const setDelCmnt = asyncHandler(async (req, res, next) => {
 	const sql = 'DELETE FROM BOARD_COMMENT WHERE CMNT_CD=?';
-
-	const resultData = await queryExecutorResult2(sql, req.body.params.cmntCd);
+	const resultData = await queryExecutorResult2(sql, req.body.cmntCd);
 
 	if (resultData.status === 'success') {
 		const sql2 = 'UPDATE BOARD SET CMNT_CNT = CMNT_CNT-1 WHERE BOARD_CD=?';
-		const resultData2 = await queryExecutorResult2(sql2, req.body.params.boardCd);
+		const resultData2 = await queryExecutorResult2(sql2, req.body.boardCd);
 
 		if (resultData2.status === 'success') {
 			return res.status(200).json({
