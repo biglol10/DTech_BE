@@ -85,7 +85,7 @@ interface IUserSocket2 {
 const usersSocket2: IUserSocket2 = {};
 
 const addUser2 = (userId: string, socketId: string) => {
-	const userSocketValue = Object.prototype.hasOwnProperty(userId) ? usersSocket2[userId] : null;
+	const userSocketValue = userId ? usersSocket2[userId] : null;
 
 	if (userSocketValue && userSocketValue === socketId) {
 		return usersSocket2;
@@ -108,6 +108,16 @@ const getConnectedUser = (userId: string) => {
 	return user;
 };
 
+const getConnectedUserRoom = (userId: string, roomID: string) => {
+	const user = usersSocket.find((item) => item.userId === userId && item.roomId === roomID);
+	return user;
+};
+
+const getAllConnectedUsersRoom = (roomID: string) => {
+	const arr = usersSocket.filter((item) => item.roomId === roomID);
+	return arr;
+};
+
 export {
 	metadataStorage,
 	usersSocket,
@@ -119,4 +129,6 @@ export {
 	addUserRoom,
 	removeUserRoom,
 	getConnectedUser,
+	getConnectedUserRoom,
+	getAllConnectedUsersRoom,
 };

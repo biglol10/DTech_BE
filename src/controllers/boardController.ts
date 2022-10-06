@@ -1,6 +1,5 @@
 import asyncHandler from '@src/middleware/async';
 import { queryExecutorResult2 } from '@src/util/queryExecutorResult';
-import { uploadImg } from '@src/util/s3Connect';
 
 export const setSubmitBoard = asyncHandler(async (req, res, next) => {
 	let { type, title, uuid, tech, content, formData } = req.body.postData;
@@ -12,37 +11,44 @@ export const setSubmitBoard = asyncHandler(async (req, res, next) => {
 
 	const sql = `INSERT INTO BOARD VALUES
 	(NEXTVAL(\'BOARD\'),?,current_timestamp(),
-	?,?,?)`;
+	?,?,?,0,0)`;
 	const resultData: any = await queryExecutorResult2(sql, [uuid, title, content, tech]);
 
 	if (resultData.status === 'success') {
 		const sql2 = `select BOARD_CD, BOARD_TITLE from BOARD
-		where BOARD_UID=?
+		where USER_UID=?
 		order by BOARD_DATE DESC
 		limit 1;`;
 		const resultData2 = await queryExecutorResult2(sql2, [uuid]);
 
-		if (resultData2.status === 'success' && imgArr.length > 0) {
-			let sql3 = 'INSERT INTO BOARD_URL VALUES ';
-			const s3Url = `https://dcx-tech.s3.ap-northeast-2.amazonaws.com/`;
-			for (let i = 0; i < imgArr.length; i++) {
-				sql3 += `('${resultData2.queryResult[0].BOARD_CD}',${i + 1},'image','${
-					s3Url + imgArr[i]
-				}'),`;
-			}
-			sql3 = sql3.slice(0, -1);
-			const resultData3 = await queryExecutorResult2(sql3, []);
+		if (resultData2.status === 'success') {
+			if (imgArr.length > 0) {
+				let sql3 = 'INSERT INTO BOARD_URL VALUES ';
+				const s3Url = `https://dcx-tech.s3.ap-northeast-2.amazonaws.com/`;
+				for (let i = 0; i < imgArr.length; i++) {
+					sql3 += `('${resultData2.queryResult[0].BOARD_CD}',${i + 1},'image','${
+						s3Url + imgArr[i]
+					}'),`;
+				}
+				sql3 = sql3.slice(0, -1);
+				const resultData3 = await queryExecutorResult2(sql3, []);
 
-			if (resultData3.status === 'success') {
+				if (resultData3.status === 'success') {
+					return res.status(200).json({
+						result: 'success',
+						resultData: resultData2,
+					});
+				} else {
+					return res.status(401).json({
+						resultData3,
+						message: 'query3 execute failed',
+						status: resultData3.status || 'err from node',
+					});
+				}
+			} else {
 				return res.status(200).json({
 					result: 'success',
 					resultData: resultData2,
-				});
-			} else {
-				return res.status(401).json({
-					resultData3,
-					message: 'query3 execute failed',
-					status: resultData3.status || 'err from node',
 				});
 			}
 		} else {
@@ -61,50 +67,6 @@ export const setSubmitBoard = asyncHandler(async (req, res, next) => {
 	}
 });
 
-export const setSubmitBoard2 = async (req: any, res: any, postData: any, imgArr?: any) => {
-	let { type, title, uuid, tech, content } = postData;
-	if (tech === '') {
-		tech = null;
-	}
-
-	const sql = `INSERT INTO BOARD VALUES
-	(NEXTVAL(\'BOARD\'),?,current_timestamp(),
-	?,?,?)`;
-	const resultData: any = await queryExecutorResult2(sql, [uuid, title, content, tech]);
-
-	if (resultData.status === 'success') {
-		const sql2 = `select BOARD_CD, BOARD_TITLE from BOARD 
-		where BOARD_UID=?
-		order by BOARD_DATE DESC
-		limit 1;`;
-		const resultData2 = await queryExecutorResult2(sql2, [uuid]);
-		// console.log(resultData2);
-
-		if (resultData2.status === 'success' && imgArr.length > 0) {
-			let sql3 = 'INSERT INTO BOARD_URL VALUES ';
-			const s3Url = `https://dcx-tech.s3.ap-northeast-2.amazonaws.com/`;
-			for (let i = 0; i < imgArr.length; i++) {
-				sql3 += `('${resultData2.queryResult[0].BOARD_CD}',${i + 1},'image','${
-					s3Url + imgArr[i]
-				}'),`;
-			}
-			sql3 = sql3.slice(0, -1);
-			const resultData3 = await queryExecutorResult2(sql3, []);
-
-			return resultData3;
-		} else {
-			return resultData2;
-		}
-	} else {
-		return resultData;
-	}
-};
-
-// export const setBoardImage = asyncHandler(async (req, res, next) => {
-// 	// console.log('setBoardImg');
-// 	uploadImg(req, res, 'img', 'board/');
-// });
-
 export const setBoardLike = asyncHandler(async (req, res, next) => {
 	let sql = '';
 	if (req.body.like === true) {
@@ -114,16 +76,30 @@ export const setBoardLike = asyncHandler(async (req, res, next) => {
 	} else {
 		sql = `delete from BOARD_COMMENT 
     WHERE BOARD_CD=? 
-    AND CMNT_UID=?;
+    AND USER_UID=?;
     `;
 	}
 
 	const resultData = await queryExecutorResult2(sql, [req.body.id, req.body.userUID]);
 
 	if (resultData.status === 'success') {
-		return res.status(200).json({
-			resultData,
-		});
+		let sql2 =
+			'UPDATE BOARD SET LIKE_CNT = LIKE_CNT' +
+			(req.body.like ? ' + ' : ' - ') +
+			'1 WHERE BOARD_CD=?';
+		const resultData2 = await queryExecutorResult2(sql2, [req.body.id]);
+
+		console.log(resultData2);
+		if (resultData2.status === 'success') {
+			return res.status(200).json({
+				resultData2,
+			});
+		} else {
+			return res.status(401).json({
+				resultData,
+				message: 'query2 execute failed',
+			});
+		}
 	} else {
 		return res.status(401).json({
 			resultData,
@@ -131,23 +107,42 @@ export const setBoardLike = asyncHandler(async (req, res, next) => {
 		});
 	}
 });
-export const getBoardList = asyncHandler(async (req, res, next) => {
-	const sql = `select B.*,
-    IFNULL((select COUNT(C.CMNT_CD) 
-    from BOARD_COMMENT C
-    where B.BOARD_CD = C.BOARD_CD
-    and C.CMNT_TYPE = "comment"
-    group by B.BOARD_CD
-    ),0) as "COMMENTS_CNT",
-    IFNULL((select COUNT(C.CMNT_CD)
-    from BOARD_COMMENT C
-    where B.BOARD_CD = C.BOARD_CD
-    and C.CMNT_TYPE = "like"
-    group by B.BOARD_CD
-    ),0) as "LIKES_CNT"
-    from BOARD B`;
 
-	const resultData = await queryExecutorResult2(sql);
+export const getBoardList = asyncHandler(async (req, res, next) => {
+	const orderType = req.body.orderType ? req.body.orderType : 'new';
+	// console.log(req.body.filterType);
+
+	let sqlParam = [req.body.uuid];
+	let sql = `SELECT B.*, T.*, COUNT(C.CMNT_CD) as LIKED
+	FROM BOARD B LEFT JOIN TECH T
+	ON B.TECH_CD = T.TECH_CD
+	LEFT OUTER JOIN BOARD_COMMENT C
+	ON B.BOARD_CD = C.BOARD_CD
+	AND C.USER_UID=?
+	AND C.CMNT_TYPE='like'
+	WHERE 1=1`;
+	if (req.body.brdId !== undefined) {
+		sql += ' AND B.BOARD_CD=?';
+		sqlParam.push(req.body.brdId);
+	}
+	if (req.body.filterType !== undefined && req.body.filterType !== null) {
+		sql += ' AND B.TECH_CD=?';
+		sqlParam.push(req.body.filterType);
+	}
+	sql += ' GROUP BY B.BOARD_CD ';
+	if (orderType === 'new') {
+		sql += 'ORDER BY B.BOARD_DATE DESC';
+	} else if (orderType === 'best') {
+		sql += 'ORDER BY B.LIKE_CNT DESC';
+	} else if (orderType === 'hot') {
+		sql += 'ORDER BY B.CMNT_CNT DESC';
+	}
+	const resultData = await queryExecutorResult2(sql, sqlParam);
+
+	// console.log(sql);
+	// console.log(sqlParam);
+	// console.log(resultData);
+
 	const sql2 = 'select BOARD_CD,URL_ORDER,URL_ADDR as url from BOARD_URL where URL_TYPE="image"';
 	const resultImg = await queryExecutorResult2(sql2);
 
@@ -162,6 +157,130 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
 		return res.status(200).json({
 			resultData,
 		});
+	} else {
+		return res.status(401).json({
+			resultData,
+			message: 'query execute failed',
+		});
+	}
+});
+
+export const setDelCmnt = asyncHandler(async (req, res, next) => {
+	console.log('setDelCmnt');
+	// console.log(req.body);
+
+	console.log(req.body.params.cmntCd);
+
+	const sql = 'DELETE FROM BOARD_COMMENT WHERE CMNT_CD=?';
+
+	const resultData = await queryExecutorResult2(sql, req.body.params.cmntCd);
+
+	if (resultData.status === 'success') {
+		const sql2 = 'UPDATE BOARD SET CMNT_CNT = CMNT_CNT-1 WHERE BOARD_CD=?';
+		const resultData2 = await queryExecutorResult2(sql2, req.body.params.boardCd);
+
+		if (resultData2.status === 'success') {
+			return res.status(200).json({
+				resultData,
+			});
+		} else {
+			return res.status(401).json({
+				resultData,
+				message: 'query2 execute failed',
+			});
+		}
+	} else {
+		return res.status(401).json({
+			resultData,
+			message: 'query execute failed',
+		});
+	}
+});
+
+export const getComments = asyncHandler(async (req, res, next) => {
+	// console.log('getComments');
+	// console.log(req.body);
+
+	const reqParam = [req.body.brdId];
+	const sql = `SELECT A.*, B.USER_NM, B.USER_TITLE
+	FROM BOARD_COMMENT A LEFT JOIN USER B
+	ON A.USER_UID = B.USER_UID WHERE BOARD_CD = ?`;
+	// const sql = `SELECT A.*, B.CMNT_CD as 'a', B.BOARD_CMNT as 'b'
+	// from BOARD_COMMENT A LEFT JOIN BOARD_COMMENT B
+	// ON A.CMNT_CD = B.UPPER_CMNT_CD
+	// WHERE A.BOARD_CD=?`;
+
+	const resultData = await queryExecutorResult2(sql, reqParam);
+	// console.log(resultData);
+
+	if (resultData.status === 'success') {
+		return res.status(200).json({
+			resultData,
+		});
+	} else {
+		return res.status(401).json({
+			resultData,
+			message: 'query execute failed',
+		});
+	}
+});
+
+export const deleteBoard = asyncHandler(async (req, res, next) => {
+	console.log('deleteBoard');
+	console.log(req.body);
+	const sql = 'DELETE FROM BOARD WHERE BOARD_CD=? ';
+	const reqParam = [req.body.brdId];
+	const resultData = await queryExecutorResult2(sql, reqParam);
+	console.log(resultData);
+	if (resultData.status === 'success') {
+		return res.status(200).json({
+			resultData: resultData,
+		});
+	} else {
+		return res.status(401).json({
+			resultData,
+			message: 'query execute failed',
+		});
+	}
+});
+
+export const setComment = asyncHandler(async (req, res, next) => {
+	console.log('setComment');
+	console.log(req.body);
+	const reqParam = [req.body.brdId, req.body.uuid, req.body.commentArea];
+	const sql = `INSERT INTO BOARD_COMMENT VALUES
+	(NEXTVAL('CMNT'),?,'comment',?,
+	?,null,current_timestamp())
+	`;
+
+	const resultData = await queryExecutorResult2(sql, reqParam);
+
+	if (resultData.status === 'success') {
+		const reqParam2 = [req.body.brdId];
+		const sql2 = 'UPDATE BOARD SET CMNT_CNT = CMNT_CNT + 1 WHERE BOARD_CD = ?';
+		const resultData2 = await queryExecutorResult2(sql2, reqParam2);
+		if (resultData2.status === 'success') {
+			const reqParam3 = [req.body.brdId];
+			const sql3 = `SELECT A.*, B.USER_NM, B.USER_TITLE
+			FROM BOARD_COMMENT A LEFT JOIN USER B
+			ON A.USER_UID = B.USER_UID WHERE BOARD_CD = ?`;
+			const resultData3 = await queryExecutorResult2(sql3, reqParam3);
+			if (resultData3.status === 'success') {
+				return res.status(200).json({
+					resultData: resultData3,
+				});
+			} else {
+				return res.status(401).json({
+					resultData: resultData3,
+					message: 'query3 execute failed',
+				});
+			}
+		} else {
+			return res.status(401).json({
+				resultData,
+				message: 'query2 execute failed',
+			});
+		}
 	} else {
 		return res.status(401).json({
 			resultData,

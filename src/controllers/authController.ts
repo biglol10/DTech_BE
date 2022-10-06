@@ -7,9 +7,7 @@ import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { generateUID } from '@src/util/customFunc';
-import { Request, Response, NextFunction } from 'express';
 import { usersSocket } from '@src/util/memoryStorage';
-import { uploadImg } from '@src/util/s3Connect';
 import { io } from '@src/app';
 
 dayjs.extend(utc);
@@ -66,7 +64,6 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 		domain,
 	]);
 	if (resultData.status !== 'success') {
-		console.log(resultData);
 		return res.status(401).json({
 			result: 'fail',
 			message: 'resultData1 failed',
@@ -77,8 +74,8 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 	// let resultData2 = { status: 'success' };
 	if (tech_list.length > 0) {
 		let techStr = '';
-		let techArr = [];
-		for (var i in tech_list) {
+		const techArr = [];
+		for (const i in tech_list) {
 			techStr += `(?,?),`;
 			techArr.push(uuid);
 			techArr.push(tech_list[i]);
@@ -87,10 +84,9 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
 		const sql = `INSERT INTO USER_TECH(USER_UID,TECH_CD) VALUES ` + techStr;
 
-		let resultData2 = await queryExecutorResult2(sql, techArr);
+		const resultData2 = await queryExecutorResult2(sql, techArr);
 
 		if (resultData2.status !== 'success') {
-			console.log(resultData2);
 			return res.status(401).json({
 				result: 'fail',
 				message: 'resultData2 failed',
@@ -124,7 +120,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 	}
 });
 
-export const idCheck = asyncHandler(async (req, res, next) => {
+export const idCheck = asyncHandler(async (req, res) => {
 	const { userId } = req.body;
 	const sql = `SELECT EXISTS (SELECT * FROM USER WHERE USER_ID = ?) AS SUCCESS`;
 
@@ -144,7 +140,7 @@ export const idCheck = asyncHandler(async (req, res, next) => {
 	}
 });
 
-export const getTeamList = asyncHandler(async (req, res, next) => {
+export const getTeamList = asyncHandler(async (req, res) => {
 	const sql = 'SELECT * FROM TEAM';
 
 	const resultData = await queryExecutorResult2(sql);
@@ -160,14 +156,28 @@ export const getTeamList = asyncHandler(async (req, res, next) => {
 	}
 });
 
-export const setProfileImage = asyncHandler(async (req, res, next) => {
-	// uploadImg(req, res, 'img', 'profile_img/');
-	return res.status(200).json({
-		result: 'success',
-	});
+export const setProfileImage = asyncHandler(async (req, res) => {
+	const imgUrl: string = 'https://dcx-tech.s3.ap-northeast-2.amazonaws.com/' + req.body.imgArr[0];
+
+	const sql = `
+	UPDATE USER SET USER_IMG_URL=?  
+	WHERE USER_UID = ?`;
+
+	const resultData = await queryExecutorResult2(sql, [imgUrl, req.body.postData.uuid]);
+
+	if (resultData.status === 'success') {
+		return res.status(200).json({
+			resultData,
+		});
+	} else {
+		return res.status(401).json({
+			resultData,
+			message: 'query execute failed',
+		});
+	}
 });
 
-export const getTechList = asyncHandler(async (req, res, next) => {
+export const getTechList = asyncHandler(async (req, res) => {
 	const sql = 'SELECT * FROM TECH';
 
 	const resultData = await queryExecutorResult2(sql);
@@ -190,9 +200,9 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('아이디/비밀번호를 입력해주세요', 400));
 	}
 
-	const userFindSql = `SELECT * FROM USER WHERE USER_ID = '${userId}'`;
+	const userFindSql = `SELECT * FROM USER WHERE USER_ID = ?`;
 
-	const { queryResult: selectedUser } = await queryExecutorResult(userFindSql);
+	const { queryResult: selectedUser }: any = await queryExecutorResult2(userFindSql, [userId]);
 
 	if (selectedUser.length === 0) {
 		return next(new ErrorResponse('로그인에 실패했습니다', 401));
@@ -204,9 +214,9 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('로그인에 실패했습니다', 401));
 	}
 
-	const updateUserLoginSql = `UPDATE USER SET REGISTER_DATE = SYSDATE() WHERE USER_ID = '${userId}'`;
+	const updateUserLoginSql = `UPDATE USER SET REGISTER_DATE = SYSDATE() WHERE USER_ID = ?`;
 
-	const { queryResult: updateResult } = await queryExecutorResult(updateUserLoginSql);
+	const { queryResult: updateResult } = await queryExecutorResult2(updateUserLoginSql, [userId]);
 
 	if (updateResult.affectedRows && process.env.JWT_SECRET) {
 		const { token, options } = tokenResponse(userId, process.env.JWT_SECRET);
@@ -233,7 +243,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 export const getUsersStatus = asyncHandler(async (req, res, next) => {
 	const usersOnline = req.query.onlineUsers as string[];
 
-	if (!!usersOnline.length) {
+	if (usersOnline.length) {
 		let sqlScript = '';
 
 		const stringReduce = usersOnline.reduce((previouseValue, currentValue, idx) => {
@@ -276,7 +286,7 @@ export const getUsersStatus = asyncHandler(async (req, res, next) => {
 export const getUsersInfo = asyncHandler(async (req, res, next) => {
 	const usersParam = req.query.usersParam as string[];
 
-	if (!!usersParam.length) {
+	if (usersParam.length) {
 		let sqlScript = '';
 
 		const stringReduce = usersParam.reduce((previouseValue, currentValue, idx) => {

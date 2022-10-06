@@ -4,8 +4,6 @@
 # production
 /dist
 
-/.vscode
-
 Dockerfile
 
 config.env
@@ -16,10 +14,8 @@ awsconfig.json
 
 /.dockerignore
 
-/.vscode/settings.json
-
 /images/userImg
-package-lock.json
-package-lock.json
 
 /config/s3.json
+
+/.vscode
