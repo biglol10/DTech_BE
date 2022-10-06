@@ -5,6 +5,4 @@ const router = Router();
 
 router.route('/getMetadata').get(getMetadata);
 
-// router.get('/getMetadata', getMetadata);
-
 export default router;
