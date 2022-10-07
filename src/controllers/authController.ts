@@ -216,7 +216,14 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 
 	const updateUserLoginSql = `UPDATE USER SET REGISTER_DATE = SYSDATE() WHERE USER_ID = ?`;
 
-	const { queryResult: updateResult } = await queryExecutorResult2(updateUserLoginSql, [userId]);
+	const { queryResult: updateResult, status: userUpdateResult } = await queryExecutorResult2(
+		updateUserLoginSql,
+		[userId],
+	);
+
+	if (userUpdateResult === 'error') {
+		return next(new ErrorResponse('Update 쿼리에 문제가 발생했습니다', 401));
+	}
 
 	if (updateResult.affectedRows && process.env.JWT_SECRET) {
 		const { token, options } = tokenResponse(userId, process.env.JWT_SECRET);
