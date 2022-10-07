@@ -66,20 +66,10 @@ export const getGroupChatList = asyncHandler(async (req, res, next) => {
 		);
 	});
 
-	const groupChatUsersSql =
-		'SELECT T2.USER_UID, T2.USER_ID, T2.USER_NM, T2.USER_TITLE, T2.USER_IMG_URL FROM GROUP_MEMBER AS T1 INNER JOIN USER AS T2 ON T1.USER_UID = T2.USER_UID WHERE CONVERSATION_ID = ?';
-
-	const groupChatUsersResult = await queryExecutorResult2(groupChatUsersSql, [chatRoomId]);
-
-	if (groupChatUsersResult.status === 'error') {
-		return next(new ErrorResponse('서버에서 에러가 발생했습니다', 400));
-	}
-
 	return res.status(200).json({
 		result: 'success',
 		chatList: resultChatList.queryResult,
 		chatRoomId,
-		groupChatUsers: groupChatUsersResult.queryResult,
 	});
 });
 
