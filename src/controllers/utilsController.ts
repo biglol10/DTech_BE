@@ -3,6 +3,9 @@ import axios from 'axios';
 import https from 'https';
 import cheerio from 'cheerio';
 import { metadataStorage } from '@src/util/memoryStorage';
+import { generateUID } from '@src/util/customFunc';
+import { queryExecutorResult2 } from '@src/util/queryExecutorResult';
+import ErrorResponse from '@src/util/errorResponse';
 
 export const getMetadata = asyncHandler(async (req, res) => {
 	const linkList = req.query.linkList as string[];
@@ -100,3 +103,24 @@ export const axiosFetchMetadata = async (url: string) => {
 
 	return fetchedMedadata;
 };
+
+export const insertErrLog = asyncHandler(async (req, res, next) => {
+	const { uri, requestType, data, errMsg, userId } = req.body;
+	const err_uuid = `errLog_${generateUID()}`;
+	const sql = `INSERT INTO ERR_LOG VALUES (?, ?, ?, ?, ?, SYSDATE(), ?)`;
+
+	const execute = await queryExecutorResult2(sql, [
+		err_uuid,
+		uri,
+		requestType,
+		data,
+		errMsg,
+		userId,
+	]);
+
+	if (execute.status === 'error') {
+		return next(new ErrorResponse('에러로그에 데이터를 넣지 못했습니다', 400));
+	}
+
+	return res.status(200).json({ result: 'success' });
+});
