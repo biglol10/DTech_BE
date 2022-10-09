@@ -10,6 +10,8 @@ config.env
 
 awsconfig.json
 
+/.env.local
+
 /.dockerignore
 
 /images/userImg
