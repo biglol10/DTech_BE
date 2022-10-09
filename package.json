@@ -3,6 +3,9 @@
 	"version": "1.0.0",
 	"description": "DCX Skill Management Backend",
 	"main": "index.js",
+	"engines": {
+		"node": "16.x"
+	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"dev": "env-cmd -f .env.local nodemon --exec ts-node -r tsconfig-paths/register src/app.ts",
