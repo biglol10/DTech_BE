@@ -166,7 +166,7 @@ app.use(express.json());
 app.set('trust proxy', true);
 
 const corsOptions = {
-	origin: ['http://localhost:3065', 'https://dev.example.com'],
+	origin: ['http://localhost:3065', 'https://dev.example.com', 'https://dtech-app.vercel.app'],
 	credentials: true,
 };
 

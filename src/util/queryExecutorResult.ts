@@ -47,19 +47,20 @@ const queryExecutor2 = (sql: string, val?: (number | string | null)[]) => {
 			if (err) {
 				reject(err);
 			}
-			resolve({
+			const successResult: IResultData = {
 				status: 'success',
 				queryResult: result,
-			});
+			};
+			resolve(successResult);
 		});
 	});
 };
 
 const queryExecutorResult2 = async (sql: string, val?: (number | string | null)[]) => {
-	let resultData: any = null;
+	let resultData: IResultData | null = null;
 
 	try {
-		resultData = await queryExecutor2(sql, val);
+		resultData = (await queryExecutor2(sql, val)) as IResultData;
 	} catch (err: any) {
 		resultData = {
 			status: 'error',
