@@ -1,6 +1,6 @@
 import ErrorResponse from '@src/util/errorResponse';
 
-const errorHandler = (err: any, req: any, res: any, next: any) => {
+const errorHandler = (err: any, req: any, res: any) => {
 	// Log to console for dev
 	// console.log(err);
 

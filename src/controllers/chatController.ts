@@ -1,14 +1,9 @@
+import { io } from '@src/util/serverInstance';
 import asyncHandler from '@src/middleware/async';
-import {
-	queryExecutorResult,
-	queryExecutorResult2,
-	queryExecutorResultProcedure,
-} from '@src/util/queryExecutorResult';
-import ErrorResponse from '@src/util/errorResponse';
 import { generateUID, LinkArrFetchMetadata } from '@src/util/customFunc';
-import conn from '@src/dbConn/dbConnection';
-import { IOSocket, io } from '@src/app';
+import ErrorResponse from '@src/util/errorResponse';
 import { getConnectedUser } from '@src/util/memoryStorage';
+import { queryExecutorResult2, queryExecutorResultProcedure } from '@src/util/queryExecutorResult';
 
 export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 	const { fromUID, toUID } = req.body;
@@ -83,35 +78,6 @@ export const getGroupChatList = asyncHandler(async (req, res, next) => {
 	});
 });
 
-// unused
-export const savePrivateChat = asyncHandler(async (req, res, next) => {
-	const { chatMessage, imgList, linkList, userUID, convId } = req.body;
-
-	const message_uuid = `message_${generateUID()}`;
-	const sql = `INSERT INTO USER_CHAT VALUES('${message_uuid}', NULL, NULL, ${conn.escape(
-		chatMessage,
-	)}, ${conn.escape(imgList)}, ${conn.escape(linkList)}, SYSDATE(), '${userUID}', '${convId}')`;
-
-	const insertResult = await queryExecutorResult(sql);
-
-	if (insertResult.status === 'error') {
-		return next(new ErrorResponse('채팅값 넣는 작업이 실패했습니다', 400));
-	}
-
-	const chatSql = `SELECT MESSAGE_ID, FROM_USERNAME, TO_USERNAME, MESSAGE_TEXT, IMG_LIST, LINK_LIST, SENT_DATETIME, USER_UID, CONVERSATION_ID FROM USER_CHAT WHERE CONVERSATION_ID = '${convId}' ORDER BY SENT_DATETIME`;
-	const resultChatList = await queryExecutorResult(chatSql);
-
-	if (resultChatList.status === 'error') {
-		return next(new ErrorResponse('서버에서 에러가 발생했습니다', 400));
-	}
-
-	return res.status(200).json({
-		result: 'success',
-		chatList: resultChatList.queryResult,
-		convId,
-	});
-});
-
 export const getUnReadChatNoti = asyncHandler(async (req, res, next) => {
 	const { fromUID } = req.query;
 
@@ -126,12 +92,6 @@ export const getUnReadChatNoti = asyncHandler(async (req, res, next) => {
 	return res.status(200).json({
 		result: 'success',
 		unReadList: resultUnReadList.queryResult,
-	});
-});
-
-export const uploadChatImg = asyncHandler(async (req, res) => {
-	return res.status(200).json({
-		bodyObj: req.body,
 	});
 });
 
@@ -158,25 +118,15 @@ export const createChatGroup = asyncHandler(async (req, res, next) => {
 
 	await Promise.all(insertAction);
 
-	if (IOSocket) {
-		IOSocket.emit('chatGroupCreateSuccess', {
-			chatGroupUID: chat_uuid,
-			chatGroupName,
-			chatCnt: userParticipants.length,
-		});
-	}
-
 	if (io) {
 		userParticipants.map((singleUser: { USER_UID: string; USER_ID: string }) => {
-			if (senderUID !== singleUser.USER_ID) {
-				const connUser = getConnectedUser(singleUser.USER_ID);
-				if (connUser) {
-					io.to(connUser.socketId).emit('chatGroupCreateSuccess', {
-						chatGroupUID: chat_uuid,
-						chatGroupName,
-						chatCnt: userParticipants.length,
-					});
-				}
+			const connUser = getConnectedUser(singleUser.USER_ID);
+			if (connUser) {
+				io.to(connUser.socketId).emit('chatGroupCreateSuccess', {
+					chatGroupUID: chat_uuid,
+					chatGroupName,
+					chatCnt: userParticipants.length,
+				});
 			}
 		});
 	}
@@ -199,5 +149,11 @@ export const getChatGroups = asyncHandler(async (req, res, next) => {
 	return res.status(200).json({
 		result: 'success',
 		chatGroups: result.queryResult,
+	});
+});
+
+export const uploadChatImg = asyncHandler(async (req, res) => {
+	return res.status(200).json({
+		bodyObj: req.body,
 	});
 });

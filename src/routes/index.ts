@@ -1,8 +1,7 @@
-import testRoute from '@src/routes/testRoute';
-import authRoute from '@src/routes/login';
-import dashboardRoute from '@src/routes/dashboard';
-import utilsRoute from '@src/routes/utils';
-import boardRoute from '@src/routes/board';
-import chatRoute from '@src/routes/chat';
+import authRoute from './login';
+import dashboardRoute from './dashboard';
+import chatRoute from './chat';
+import utilsRoute from './utils';
+import boardRoute from './board';
 
-export { authRoute, dashboardRoute, testRoute, utilsRoute, chatRoute, boardRoute };
+export { authRoute, dashboardRoute, chatRoute, utilsRoute, boardRoute };
