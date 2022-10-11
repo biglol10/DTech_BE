@@ -1,5 +1,5 @@
 import { generateUID, LinkArrFetchMetadata } from '@src/util/customFunc';
-import { queryExecutorResult, queryExecutorResultProcedure } from '@src/util/queryExecutorResult';
+import { queryExecutorResultProcedure } from '@src/util/queryExecutorResult';
 
 interface errResult {
 	result: 'error';

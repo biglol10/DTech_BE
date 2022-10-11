@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response } from 'express';
 
 import {
 	authRoute,
 	dashboardRoute,
-	testRoute,
 	utilsRoute,
 	chatRoute,
 	boardRoute,
@@ -13,7 +12,6 @@ import {
 
 import cors from 'cors';
 import errorHandler from '@src/middleware/error';
-import http from 'http';
 import { sendPrivateMessageFunction, sendGroupMessageFunction } from './util/socketActions';
 import {
 	usersSocket,
@@ -23,23 +21,15 @@ import {
 	addUserRoom,
 	removeUserRoom,
 } from './util/memoryStorage';
-import ioInstance from './util/socketIO';
+import { app, server, io } from './util/serverInstance';
 
-const app = express();
-
-const server = http.createServer(app);
-// const io = new Server(server);
-export const io = ioInstance(server);
-export let IOSocket: any = null;
+// import { authRoute, dashboardRoute, chatRoute, utilsRoute, boardRoute } from './routes';
 
 const PORT = 3066;
 
 io.on('connection', (socket) => {
-	IOSocket = socket;
-
 	const interval = setInterval(() => {
 		socket.emit('connectedUsers', {
-			// users: usersSocket,
 			users: usersSocket,
 		});
 	}, 10000);
@@ -48,7 +38,6 @@ io.on('connection', (socket) => {
 		await addUser(userId, socket.id);
 
 		socket.emit('connectedUsers', {
-			// users: usersSocket,
 			users: usersSocket,
 		});
 	});
@@ -175,10 +164,9 @@ app.use(cors(corsOptions));
 
 app.use('/api/auth', authRoute);
 app.use('/api/dashboard', dashboardRoute);
-app.use('/api/testApi', testRoute);
+app.use('/api/chat', chatRoute);
 app.use('/api/utils', utilsRoute);
 app.use('/api/board', boardRoute);
-app.use('/api/chat', chatRoute);
 app.use('/api/info', infoRoute);
 
 app.use(errorHandler);

@@ -1,10 +1,11 @@
+/* eslint-disable no-useless-escape */
 import asyncHandler from '@src/middleware/async';
 import { queryExecutorResult2 } from '@src/util/queryExecutorResult';
 
 export const setSubmitBoard = asyncHandler(async (req, res, next) => {
 	let { tech } = req.body.postData;
-	const { title, uuid, content } = req.body.postData;
 
+	const { type, title, uuid, content, formData } = req.body.postData;
 	const imgArr = req.body.imgArr;
 
 	if (tech === '') {
