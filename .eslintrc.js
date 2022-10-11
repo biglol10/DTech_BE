@@ -40,4 +40,5 @@ module.exports = {
 		'consistent-return': 'off', // ? 굳이 꼭 무언가를 리턴할 필요가 없게끔 설정
 		'@typescript-eslint/no-explicit-any': 'off',
 	},
+	ignorePatterns: ['dist/*'],
 };
