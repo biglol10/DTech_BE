@@ -4,7 +4,10 @@ import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-const dayjsKor = dayjs().tz('Asia/Seoul');
+
+const dayjsKor = () => {
+	return dayjs().tz('Asia/Seoul');
+};
 
 const getDateString = () => {
 	const date = new Date();

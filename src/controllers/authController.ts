@@ -32,7 +32,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 	const { name, user_id, passwd, team, title, phonenum, detail, tech_list, github, domain } =
 		req.body;
 
-	const time = dayjsKor;
+	const time = dayjsKor().format('YYYY-MM-DD HH:mm:ss');
 	const salt = await bcrypt.genSalt(10);
 	const hashedPassword = await bcrypt.hash(passwd, salt);
 	const uuid = generateUID();
@@ -221,7 +221,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 	if (updateResult.affectedRows && process.env.JWT_SECRET) {
 		const { token, options } = tokenResponse(userId, process.env.JWT_SECRET);
 
-		const time = dayjsKor;
+		const time = dayjsKor().format('YYYY-MM-DD HH:mm:ss');
 
 		return res.status(200).cookie('token', token, options).json({
 			name: selectedUser[0].USER_NM,
