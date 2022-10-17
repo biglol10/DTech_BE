@@ -150,9 +150,19 @@ const corsOptions = {
 	credentials: true,
 };
 
+app.get('/welcome', (req: Request, res: Response) => {
+	return res.send('welcome!');
+});
+
+app.get('/hello', (req: Request, res: Response) => {
+	return res.status(200).json({
+		data: 'hihi',
+	});
+});
+
 // Enable CORS
-// app.use(cors(corsOptions));
-app.use(cors());
+app.use(cors(corsOptions));
+// app.use(cors());
 
 app.use('/api/auth', authRoute);
 app.use('/api/dashboard', dashboardRoute);
@@ -161,16 +171,6 @@ app.use('/api/utils', utilsRoute);
 app.use('/api/board', boardRoute);
 
 app.use(errorHandler);
-
-app.get('/welcome', (req: Request, res: Response) => {
-	res.send('welcome!');
-});
-
-app.get('/hello', (req: Request, res: Response) => {
-	res.status(200).json({
-		data: 'hihi',
-	});
-});
 
 server.listen(PORT, () => {
 	console.log(`

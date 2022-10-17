@@ -124,3 +124,7 @@ export const insertErrLog = asyncHandler(async (req, res, next) => {
 
 	return res.status(200).json({ result: 'success' });
 });
+
+export const utilTest = asyncHandler(async (req, res, next) => {
+	return res.status(200).json({ result: 'successful' });
+});

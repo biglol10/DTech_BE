@@ -26,10 +26,6 @@ const errorHandler = (err: any, req: any, res: any) => {
 		error = new ErrorResponse(message, 400);
 	}
 
-	console.log('came to errerr');
-	console.log(error.statusCode);
-	console.log(error.message);
-
 	res.status(error.statusCode || 500).json({
 		success: false,
 		error: error.message || 'Server Error',
