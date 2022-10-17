@@ -151,7 +151,8 @@ const corsOptions = {
 };
 
 // Enable CORS
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(cors());
 
 app.use('/api/auth', authRoute);
 app.use('/api/dashboard', dashboardRoute);
