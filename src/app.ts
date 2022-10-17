@@ -16,7 +16,7 @@ import { app, server, io } from './util/serverInstance';
 
 import { authRoute, dashboardRoute, chatRoute, utilsRoute, boardRoute } from './routes';
 
-const PORT = 80;
+const PORT = 8080;
 
 io.on('connection', (socket) => {
 	const interval = setInterval(() => {
