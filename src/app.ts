@@ -166,6 +166,12 @@ app.get('/welcome', (req: Request, res: Response) => {
 	res.send('welcome!');
 });
 
+app.get('/hello', (req: Request, res: Response) => {
+	res.status(200).json({
+		data: 'hihi',
+	});
+});
+
 server.listen(PORT, () => {
 	console.log(`
   ################################################
