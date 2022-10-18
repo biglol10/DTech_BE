@@ -14,7 +14,7 @@ const ioInstance = (server: http.Server) => {
 				'http://localhost:3065',
 				'https://dev.example.com',
 				'https://dtech-app.vercel.app',
-				'http://43.200.191.162',
+				'http://43.200.191.162:3065',
 			],
 			allowedHeaders: ['my-custom-header'],
 			credentials: true,
