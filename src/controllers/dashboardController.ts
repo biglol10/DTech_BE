@@ -3,6 +3,7 @@ import { queryExecutorResult2 } from '@src/util/queryExecutorResult';
 import ErrorResponse from '@src/util/errorResponse';
 
 export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
+	console.log('came here 1');
 	const teamSkillSetSql = `SELECT T1.TECH_CD, T2.TECH_NM, T2.TECH_DETAIL, T2.TECH_PAGE_URL, count(*) AS TECH_CNT from USER_TECH AS T1 INNER JOIN TECH T2 ON T1.TECH_CD = T2.TECH_CD GROUP BY TECH_CD;`;
 	const resultData1 = await queryExecutorResult2(teamSkillSetSql);
 
@@ -12,6 +13,8 @@ export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
 	const teamSkillCount = `SELECT T1.TECH_NM, T3.USER_NM AS USER_NM, T3.USER_UID, T3.TEAM_CD, T3.USER_TITLE, T3.USER_IMG_URL, T1.TECH_CNT FROM (SELECT T2.TECH_NM, T2.TECH_CD, COUNT(*) AS TECH_CNT FROM USER_TECH AS T1 INNER JOIN TECH AS T2 ON T1.TECH_CD = T2.TECH_CD GROUP BY T2.TECH_NM, T2.TECH_CD) AS T1 LEFT JOIN USER_TECH AS T2 ON T1.TECH_CD = T2.TECH_CD LEFT JOIN USER AS T3 ON T2.USER_UID = T3.USER_UID;`;
 	const resultData3 = await queryExecutorResult2(teamSkillCount);
 
+	console.log('came here 2');
+
 	if (
 		resultData1.status === 'error' ||
 		resultData2.status === 'error' ||
@@ -19,6 +22,8 @@ export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
 	) {
 		return next(new ErrorResponse('팀 스킬 조회에 실패했습니다', 403));
 	}
+
+	console.log('came here 3');
 
 	const skillObj: any = {};
 	resultData3.queryResult.map((item: any) => {
@@ -28,6 +33,7 @@ export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
 			);
 		}
 	});
+	console.log('came here 4');
 
 	res.status(200).json({
 		teamSkillDashboard: resultData1.queryResult,
