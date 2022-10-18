@@ -13,6 +13,7 @@ export const protectedApi = asyncHandler(async (req: any, res, next) => {
 
 	console.log('req headers is');
 	console.log(req.headers);
+	console.log(req.headers.Authorization);
 
 	if (req.headers.authorizations && req.headers.authorizations.startsWith('Bearer')) {
 		console.log('came to headers');

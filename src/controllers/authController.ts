@@ -22,35 +22,10 @@ export const uploadUserImgS3 = asyncHandler(async (req: any, res, next) => {
 });
 
 export const getUserByToken = asyncHandler(async (req, res, next) => {
-	const { token } = req.body;
-
-	const decoded: any = process.env.JWT_SECRET ? jwt.verify(token, process.env.JWT_SECRET) : '';
-
-	if (decoded) {
-		const sql = `SELECT USER_UID, USER_ID, USER_NM, TEAM_CD, USER_TITLE, USER_ADMIN_YN, USER_IMG_URL FROM USER WHERE USER_ID = '${decoded.id}'`;
-		const { status: isQuerySuccess, queryResult: selectedUser } = await queryExecutorResult(
-			sql,
-		);
-
-		if (isQuerySuccess === 'success') {
-			req.user = selectedUser[0];
-			return res.status(200).json({
-				success: true,
-				user: req.user,
-			});
-		} else {
-			// return next(new ErrorResponse('Not authorized to access this route', 401));
-			return res.status(403).json({
-				success: 'fail',
-				user: null,
-			});
-		}
-	}
-
-	// return res.status(200).json({
-	// 	success: true,
-	// 	user: null,
-	// });
+	return res.status(200).json({
+		success: true,
+		user: req.user,
+	});
 });
 
 export const registerUser = asyncHandler(async (req, res, next) => {
