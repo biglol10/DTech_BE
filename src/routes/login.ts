@@ -27,7 +27,7 @@ router.route('/getTechList').post(getTechList);
 
 router.post('/uploadUserImg', uploadImg, setProfileImage);
 
-router.post('/getLoggedInUserInfo', protectedApi, getUserByToken);
+router.post('/getLoggedInUserInfo', getUserByToken);
 
 router.get('/getUsersStatus', getUsersStatus);
 
