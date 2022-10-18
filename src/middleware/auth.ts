@@ -12,8 +12,10 @@ export const protectedApi = asyncHandler(async (req: any, res, next) => {
 	let token;
 
 	if (req.headers.authorizations && req.headers.authorizations.startsWith('Bearer')) {
+		console.log('came to headers');
 		token = req.headers.authorizations.split(' ')[1];
 	} else if (req.cookies.token) {
+		console.log('came to cookies');
 		token = req.cookies.token;
 	}
 
