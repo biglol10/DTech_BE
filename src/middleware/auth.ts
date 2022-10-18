@@ -8,11 +8,11 @@ interface IReqWithUser extends Request {
 	[name: string]: any;
 }
 
-export const protectedApi = asyncHandler(async (req: IReqWithUser, res, next) => {
+export const protectedApi = asyncHandler(async (req: any, res, next) => {
 	let token;
 
-	if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-		token = req.headers.authorization.split(' ')[1];
+	if (req.headers.authorizations && req.headers.authorizations.startsWith('Bearer')) {
+		token = req.headers.authorizations.split(' ')[1];
 	} else if (req.cookies.token) {
 		token = req.cookies.token;
 	}
