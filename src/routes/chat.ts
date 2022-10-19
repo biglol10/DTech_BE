@@ -12,10 +12,10 @@ import { uploadImg } from '@src/util/s3Connect';
 
 const router = Router();
 
-router.post('/getPrivateChatList', protectedApi, getPrivateChatList);
-router.post('/getGroupChatList', protectedApi, getGroupChatList);
+router.post('/getPrivateChatList', getPrivateChatList);
+router.post('/getGroupChatList', getGroupChatList);
 router.get('/getUnreadChatNoti', getUnReadChatNoti);
-router.post('/createChatGroup', protectedApi, createChatGroup);
+router.post('/createChatGroup', createChatGroup);
 router.get('/getChatGroups', getChatGroups);
 router.post('/uploadChatImg', uploadImg, uploadChatImg);
 
