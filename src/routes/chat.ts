@@ -16,7 +16,7 @@ router.post('/getPrivateChatList', getPrivateChatList);
 router.post('/getGroupChatList', getGroupChatList);
 router.get('/getUnreadChatNoti', getUnReadChatNoti);
 router.post('/createChatGroup', createChatGroup);
-router.get('/getChatGroups', getChatGroups);
+router.post('/getChatGroups', getChatGroups);
 router.post('/uploadChatImg', uploadImg, uploadChatImg);
 
 export default router;
