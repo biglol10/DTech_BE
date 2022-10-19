@@ -10,14 +10,15 @@ const server = http.createServer(app);
 const ioInstance = (server: http.Server) => {
 	return new Server(server, {
 		cors: {
-			origin: [
-				'http://localhost:3065',
-				'https://dev.example.com',
-				'https://dtech-app.vercel.app',
-				'http://43.200.191.162:3065',
-				'https://dtech-app.vercel.app/dtech',
-			],
-			credentials: true,
+			// origin: [
+			// 	'http://localhost:3065',
+			// 	'https://dev.example.com',
+			// 	'https://dtech-app.vercel.app',
+			// 	'http://43.200.191.162:3065',
+			// 	'https://dtech-app.vercel.app/dtech',
+			// ],
+			origin: '*',
+			// credentials: true,
 		},
 	});
 };
