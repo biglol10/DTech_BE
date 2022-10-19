@@ -3,17 +3,10 @@ import { queryExecutorResult, queryExecutorResult2 } from '@src/util/queryExecut
 import ErrorResponse from '@src/util/errorResponse';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
-import utc from 'dayjs/plugin/utc';
 import { generateUID } from '@src/util/customFunc';
 import { usersSocket } from '@src/util/memoryStorage';
-import { io } from '@src/app';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-dayjs.tz.setDefault('Asia/Seoul');
+import { dayjsKor } from '@src/util/dateFunc';
+// import { io } from '@src/app';
 
 export const uploadUserImg = asyncHandler(async (req: any, res, next) => {
 	return res.status(200).json({
@@ -39,7 +32,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 	const { name, user_id, passwd, team, title, phonenum, detail, tech_list, github, domain } =
 		req.body;
 
-	const time = dayjs();
+	const time = dayjsKor().format('YYYY-MM-DD HH:mm:ss');
 	const salt = await bcrypt.genSalt(10);
 	const hashedPassword = await bcrypt.hash(passwd, salt);
 	const uuid = generateUID();
@@ -99,7 +92,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 	if (process.env.JWT_SECRET) {
 		const { token, options } = tokenResponse(user_id, process.env.JWT_SECRET);
 
-		io.emit('newUserCreated');
+		// io.emit('newUserCreated');
 
 		return res.status(200).cookie('token', token, options).json({
 			name,
@@ -196,6 +189,8 @@ export const getTechList = asyncHandler(async (req, res) => {
 export const loginUser = asyncHandler(async (req, res, next) => {
 	const { userId, password } = req.body;
 
+	console.log(`came to login user with id of ${userId}`);
+
 	if (!userId || !password) {
 		return next(new ErrorResponse('아이디/비밀번호를 입력해주세요', 400));
 	}
@@ -228,7 +223,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 	if (updateResult.affectedRows && process.env.JWT_SECRET) {
 		const { token, options } = tokenResponse(userId, process.env.JWT_SECRET);
 
-		const time = dayjs();
+		const time = dayjsKor().format('YYYY-MM-DD HH:mm:ss');
 
 		return res.status(200).cookie('token', token, options).json({
 			name: selectedUser[0].USER_NM,

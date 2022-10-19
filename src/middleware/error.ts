@@ -1,6 +1,6 @@
 import ErrorResponse from '@src/util/errorResponse';
 
-const errorHandler = (err: any, req: any, res: any, next: any) => {
+const errorHandler = (err: any, req: any, res: any) => {
 	// Log to console for dev
 	// console.log(err);
 
@@ -25,10 +25,6 @@ const errorHandler = (err: any, req: any, res: any, next: any) => {
 		const message: any = Object.values(err.errors).map((val: any) => val.message);
 		error = new ErrorResponse(message, 400);
 	}
-
-	console.log('came to errerr');
-	console.log(error.statusCode);
-	console.log(error.message);
 
 	res.status(error.statusCode || 500).json({
 		success: false,

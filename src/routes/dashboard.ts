@@ -4,7 +4,7 @@ import { getTeamSkillsets, getUserSkillFilter } from '@src/controllers/dashboard
 
 const router = Router();
 
-router.get('/getTeamSkills', protectedApi, getTeamSkillsets);
-router.post('/getUserSkillFilter', protectedApi, getUserSkillFilter);
+router.get('/getTeamSkills', getTeamSkillsets);
+router.post('/getUserSkillFilter', getUserSkillFilter);
 
 export default router;

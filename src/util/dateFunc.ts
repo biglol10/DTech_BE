@@ -1,3 +1,14 @@
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const dayjsKor = () => {
+	return dayjs().tz('Asia/Seoul');
+};
+
 const getDateString = () => {
 	const date = new Date();
 	const year = date.getFullYear();
@@ -14,4 +25,4 @@ const getDateString = () => {
 	return finalStr;
 };
 
-export { getDateString };
+export { dayjsKor, getDateString };

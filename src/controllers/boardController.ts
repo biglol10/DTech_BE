@@ -1,8 +1,10 @@
+/* eslint-disable no-useless-escape */
 import asyncHandler from '@src/middleware/async';
 import { queryExecutorResult2 } from '@src/util/queryExecutorResult';
 
 export const setSubmitBoard = asyncHandler(async (req, res, next) => {
-	let { type, title, uuid, tech, content, formData } = req.body.postData;
+	let { tech } = req.body.postData;
+	const { type, title, uuid, content, formData } = req.body.postData;
 	const imgArr = req.body.imgArr;
 
 	if (tech === '') {
@@ -83,7 +85,7 @@ export const setBoardLike = asyncHandler(async (req, res, next) => {
 	const resultData = await queryExecutorResult2(sql, [req.body.id, req.body.userUID]);
 
 	if (resultData.status === 'success') {
-		let sql2 =
+		const sql2 =
 			'UPDATE BOARD SET LIKE_CNT = LIKE_CNT' +
 			(req.body.like ? ' + ' : ' - ') +
 			'1 WHERE BOARD_CD=?';
@@ -112,7 +114,7 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
 	const orderType = req.body.orderType ? req.body.orderType : 'new';
 	// console.log(req.body.filterType);
 
-	let sqlParam = [req.body.uuid];
+	const sqlParam = [req.body.uuid];
 	let sql = `SELECT B.*, T.*, COUNT(C.CMNT_CD) as LIKED
 	FROM BOARD B LEFT JOIN TECH T
 	ON B.TECH_CD = T.TECH_CD
