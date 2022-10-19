@@ -3,7 +3,11 @@ import asyncHandler from '@src/middleware/async';
 import { generateUID, LinkArrFetchMetadata } from '@src/util/customFunc';
 import ErrorResponse from '@src/util/errorResponse';
 import { getConnectedUser } from '@src/util/memoryStorage';
-import { queryExecutorResult2, queryExecutorResultProcedure } from '@src/util/queryExecutorResult';
+import {
+	queryExecutorResult,
+	queryExecutorResult2,
+	queryExecutorResultProcedure,
+} from '@src/util/queryExecutorResult';
 
 export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 	const { fromUID, toUID } = req.body;
@@ -139,8 +143,8 @@ export const createChatGroup = asyncHandler(async (req, res, next) => {
 
 export const getChatGroups = asyncHandler(async (req, res, next) => {
 	const currentUser = req.query.currentUser as string;
-	const sql = `SELECT T1.CONVERSATION_ID, T1.CONVERSATION_NAME, (SELECT COUNT(*) FROM GROUP_MEMBER AS T3 WHERE T1.CONVERSATION_ID = T3.CONVERSATION_ID) AS CNT FROM CONVERSATION AS T1 WHERE EXISTS (SELECT * FROM GROUP_MEMBER AS T2 WHERE T1.CONVERSATION_ID = T2.CONVERSATION_ID AND T2.USER_UID = ? ORDER BY T2.JOINED_DATE DESC) AND T1.GUBUN = '단체톡';`;
-	const result = await queryExecutorResult2(sql, [currentUser]);
+	const sql = `SELECT T1.CONVERSATION_ID, T1.CONVERSATION_NAME, (SELECT COUNT(*) FROM GROUP_MEMBER AS T3 WHERE T1.CONVERSATION_ID = T3.CONVERSATION_ID) AS CNT FROM CONVERSATION AS T1 WHERE EXISTS (SELECT * FROM GROUP_MEMBER AS T2 WHERE T1.CONVERSATION_ID = T2.CONVERSATION_ID AND T2.USER_UID = ${currentUser} ORDER BY T2.JOINED_DATE DESC) AND T1.GUBUN = '단체톡';`;
+	const result = await queryExecutorResult(sql);
 
 	if (result.status === 'error') {
 		return next(new ErrorResponse('채팅방 목록을 가져오지 못했습니다', 500));
