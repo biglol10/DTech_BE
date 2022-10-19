@@ -189,6 +189,8 @@ export const getTechList = asyncHandler(async (req, res) => {
 export const loginUser = asyncHandler(async (req, res, next) => {
 	const { userId, password } = req.body;
 
+	console.log(`came to login user with id of ${userId}`);
+
 	if (!userId || !password) {
 		return next(new ErrorResponse('아이디/비밀번호를 입력해주세요', 400));
 	}
