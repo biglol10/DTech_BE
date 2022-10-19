@@ -161,8 +161,8 @@ app.get('/hello', (req: Request, res: Response) => {
 });
 
 // Enable CORS
-app.use(cors(corsOptions));
-// app.use(cors({ credentials: true }));
+// app.use(cors(corsOptions));
+app.use(cors({ credentials: true }));
 
 app.use('/api/auth', authRoute);
 app.use('/api/dashboard', dashboardRoute);

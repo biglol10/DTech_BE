@@ -11,9 +11,6 @@ interface IReqWithUser extends Request {
 export const protectedApi = asyncHandler(async (req: any, res, next) => {
 	let token;
 
-	console.log('req cookies is');
-	console.log(req.cookies);
-
 	if (req.headers.authorizations && req.headers.authorizations.startsWith('Bearer')) {
 		token = req.headers.authorizations.split(' ')[1];
 	} else if (req.cookies?.token) {
