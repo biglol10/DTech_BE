@@ -147,7 +147,7 @@ app.set('trust proxy', true);
 
 const corsOptions = {
 	origin: ['http://localhost:3065', 'https://dev.example.com', 'https://dtech-app.vercel.app'],
-	credentials: true,
+	// credentials: true,
 };
 
 app.get('/welcome', (req: Request, res: Response) => {
@@ -161,8 +161,8 @@ app.get('/hello', (req: Request, res: Response) => {
 });
 
 // Enable CORS
-// app.use(cors(corsOptions));
-app.use(cors({ credentials: true }));
+app.use(cors(corsOptions));
+// app.use(cors({ credentials: true }));
 
 app.use('/api/auth', authRoute);
 app.use('/api/dashboard', dashboardRoute);
