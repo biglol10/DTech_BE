@@ -29,7 +29,7 @@ router.post('/uploadUserImg', uploadImg, setProfileImage);
 
 router.post('/getLoggedInUserInfo', protectedApi, getUserByToken);
 
-router.get('/getUsersStatus', getUsersStatus);
+router.post('/getUsersStatus', getUsersStatus);
 
 router.get('/getUsersInfo', getUsersInfo);
 
