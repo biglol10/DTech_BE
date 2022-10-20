@@ -83,7 +83,7 @@ export const getGroupChatList = asyncHandler(async (req, res, next) => {
 });
 
 export const getUnReadChatNoti = asyncHandler(async (req, res, next) => {
-	const { fromUID } = req.query;
+	const { fromUID } = req.body;
 
 	const resultUnReadList = await queryExecutorResultProcedure('GetUnReadChatNoti', [
 		fromUID as string,
@@ -143,14 +143,8 @@ export const createChatGroup = asyncHandler(async (req, res, next) => {
 
 export const getChatGroups = asyncHandler(async (req, res, next) => {
 	const { currentUser } = req.body;
-
 	const sql = `SELECT T1.CONVERSATION_ID, T1.CONVERSATION_NAME, (SELECT COUNT(*) FROM GROUP_MEMBER AS T3 WHERE T1.CONVERSATION_ID = T3.CONVERSATION_ID) AS CNT FROM CONVERSATION AS T1 WHERE EXISTS (SELECT * FROM GROUP_MEMBER AS T2 WHERE T1.CONVERSATION_ID = T2.CONVERSATION_ID AND T2.USER_UID = '${currentUser}' ORDER BY T2.JOINED_DATE DESC) AND T1.GUBUN = '단체톡';`;
-	// console.log('getChatGroups is');
-	// console.log(sql);
-
 	const result = await queryExecutorResult(sql);
-
-	// console.log(result.queryResult);
 
 	if (result.status === 'error') {
 		return next(new ErrorResponse('채팅방 목록을 가져오지 못했습니다', 500));
