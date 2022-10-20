@@ -95,11 +95,15 @@ const queryExecutorProcedure = (
 				if (err as any) {
 					reject(err);
 				}
-				const successResult: IResultData = {
-					status: 'success',
-					queryResult: result[0],
-				};
-				resolve(successResult);
+				try {
+					const successResult: IResultData = {
+						status: 'success',
+						queryResult: result[0],
+					};
+					resolve(successResult);
+				} catch {
+					reject(`${procedureName} 프로시저에서 문제가 발생했습니다`);
+				}
 			});
 		} else {
 			conn.query(`call ${procedureName}`, function (err, result) {

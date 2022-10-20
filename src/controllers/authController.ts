@@ -189,8 +189,6 @@ export const getTechList = asyncHandler(async (req, res) => {
 export const loginUser = asyncHandler(async (req, res, next) => {
 	const { userId, password } = req.body;
 
-	console.log(`came to login user with id of ${userId}`);
-
 	if (!userId || !password) {
 		return next(new ErrorResponse('아이디/비밀번호를 입력해주세요', 400));
 	}
@@ -243,7 +241,8 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 });
 
 export const getUsersStatus = asyncHandler(async (req, res, next) => {
-	const usersOnline = req.query.onlineUsers as string[];
+	// const usersOnline = req.query.onlineUsers as string[];
+	const { onlineUsers: usersOnline } = req.body;
 
 	if (usersOnline.length) {
 		let sqlScript = '';
