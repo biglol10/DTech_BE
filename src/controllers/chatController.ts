@@ -100,7 +100,7 @@ export const getUnReadChatNoti = asyncHandler(async (req, res, next) => {
 });
 
 export const createChatGroup = asyncHandler(async (req, res, next) => {
-	const { chatGroupName, userParticipants, senderUID } = req.body;
+	const { chatGroupName, userParticipants } = req.body;
 
 	const chat_uuid = `conv_group_${generateUID()}`;
 
