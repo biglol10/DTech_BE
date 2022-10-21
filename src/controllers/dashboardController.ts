@@ -29,12 +29,6 @@ export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
 		}
 	});
 
-	console.log(resultData1.queryResult);
-	console.log('-----');
-	console.log(resultData2.queryResult);
-	console.log('-----');
-	console.log(resultData3.queryResult);
-
 	res.status(200).json({
 		teamSkillDashboard: resultData1.queryResult,
 		teamSkillCountObj: skillObj,
