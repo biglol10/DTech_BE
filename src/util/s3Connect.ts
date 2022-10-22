@@ -17,6 +17,7 @@ const upload = multer({
 		contentType: multerS3.AUTO_CONTENT_TYPE,
 		key: async function (req: any, file: any, cb: any) {
 			POSTDATA = req.body.postData !== undefined ? JSON.parse(req.body.postData) : {};
+
 			if (POSTDATA.type === 'REGISTER_USER') {
 				imgArr.push(`${POSTDATA.dir}${file.originalname}`);
 				cb(null, `${POSTDATA.dir}${file.originalname}`);

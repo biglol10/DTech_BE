@@ -14,8 +14,6 @@ const router = Router();
 
 router.route('/getBoardList').post(getBoardList);
 router.route('/setBoardLike').post(setBoardLike);
-// router.route('/setSubmitBoard').post(setSubmitBoard);
-// router.post('/uploadBoardImg', setBoardImage);
 router.post('/uploadBoard', uploadImg, setSubmitBoard);
 router.post('/getComments', getComments);
 router.post('/setComment', setComment);

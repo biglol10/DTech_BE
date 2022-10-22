@@ -1,6 +1,15 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import express, { Request, Response } from 'express';
 
+import {
+	authRoute,
+	dashboardRoute,
+	utilsRoute,
+	chatRoute,
+	boardRoute,
+	infoRoute,
+} from '@src/routes/index';
+
 import cors from 'cors';
 import errorHandler from '@src/middleware/error';
 import { sendPrivateMessageFunction, sendGroupMessageFunction } from './util/socketActions';
@@ -14,7 +23,7 @@ import {
 } from './util/memoryStorage';
 import { app, server, io } from './util/serverInstance';
 
-import { authRoute, dashboardRoute, chatRoute, utilsRoute, boardRoute } from './routes';
+// import { authRoute, dashboardRoute, chatRoute, utilsRoute, boardRoute } from './routes';
 
 const PORT = 3066;
 
@@ -169,6 +178,7 @@ app.use('/api/dashboard', dashboardRoute);
 app.use('/api/chat', chatRoute);
 app.use('/api/utils', utilsRoute);
 app.use('/api/board', boardRoute);
+app.use('/api/info', infoRoute);
 
 app.use(errorHandler);
 
