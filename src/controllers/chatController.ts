@@ -114,13 +114,13 @@ export const createChatGroup = asyncHandler(async (req, res, next) => {
 	}
 
 	const insertAction = userParticipants.map(
-		async (singleUser: { USER_UID: string; USER_ID: string }) => {
+		(singleUser: { USER_UID: string; USER_ID: string }) => {
 			const groupMemberSql = `INSERT INTO GROUP_MEMBER VALUES ('${chat_uuid}', '${singleUser.USER_UID}', SYSDATE(), 0);`;
-			await queryExecutorResult2(groupMemberSql, []);
+			queryExecutorResult2(groupMemberSql, []);
 		},
 	);
 
-	await Promise.all(insertAction);
+	Promise.all(insertAction);
 
 	if (io) {
 		userParticipants.map((singleUser: { USER_UID: string; USER_ID: string }) => {
