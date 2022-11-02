@@ -10,7 +10,8 @@ config.env
 
 awsconfig.json
 
-# /.env.local
+/.env.local
+/.env.production
 
 # /.dockerignore
 
