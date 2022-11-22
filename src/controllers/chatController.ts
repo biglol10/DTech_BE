@@ -52,12 +52,14 @@ export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 });
 
 export const getGroupChatList = asyncHandler(async (req, res, next) => {
-	const { chatRoomId, readingUser } = req.body;
+	const { chatRoomId, readingUser, lastMsgId } = req.body;
 
-	const resultChatList = await queryExecutorResultProcedure('ReadGroupChatList', [
-		readingUser,
-		chatRoomId,
-	]);
+	const prObj = {
+		prName: !lastMsgId ? 'ReadGroupChatList' : 'ReadChatListDateBetween',
+		prParam: !lastMsgId ? [readingUser, chatRoomId] : [readingUser, chatRoomId, lastMsgId],
+	};
+
+	const resultChatList = await queryExecutorResultProcedure(prObj.prName, prObj.prParam);
 
 	if (resultChatList.status === 'error') {
 		return next(new ErrorResponse('서버에서 에러가 발생했습니다', 400));
@@ -197,7 +199,7 @@ export const insertPrivateChatMessage = asyncHandler(async (req, res, next) => {
 	queryResult = await LinkArrFetchMetadata(queryResult);
 
 	if (status === 'error') {
-		return next(new ErrorResponse('메타데이터를 가져오지 못했습니다', 400));
+		return next(new ErrorResponse('메시지 저장 후 정상작업을 수행하지 못했습니다', 400));
 	}
 
 	if (io) {
@@ -218,5 +220,59 @@ export const insertPrivateChatMessage = asyncHandler(async (req, res, next) => {
 		result: 'success',
 		newChat: queryResult,
 		convId,
+	});
+});
+
+export const insertGroupChatMessage = asyncHandler(async (req, res, next) => {
+	const message_uuid = `message_${generateUID()}`;
+
+	const { chatMessage, userUID, convId, imgList, linkList } = req.body;
+
+	const insertResult = await queryExecutorResultProcedure('SendGroupChat', [
+		message_uuid,
+		chatMessage,
+		imgList,
+		linkList,
+		userUID,
+		convId,
+	]);
+
+	if (insertResult.status === 'error') {
+		return next(new ErrorResponse('메시지를 보내지 못했습니다', 400));
+	}
+
+	const messageTransactionAfter = await queryExecutorResultProcedure('MessageTransactionAfter', [
+		userUID,
+		convId,
+		message_uuid,
+	]);
+
+	let { queryResult } = messageTransactionAfter;
+	const { status } = messageTransactionAfter;
+
+	queryResult = await LinkArrFetchMetadata(queryResult);
+
+	if (status === 'error') {
+		return next(new ErrorResponse('메시지 저장 후 정상작업을 수행하지 못했습니다', 400));
+	}
+
+	const usersToNotify = insertResult.queryResult.map((item: any) => item.USER_ID);
+
+	// if (io) {
+	// 	usersToNotify.map((userString) => {
+	// 		const user = getConnectedUser(userString);
+	// 		if (user) {
+	// 			io.to(user.socketId).emit('newMessageGroupReceivedSidebar', {
+	// 				fromUID: convId,
+	// 			});
+	// 		}
+	// 	});
+	// }
+
+	return res.status(200).json({
+		result: 'success',
+		newChat: queryResult,
+		convId,
+		usersToNotify,
 	});
 });

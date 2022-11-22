@@ -96,38 +96,22 @@ io.on('connection', (socket) => {
 
 	socket.on(
 		'sendGroupMessage',
-		async ({ chatMessage, userUID, convId, imgList, linkList }: { [keys: string]: string }) => {
-			const sendResult = await sendGroupMessageFunction(
-				chatMessage,
-				userUID,
+		({ convId, usersToNotify }: { convId: string; usersToNotify: string[] }) => {
+			socket.broadcast.to(convId).emit('newMessageGroupReceived', {
 				convId,
-				imgList,
-				linkList,
-			);
+			});
 
-			if (sendResult.result === 'success') {
-				socket.emit('messageGroupSendSuccess', {
-					chatListSocket: sendResult.chatList,
-				});
-
-				socket.broadcast.to(convId).emit('newMessageGroupReceived', {
-					chatListSocket: sendResult.chatList,
-					fromUID: userUID,
-					convId,
-				});
-
-				setTimeout(() => {
-					sendResult.usersToNotify &&
-						sendResult.usersToNotify.map((userString) => {
-							const user = getConnectedUser(userString);
-							if (user) {
-								io.to(user.socketId).emit('newMessageGroupReceivedSidebar', {
-									fromUID: convId,
-								});
-							}
-						});
-				}, 1000);
-			}
+			setTimeout(() => {
+				usersToNotify &&
+					usersToNotify.map((userString) => {
+						const user = getConnectedUser(userString);
+						if (user) {
+							io.to(user.socketId).emit('newMessageGroupReceivedSidebar', {
+								fromUID: convId,
+							});
+						}
+					});
+			}, 1000);
 		},
 	);
 

@@ -2,7 +2,7 @@
 	"extends": "./tsconfig.paths.json",
 	"compilerOptions": {
 		"module": "Commonjs",
-		"target": "es5",
+		"target": "es2015",
 		"sourceMap": true,
 		"allowJs": true,
 		"esModuleInterop": true,
