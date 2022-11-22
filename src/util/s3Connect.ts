@@ -12,7 +12,7 @@ let imgArr: any = [];
 const upload = multer({
 	storage: multerS3({
 		s3: s3,
-		bucket: 'dcx-tech',
+		bucket: 'dtech-bucket',
 		acl: 'public-read-write',
 		contentType: multerS3.AUTO_CONTENT_TYPE,
 		key: async function (req: any, file: any, cb: any) {
@@ -34,6 +34,7 @@ const uploadImg = async (req: any, res: any, next: any) => {
 
 	upload.array('img')(req, res, async (err: any) => {
 		if (err !== undefined) {
+			console.log(err);
 			return next(new ErrorResponse('AWS s3 upload failed', 401));
 		}
 		req.body.postData = req.body.postData !== undefined ? JSON.parse(req.body.postData) : {};
