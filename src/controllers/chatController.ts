@@ -10,7 +10,7 @@ import {
 } from '@src/util/queryExecutorResult';
 
 export const getPrivateChatList = asyncHandler(async (req, res, next) => {
-	const { fromUID, toUID } = req.body;
+	const { fromUID, toUID, lastMsgId } = req.body;
 	const chat_uuid = `conv_private_${generateUID()}`;
 
 	const resultChatId = await queryExecutorResultProcedure('CheckAndReturnConvId', [
@@ -24,7 +24,12 @@ export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('서버에서 에러가 발생했습니다', 400));
 	}
 
-	const resultChatList = await queryExecutorResultProcedure('ReadChatList', [fromUID, convId]);
+	const prObj = {
+		prName: !lastMsgId ? 'ReadChatList' : 'ReadChatListDateBetween',
+		prParam: !lastMsgId ? [fromUID, convId] : [fromUID, convId, lastMsgId],
+	};
+
+	const resultChatList = await queryExecutorResultProcedure(prObj.prName, prObj.prParam);
 
 	if (resultChatList.status === 'error') {
 		return next(new ErrorResponse('서버에서 에러가 발생했습니다', 400));
@@ -159,5 +164,59 @@ export const getChatGroups = asyncHandler(async (req, res, next) => {
 export const uploadChatImg = asyncHandler(async (req, res) => {
 	return res.status(200).json({
 		bodyObj: req.body,
+	});
+});
+
+export const insertPrivateChatMessage = asyncHandler(async (req, res, next) => {
+	const message_uuid = `message_${generateUID()}`;
+	const { chatMessage, userUID, convId, imgList, linkList, toUserId } = req.body;
+
+	const insertResult = await queryExecutorResultProcedure('SendUserPrivateChat', [
+		message_uuid,
+		chatMessage,
+		imgList,
+		linkList,
+		userUID,
+		convId,
+		toUserId,
+	]);
+
+	if (insertResult.status === 'error') {
+		return next(new ErrorResponse('메시지를 보내지 못했습니다', 400));
+	}
+
+	const messageTransactionAfter = await queryExecutorResultProcedure('MessageTransactionAfter', [
+		userUID,
+		convId,
+		message_uuid,
+	]);
+
+	let { queryResult } = messageTransactionAfter;
+	const { status } = messageTransactionAfter;
+
+	queryResult = await LinkArrFetchMetadata(queryResult);
+
+	if (status === 'error') {
+		return next(new ErrorResponse('메타데이터를 가져오지 못했습니다', 400));
+	}
+
+	if (io) {
+		const user = getConnectedUser(toUserId);
+		if (user) {
+			io.to(user.socketId).emit('newMessageReceived', {
+				fromUID: userUID,
+			});
+			setTimeout(() => {
+				io.to(user.socketId).emit('newMessageReceivedSidebar', {
+					fromUID: userUID,
+				});
+			}, 1000);
+		}
+	}
+
+	return res.status(200).json({
+		result: 'success',
+		newChat: queryResult,
+		convId,
 	});
 });

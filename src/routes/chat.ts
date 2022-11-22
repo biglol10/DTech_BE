@@ -6,6 +6,7 @@ import {
 	createChatGroup,
 	getChatGroups,
 	uploadChatImg,
+	insertPrivateChatMessage,
 } from '@src/controllers/chatController';
 import { uploadImg } from '@src/util/s3Connect';
 
@@ -17,5 +18,6 @@ router.post('/getUnreadChatNoti', getUnReadChatNoti);
 router.post('/createChatGroup', createChatGroup);
 router.post('/getChatGroups', getChatGroups);
 router.post('/uploadChatImg', uploadImg, uploadChatImg);
+router.post('/insertPrivateChatMessage', insertPrivateChatMessage);
 
 export default router;
