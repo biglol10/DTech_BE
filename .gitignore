@@ -20,3 +20,4 @@ awsconfig.json
 /config/s3.json
 
 /.vscode
+src/config/s3.json
