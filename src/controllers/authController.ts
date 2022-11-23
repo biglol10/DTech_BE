@@ -4,9 +4,8 @@ import ErrorResponse from '@src/util/errorResponse';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { generateUID } from '@src/util/customFunc';
-import { usersSocket } from '@src/util/memoryStorage';
+import dtechCommonProp from '@src/util/dtechCommon';
 import { dayjsKor } from '@src/util/dateFunc';
-// import { io } from '@src/app';
 
 export const uploadUserImg = asyncHandler(async (req: any, res, next) => {
 	return res.status(200).json({
@@ -150,7 +149,8 @@ export const getTeamList = asyncHandler(async (req, res) => {
 });
 
 export const setProfileImage = asyncHandler(async (req, res) => {
-	const imgUrl: string = 'https://dcx-tech.s3.ap-northeast-2.amazonaws.com/' + req.body.imgArr[0];
+	const imgUrl: string =
+		'https://dtech-bucket.s3.ap-northeast-2.amazonaws.com/' + req.body.imgArr[0];
 
 	const sql = `
 	UPDATE USER SET USER_IMG_URL=?  
@@ -316,7 +316,9 @@ export const getUsersInfo = asyncHandler(async (req, res, next) => {
 			result: 'success',
 			usersInfo: queryResult,
 			usersOnline: queryResult.map((item: any) => {
-				const user = usersSocket.find((user) => user.userId === item.USER_ID);
+				const user = dtechCommonProp.getUsersSocket.find(
+					(user) => user.userId === item.USER_ID,
+				);
 				if (user && user.socketId) {
 					return { userUID: item.USER_UID, userId: item.USER_ID, status: 'online' };
 				} else {

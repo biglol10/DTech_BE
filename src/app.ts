@@ -12,120 +12,46 @@ import {
 
 import cors from 'cors';
 import errorHandler from '@src/middleware/error';
-import { sendPrivateMessageFunction, sendGroupMessageFunction } from './util/socketActions';
-import {
-	usersSocket,
-	addUser,
-	removeUser,
-	getConnectedUser,
-	addUserRoom,
-	removeUserRoom,
-} from './util/memoryStorage';
+import dtechCommonProp from '@src/util/dtechCommon';
 import { app, server, io } from './util/serverInstance';
-
-// import { authRoute, dashboardRoute, chatRoute, utilsRoute, boardRoute } from './routes';
 
 const PORT = 3066;
 
 io.on('connection', (socket) => {
 	const interval = setInterval(() => {
 		socket.emit('connectedUsers', {
-			users: usersSocket,
+			users: dtechCommonProp.getUsersSocket,
 		});
 	}, 10000);
 
 	socket.on('connectUser', async ({ userId }: { userId: string }) => {
-		await addUser(userId, socket.id);
+		dtechCommonProp.userSocket = { userId, socketId: socket.id };
 
 		socket.emit('connectedUsers', {
-			users: usersSocket,
+			users: dtechCommonProp.getUsersSocket,
 		});
 	});
 
 	socket.on('disconnect', async () => {
-		await removeUser(socket.id);
+		dtechCommonProp.removeUserSocket = socket.id;
 		clearInterval(interval);
 	});
 
 	socket.on(
-		'sendPrivateMessage',
-		async ({
-			chatMessage,
-			userUID,
-			convId,
-			imgList,
-			linkList,
-			toUserId,
-			toUserUID,
-		}: {
-			[keys: string]: string;
-		}) => {
-			const sendResult = await sendPrivateMessageFunction(
-				chatMessage,
-				userUID,
-				convId,
-				imgList,
-				linkList,
-				toUserId,
-			);
-
-			if (sendResult.result === 'success' && toUserId) {
-				const user = getConnectedUser(toUserId);
-				if (user) {
-					io.to(user.socketId).emit('newMessageReceived', {
-						chatListSocket: sendResult.chatList,
-						convIdSocket: sendResult.convId,
-						fromUID: userUID,
-					});
-
-					setTimeout(() => {
-						io.to(user.socketId).emit('newMessageReceivedSidebar', {
-							fromUID: userUID,
-						});
-					}, 1000);
-				}
-
-				socket.emit('messageSendSuccess', {
-					chatListSocket: sendResult.chatList,
-					convIdSocket: sendResult.convId,
-					toUserUID,
-				});
-			}
-		},
-	);
-
-	socket.on(
-		'sendGroupMessage',
-		({ convId, usersToNotify }: { convId: string; usersToNotify: string[] }) => {
-			socket.broadcast.to(convId).emit('newMessageGroupReceived', {
-				convId,
-			});
-
-			setTimeout(() => {
-				usersToNotify &&
-					usersToNotify.map((userString) => {
-						const user = getConnectedUser(userString);
-						if (user) {
-							io.to(user.socketId).emit('newMessageGroupReceivedSidebar', {
-								fromUID: convId,
-							});
-						}
-					});
-			}, 1000);
-		},
-	);
-
-	socket.on(
 		'joinRoom',
 		async ({ roomID, joinedUser }: { roomID: string; joinedUser: string }) => {
-			await addUserRoom(joinedUser, socket.id, roomID);
+			dtechCommonProp.userSocketRoom = {
+				userId: joinedUser,
+				socketId: socket.id,
+				roomId: roomID,
+			};
 
 			socket.join(roomID);
 		},
 	);
 
 	socket.on('leaveRoom', async ({ roomID }: { roomID: string; joinedUser: string }) => {
-		await removeUserRoom(socket.id, roomID);
+		dtechCommonProp.removeUserSocketRoom = { socketId: socket.id, roomId: roomID };
 
 		socket.leave(roomID);
 	});
