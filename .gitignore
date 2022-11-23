@@ -4,7 +4,8 @@
 # production
 /dist
 
-# Dockerfile
+Dockerfile
+/.dockerignore
 
 config.env
 
@@ -13,7 +14,6 @@ awsconfig.json
 /.env.local
 /.env.production
 
-# /.dockerignore
 
 /images/userImg
 
