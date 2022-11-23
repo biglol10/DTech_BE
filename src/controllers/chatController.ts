@@ -7,7 +7,7 @@ import {
 	queryExecutorResult2,
 	queryExecutorResultProcedure,
 } from '@src/util/queryExecutorResult';
-import dtechCommonProp from '@src/util/dtechCommon';
+import dtechCommonProp from '../util/dtechCommon';
 
 export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 	const { fromUID, toUID, lastMsgId } = req.body;
@@ -202,19 +202,20 @@ export const insertPrivateChatMessage = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('메시지 저장 후 정상작업을 수행하지 못했습니다', 400));
 	}
 
-	if (io) {
-		const user = dtechCommonProp.getConnectedUser(toUserId);
-		if (user) {
-			io.to(user.socketId).emit('newMessageReceived', {
-				fromUID: userUID,
-			});
-			setTimeout(() => {
-				io.to(user.socketId).emit('newMessageReceivedSidebar', {
-					fromUID: userUID,
-				});
-			}, 1000);
-		}
-	}
+	// // ? build 후 io.to가 작동안됨 (값은 다 있음)
+	// if (io) {
+	// 	const user = dtechCommonProp.getConnectedUser(toUserId);
+	// 	if (user) {
+	// 		io.to(user.socketId).emit('newMessageReceived', {
+	// 			fromUID: userUID,
+	// 		});
+	// 		setTimeout(() => {
+	// 			io.to(user.socketId).emit('newMessageReceivedSidebar', {
+	// 				fromUID: userUID,
+	// 			});
+	// 		}, 1000);
+	// 	}
+	// }
 
 	return res.status(200).json({
 		result: 'success',
@@ -258,20 +259,20 @@ export const insertGroupChatMessage = asyncHandler(async (req, res, next) => {
 
 	const usersToNotify = insertResult.queryResult.map((item: any) => item.USER_ID);
 
-	if (io) {
-		io.to(convId).emit('newMessageGroupReceived', {
-			convId,
-			userUID,
-		});
-		usersToNotify.map((userString) => {
-			const user = dtechCommonProp.getConnectedUser(userString);
-			if (user) {
-				io.to(user.socketId).emit('newMessageGroupReceivedSidebar', {
-					fromUID: convId,
-				});
-			}
-		});
-	}
+	// if (io) {
+	// 	io.to(convId).emit('newMessageGroupReceived', {
+	// 		convId,
+	// 		userUID,
+	// 	});
+	// 	usersToNotify.map((userString) => {
+	// 		const user = dtechCommonProp.getConnectedUser(userString);
+	// 		if (user) {
+	// 			io.to(user.socketId).emit('newMessageGroupReceivedSidebar', {
+	// 				fromUID: convId,
+	// 			});
+	// 		}
+	// 	});
+	// }
 
 	return res.status(200).json({
 		result: 'success',
