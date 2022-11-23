@@ -2,12 +2,12 @@ import { io } from '@src/util/serverInstance';
 import asyncHandler from '@src/middleware/async';
 import { generateUID, LinkArrFetchMetadata } from '@src/util/customFunc';
 import ErrorResponse from '@src/util/errorResponse';
-import { getConnectedUser } from '@src/util/memoryStorage';
 import {
 	queryExecutorResult,
 	queryExecutorResult2,
 	queryExecutorResultProcedure,
 } from '@src/util/queryExecutorResult';
+import dtechCommonProp from '@src/util/dtechCommon';
 
 export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 	const { fromUID, toUID, lastMsgId } = req.body;
@@ -131,7 +131,7 @@ export const createChatGroup = asyncHandler(async (req, res, next) => {
 
 	if (io) {
 		userParticipants.map((singleUser: { USER_UID: string; USER_ID: string }) => {
-			const connUser = getConnectedUser(singleUser.USER_ID);
+			const connUser = dtechCommonProp.getConnectedUser(singleUser.USER_ID);
 			if (connUser) {
 				io.to(connUser.socketId).emit('chatGroupCreateSuccess', {
 					chatGroupUID: chat_uuid,
@@ -203,7 +203,7 @@ export const insertPrivateChatMessage = asyncHandler(async (req, res, next) => {
 	}
 
 	if (io) {
-		const user = getConnectedUser(toUserId);
+		const user = dtechCommonProp.getConnectedUser(toUserId);
 		if (user) {
 			io.to(user.socketId).emit('newMessageReceived', {
 				fromUID: userUID,
@@ -258,16 +258,20 @@ export const insertGroupChatMessage = asyncHandler(async (req, res, next) => {
 
 	const usersToNotify = insertResult.queryResult.map((item: any) => item.USER_ID);
 
-	// if (io) {
-	// 	usersToNotify.map((userString) => {
-	// 		const user = getConnectedUser(userString);
-	// 		if (user) {
-	// 			io.to(user.socketId).emit('newMessageGroupReceivedSidebar', {
-	// 				fromUID: convId,
-	// 			});
-	// 		}
-	// 	});
-	// }
+	if (io) {
+		io.to(convId).emit('newMessageGroupReceived', {
+			convId,
+			userUID,
+		});
+		usersToNotify.map((userString) => {
+			const user = dtechCommonProp.getConnectedUser(userString);
+			if (user) {
+				io.to(user.socketId).emit('newMessageGroupReceivedSidebar', {
+					fromUID: convId,
+				});
+			}
+		});
+	}
 
 	return res.status(200).json({
 		result: 'success',
