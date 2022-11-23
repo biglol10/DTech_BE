@@ -56,6 +56,44 @@ io.on('connection', (socket) => {
 		socket.leave(roomID);
 	});
 
+	socket.on(
+		'privateMessageSentSuccess',
+		({ fromUserId, toUserId }: { [key: string]: string }) => {
+			const targetUser = dtechCommonProp.getConnectedUser(toUserId);
+			if (targetUser) {
+				io.to(targetUser.socketId).emit('newMessageReceived', {
+					fromUID: fromUserId,
+				});
+				setTimeout(() => {
+					io.to(targetUser.socketId).emit('newMessageReceivedSidebar', {
+						fromUID: fromUserId,
+					});
+				}, 1000);
+			}
+		},
+	);
+
+	socket.on(
+		'groupMessageSentSuccess',
+		({ convId, usersToNotify }: { convId: string; usersToNotify: string[] }) => {
+			socket.broadcast.to(convId).emit('newMessageGroupReceived', {
+				convId,
+			});
+
+			setTimeout(() => {
+				usersToNotify &&
+					usersToNotify.map((userString) => {
+						const user = dtechCommonProp.getConnectedUser(userString);
+						if (user) {
+							io.to(user.socketId).emit('newMessageGroupReceivedSidebar', {
+								fromUID: convId,
+							});
+						}
+					});
+			}, 1000);
+		},
+	);
+
 	require('./util/socketDefinition')(socket);
 });
 
