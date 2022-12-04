@@ -100,6 +100,21 @@ io.on('connection', (socket) => {
 // Body parser
 app.use(express.json());
 
+const setCache = function (req, res, next) {
+	const period = 60 * 5;
+
+	// you only want to cache for GET requests
+	if (req.method == 'GET') {
+		res.set('Cache-control', `public, max-age=${period}`);
+	} else {
+		// for the other requests set strict no caching parameters
+		res.set('Cache-control', `no-store`);
+	}
+	next();
+};
+
+app.use(setCache);
+
 app.set('trust proxy', true);
 
 const corsOptions = {
