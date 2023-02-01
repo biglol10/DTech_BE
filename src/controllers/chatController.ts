@@ -26,7 +26,7 @@ export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 
 	const prObj = {
 		prName: !lastMsgId ? 'ReadChatList' : 'ReadChatListDateBetween',
-		prParam: !lastMsgId ? [fromUID, convId] : [fromUID, convId, lastMsgId],
+		prParam: !lastMsgId ? [fromUID, convId] : [fromUID, convId, lastMsgId, 'Y'],
 	};
 
 	const resultChatList = await queryExecutorResultProcedure(prObj.prName, prObj.prParam);
