@@ -150,7 +150,7 @@ export const getTeamList = asyncHandler(async (req, res) => {
 
 export const setProfileImage = asyncHandler(async (req, res) => {
 	const imgUrl: string =
-		'https://dtech-bucket.s3.ap-northeast-2.amazonaws.com/' + req.body.imgArr[0];
+		`https://${process.env.BUCKET_BASE}.s3.ap-northeast-2.amazonaws.com/` + req.body.imgArr[0];
 
 	const sql = `
 	UPDATE USER SET USER_IMG_URL=?  

@@ -11,13 +11,7 @@ config.env
 
 awsconfig.json
 
-/.env.local
-/.env.production
-
 
 /images/userImg
 
-/config/s3.json
-
 /.vscode
-src/config/s3.json

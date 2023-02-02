@@ -18,7 +18,7 @@ type MulterCallback = (error: Error | null, key?: string) => void;
 const upload = multer({
 	storage: multerS3({
 		s3: s3,
-		bucket: 'dtech-bucket',
+		bucket: `${process.env.BUCKET_BASE}`,
 		acl: 'public-read-write',
 		contentType: multerS3.AUTO_CONTENT_TYPE,
 		key: async function (req: ExpressRequest, file: Express.Multer.File, cb: MulterCallback) {
