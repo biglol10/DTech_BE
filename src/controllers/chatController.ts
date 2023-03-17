@@ -56,7 +56,7 @@ export const getGroupChatList = asyncHandler(async (req, res, next) => {
 
 	const prObj = {
 		prName: !lastMsgId ? 'ReadGroupChatList' : 'ReadChatListDateBetween',
-		prParam: !lastMsgId ? [readingUser, chatRoomId] : [readingUser, chatRoomId, lastMsgId],
+		prParam: !lastMsgId ? [readingUser, chatRoomId] : [readingUser, chatRoomId, lastMsgId, 'Y'],
 	};
 
 	const resultChatList = await queryExecutorResultProcedure(prObj.prName, prObj.prParam);
