@@ -15,7 +15,7 @@ import errorHandler from '@src/middleware/error';
 import dtechCommonProp from '@src/util/dtechCommon';
 import { app, server, io } from './util/serverInstance';
 
-const PORT = 3066;
+const PORT = process.env.PORT || 3066;
 
 io.on('connection', (socket) => {
 	const interval = setInterval(() => {
