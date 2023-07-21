@@ -12,20 +12,14 @@ export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
 	const teamSkillCount = `SELECT T1.TECH_NM, T3.USER_NM AS USER_NM, T3.USER_UID, T3.TEAM_CD, T3.USER_TITLE, T3.USER_IMG_URL, T1.TECH_CNT FROM (SELECT T2.TECH_NM, T2.TECH_CD, COUNT(*) AS TECH_CNT FROM USER_TECH AS T1 INNER JOIN TECH AS T2 ON T1.TECH_CD = T2.TECH_CD GROUP BY T2.TECH_NM, T2.TECH_CD) AS T1 LEFT JOIN USER_TECH AS T2 ON T1.TECH_CD = T2.TECH_CD LEFT JOIN USER AS T3 ON T2.USER_UID = T3.USER_UID;`;
 	const resultData3 = await queryExecutorResult2(teamSkillCount);
 
-	if (
-		resultData1.status === 'error' ||
-		resultData2.status === 'error' ||
-		resultData3.status === 'error'
-	) {
+	if (resultData1.status === 'error' || resultData2.status === 'error' || resultData3.status === 'error') {
 		return next(new ErrorResponse('팀 스킬 조회에 실패했습니다', 403));
 	}
 
 	const skillObj: any = {};
 	resultData3.queryResult.map((item: any) => {
 		if (!skillObj[item.TECH_NM]) {
-			skillObj[item.TECH_NM] = resultData3.queryResult.filter(
-				(item2: any) => item2.TECH_NM === item.TECH_NM,
-			);
+			skillObj[item.TECH_NM] = resultData3.queryResult.filter((item2: any) => item2.TECH_NM === item.TECH_NM);
 		}
 	});
 

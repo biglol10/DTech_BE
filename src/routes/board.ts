@@ -1,13 +1,5 @@
 import { Router } from 'express';
-import {
-	getBoardList,
-	setBoardLike,
-	setSubmitBoard,
-	getComments,
-	setComment,
-	setDelCmnt,
-	deleteBoard,
-} from '@src/controllers/boardController';
+import { getBoardList, setBoardLike, setSubmitBoard, getComments, setComment, setDelCmnt, deleteBoard } from '@src/controllers/boardController';
 import { uploadImg } from '@src/util/s3Connect';
 
 const router = Router();

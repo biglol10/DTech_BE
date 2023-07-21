@@ -39,10 +39,7 @@ export const sendPrivateMessageFunction = async (
 		};
 	}
 
-	const messageTransactionAfter = await queryExecutorResultProcedure('MessageTransactionAfter', [
-		userUID,
-		convId,
-	]);
+	const messageTransactionAfter = await queryExecutorResultProcedure('MessageTransactionAfter', [userUID, convId]);
 
 	let { queryResult } = messageTransactionAfter;
 	const { status } = messageTransactionAfter;
@@ -71,14 +68,7 @@ export const sendGroupMessageFunction = async (
 ): Promise<errResult | succResult> => {
 	const message_uuid = `message_${generateUID()}`;
 
-	const insertResult = await queryExecutorResultProcedure('SendGroupChat', [
-		message_uuid,
-		chatMessage,
-		imgList,
-		linkList,
-		userUID,
-		convId,
-	]);
+	const insertResult = await queryExecutorResultProcedure('SendGroupChat', [message_uuid, chatMessage, imgList, linkList, userUID, convId]);
 
 	if (insertResult.status === 'error') {
 		return {
@@ -86,10 +76,7 @@ export const sendGroupMessageFunction = async (
 		};
 	}
 
-	const messageTransactionAfter = await queryExecutorResultProcedure('MessageTransactionAfter', [
-		userUID,
-		convId,
-	]);
+	const messageTransactionAfter = await queryExecutorResultProcedure('MessageTransactionAfter', [userUID, convId]);
 
 	let { queryResult } = messageTransactionAfter;
 	const { status } = messageTransactionAfter;

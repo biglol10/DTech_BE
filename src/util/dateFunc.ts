@@ -19,8 +19,7 @@ const getDateString = () => {
 	const second = date.getSeconds();
 	const milliSec = date.getMilliseconds();
 
-	const finalStr =
-		year + '' + month + '' + day + '' + hour + '' + minute + '' + second + '' + milliSec;
+	const finalStr = year + '' + month + '' + day + '' + hour + '' + minute + '' + second + '' + milliSec;
 
 	return finalStr;
 };

@@ -2,22 +2,14 @@ import { io } from '@src/util/serverInstance';
 import asyncHandler from '@src/middleware/async';
 import { generateUID, LinkArrFetchMetadata } from '@src/util/customFunc';
 import ErrorResponse from '@src/util/errorResponse';
-import {
-	queryExecutorResult,
-	queryExecutorResult2,
-	queryExecutorResultProcedure,
-} from '@src/util/queryExecutorResult';
+import { queryExecutorResult, queryExecutorResult2, queryExecutorResultProcedure } from '@src/util/queryExecutorResult';
 import dtechCommonProp from '../util/dtechCommon';
 
 export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 	const { fromUID, toUID, lastMsgId } = req.body;
 	const chat_uuid = `conv_private_${generateUID()}`;
 
-	const resultChatId = await queryExecutorResultProcedure('CheckAndReturnConvId', [
-		fromUID,
-		toUID,
-		chat_uuid,
-	]);
+	const resultChatId = await queryExecutorResultProcedure('CheckAndReturnConvId', [fromUID, toUID, chat_uuid]);
 
 	const convId = resultChatId.queryResult[0].ConvId;
 	if (resultChatId.status === 'error' || !convId) {
@@ -37,9 +29,7 @@ export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 
 	resultChatList.queryResult = await LinkArrFetchMetadata(resultChatList.queryResult);
 	resultChatList.queryResult.map((item: any, idx: number) => {
-		resultChatList.queryResult[idx].IMG_LIST = JSON.parse(
-			resultChatList.queryResult[idx].IMG_LIST,
-		);
+		resultChatList.queryResult[idx].IMG_LIST = JSON.parse(resultChatList.queryResult[idx].IMG_LIST);
 	});
 
 	return res.status(200).json({
@@ -67,9 +57,7 @@ export const getGroupChatList = asyncHandler(async (req, res, next) => {
 
 	resultChatList.queryResult = await LinkArrFetchMetadata(resultChatList.queryResult);
 	resultChatList.queryResult.map((item: any, idx: number) => {
-		resultChatList.queryResult[idx].IMG_LIST = JSON.parse(
-			resultChatList.queryResult[idx].IMG_LIST,
-		);
+		resultChatList.queryResult[idx].IMG_LIST = JSON.parse(resultChatList.queryResult[idx].IMG_LIST);
 	});
 
 	const groupChatUsersSql =
@@ -92,9 +80,7 @@ export const getGroupChatList = asyncHandler(async (req, res, next) => {
 export const getUnReadChatNoti = asyncHandler(async (req, res, next) => {
 	const { fromUID } = req.body;
 
-	const resultUnReadList = await queryExecutorResultProcedure('GetUnReadChatNoti', [
-		fromUID as string,
-	]);
+	const resultUnReadList = await queryExecutorResultProcedure('GetUnReadChatNoti', [fromUID as string]);
 
 	if (resultUnReadList.status === 'error') {
 		return next(new ErrorResponse('서버에서 에러가 발생했습니다', 500));
@@ -120,12 +106,10 @@ export const createChatGroup = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('채팅방을 만들지 못했습니다', 500));
 	}
 
-	const insertAction = userParticipants.map(
-		(singleUser: { USER_UID: string; USER_ID: string }) => {
-			const groupMemberSql = `INSERT INTO GROUP_MEMBER VALUES ('${chat_uuid}', '${singleUser.USER_UID}', SYSDATE(), 0);`;
-			queryExecutorResult2(groupMemberSql, []);
-		},
-	);
+	const insertAction = userParticipants.map((singleUser: { USER_UID: string; USER_ID: string }) => {
+		const groupMemberSql = `INSERT INTO GROUP_MEMBER VALUES ('${chat_uuid}', '${singleUser.USER_UID}', SYSDATE(), 0);`;
+		queryExecutorResult2(groupMemberSql, []);
+	});
 
 	Promise.all(insertAction);
 
@@ -187,11 +171,7 @@ export const insertPrivateChatMessage = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('메시지를 보내지 못했습니다', 400));
 	}
 
-	const messageTransactionAfter = await queryExecutorResultProcedure('MessageTransactionAfter', [
-		userUID,
-		convId,
-		message_uuid,
-	]);
+	const messageTransactionAfter = await queryExecutorResultProcedure('MessageTransactionAfter', [userUID, convId, message_uuid]);
 
 	let { queryResult } = messageTransactionAfter;
 	const { status } = messageTransactionAfter;
@@ -229,24 +209,13 @@ export const insertGroupChatMessage = asyncHandler(async (req, res, next) => {
 
 	const { chatMessage, userUID, convId, imgList, linkList } = req.body;
 
-	const insertResult = await queryExecutorResultProcedure('SendGroupChat', [
-		message_uuid,
-		chatMessage,
-		imgList,
-		linkList,
-		userUID,
-		convId,
-	]);
+	const insertResult = await queryExecutorResultProcedure('SendGroupChat', [message_uuid, chatMessage, imgList, linkList, userUID, convId]);
 
 	if (insertResult.status === 'error') {
 		return next(new ErrorResponse('메시지를 보내지 못했습니다', 400));
 	}
 
-	const messageTransactionAfter = await queryExecutorResultProcedure('MessageTransactionAfter', [
-		userUID,
-		convId,
-		message_uuid,
-	]);
+	const messageTransactionAfter = await queryExecutorResultProcedure('MessageTransactionAfter', [userUID, convId, message_uuid]);
 
 	let { queryResult } = messageTransactionAfter;
 	const { status } = messageTransactionAfter;

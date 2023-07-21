@@ -28,8 +28,7 @@ export const getUserByToken = asyncHandler(async (req, res, next) => {
 });
 
 export const registerUser = asyncHandler(async (req, res, next) => {
-	const { name, user_id, passwd, team, title, phonenum, detail, tech_list, github, domain } =
-		req.body;
+	const { name, user_id, passwd, team, title, phonenum, detail, tech_list, github, domain } = req.body;
 
 	const time = dayjsKor().format('YYYY-MM-DD HH:mm:ss');
 	const salt = await bcrypt.genSalt(10);
@@ -43,18 +42,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 		VALUES (?, ?, ?, ?, ?, ?,?, ?,?,?, CURRENT_TIMESTAMP,  0)
 	`;
 
-	const resultData: any = await queryExecutorResult2(sql, [
-		uuid,
-		user_id,
-		name,
-		hashedPassword,
-		team,
-		title,
-		phonenum,
-		detail,
-		github,
-		domain,
-	]);
+	const resultData: any = await queryExecutorResult2(sql, [uuid, user_id, name, hashedPassword, team, title, phonenum, detail, github, domain]);
 	if (resultData.status !== 'success') {
 		return res.status(401).json({
 			result: 'fail',
@@ -149,8 +137,7 @@ export const getTeamList = asyncHandler(async (req, res) => {
 });
 
 export const setProfileImage = asyncHandler(async (req, res) => {
-	const imgUrl: string =
-		`https://${process.env.BUCKET_BASE}.s3.ap-northeast-2.amazonaws.com/` + req.body.imgArr[0];
+	const imgUrl: string = `https://${process.env.BUCKET_BASE}.s3.ap-northeast-2.amazonaws.com/` + req.body.imgArr[0];
 
 	const sql = `
 	UPDATE USER SET USER_IMG_URL=?  
@@ -209,10 +196,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 
 	const updateUserLoginSql = `UPDATE USER SET REGISTER_DATE = SYSDATE() WHERE USER_ID = ?`;
 
-	const { queryResult: updateResult, status: userUpdateResult } = await queryExecutorResult2(
-		updateUserLoginSql,
-		[userId],
-	);
+	const { queryResult: updateResult, status: userUpdateResult } = await queryExecutorResult2(updateUserLoginSql, [userId]);
 
 	if (userUpdateResult === 'error') {
 		return next(new ErrorResponse('Update 쿼리에 문제가 발생했습니다', 401));
@@ -316,9 +300,7 @@ export const getUsersInfo = asyncHandler(async (req, res, next) => {
 			result: 'success',
 			usersInfo: queryResult,
 			usersOnline: queryResult.map((item: any) => {
-				const user = dtechCommonProp.getUsersSocket.find(
-					(user) => user.userId === item.USER_ID,
-				);
+				const user = dtechCommonProp.getUsersSocket.find((user) => user.userId === item.USER_ID);
 				if (user && user.socketId) {
 					return { userUID: item.USER_UID, userId: item.USER_ID, status: 'online' };
 				} else {

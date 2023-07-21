@@ -25,10 +25,7 @@ export const getMetadata = asyncHandler(async (req, res) => {
 });
 
 export const axiosFetchMetadata = async (url: string) => {
-	if (
-		Object.prototype.hasOwnProperty.call(metadataStorage, url) &&
-		metadataStorage[url].status === 'success'
-	) {
+	if (Object.prototype.hasOwnProperty.call(metadataStorage, url) && metadataStorage[url].status === 'success') {
 		const { metadata_title, metadata_description, metadata_image } = metadataStorage[url];
 		return {
 			status: 'success',
@@ -51,18 +48,11 @@ export const axiosFetchMetadata = async (url: string) => {
 			const text = response.data;
 
 			const $ = cheerio.load(text);
-			const title =
-				$('meta[property="og:title"]').attr('content') ||
-				$('title').text() ||
-				$('meta[name="title"]').attr('content');
-			const description =
-				$('meta[property="og:description"]').attr('content') ||
-				$('meta[name="description"]').attr('content');
+			const title = $('meta[property="og:title"]').attr('content') || $('title').text() || $('meta[name="title"]').attr('content');
+			const description = $('meta[property="og:description"]').attr('content') || $('meta[name="description"]').attr('content');
 			// const url = $('meta[property="og:url"]').attr('content');
 			// const site_name = $('meta[property="og:site_name"]').attr('content');
-			const image =
-				$('meta[property="og:image"]').attr('content') ||
-				$('meta[property="og:image:url"]').attr('content');
+			const image = $('meta[property="og:image"]').attr('content') || $('meta[property="og:image:url"]').attr('content');
 			// const icon =
 			// 	$('link[rel="icon"]').attr('href') || $('link[rel="shortcut icon"]').attr('href');
 			// const keywords =
@@ -109,14 +99,7 @@ export const insertErrLog = asyncHandler(async (req, res, next) => {
 	const err_uuid = `errLog_${generateUID()}`;
 	const sql = `INSERT INTO ERR_LOG VALUES (?, ?, ?, ?, ?, SYSDATE(), ?)`;
 
-	const execute = await queryExecutorResult2(sql, [
-		err_uuid,
-		uri,
-		requestType,
-		data,
-		errMsg,
-		userId,
-	]);
+	const execute = await queryExecutorResult2(sql, [err_uuid, uri, requestType, data, errMsg, userId]);
 
 	if (execute.status === 'error') {
 		return next(new ErrorResponse('에러로그에 데이터를 넣지 못했습니다', 400));
