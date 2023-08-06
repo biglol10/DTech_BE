@@ -19,17 +19,17 @@
 ## 📝 프로젝트 기능
 
 1. 💻 절대경로
-    - tsconfig-paths를 이용한 절대경로 세팅
+   - tsconfig-paths를 이용한 절대경로 세팅
 2. 🤖 인증
-    - jwt를 이용한 유저인증
+   - jwt를 이용한 유저인증
 3. 🗂️ 이미지 업로드
-    - Multer S3를 이용한 이미지 파일 업로드
+   - Multer S3를 이용한 이미지 파일 업로드
 4. ↔️ Socket, Rest Api
-    - Socket library를 이용한 개인/그룹 채팅 구현
-    - Express Rest api 구현
+   - Socket library를 이용한 개인/그룹 채팅 구현
+   - Express Rest api 구현
 5. ℹ️ Url 메타데이터
-    - Axios, cheerio를 이용하여 url 메타데이터 확보 후 서버에 저장
+   - Axios, cheerio를 이용하여 url 메타데이터 확보 후 서버에 저장
 6. 🇦🇼 Infra
-    - AWS EC2에 Docker Image 배포
-    - ACM, CloudFront를 이용하여 https적용
-    - CloudWatch를 이용하여 EC2 Alive 시간 조절
+   - AWS EC2에 Docker Image 배포
+   - ACM, CloudFront를 이용하여 https적용 (https://www.youtube.com/watch?v=WS2n8mkrFaY)
+   - CloudWatch를 이용하여 EC2 Alive 시간 조절
