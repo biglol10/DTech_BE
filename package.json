@@ -8,6 +8,7 @@
 	},
 	"scripts": {
 		"dev": "env-cmd -f .env.production nodemon --exec ts-node -r tsconfig-paths/register src/app.ts",
+		"start": "node dist/app.js",
 		"start2": "env-cmd -f .env.production ts-node -r tsconfig-paths/register src/app.ts",
 		"build": "tsc",
 		"build2": "tsc -p tsconfig.json",
