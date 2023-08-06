@@ -116,6 +116,10 @@ app.get('/hello', (req: Request, res: Response) => {
 	});
 });
 
+app.get('/', (req, res) => {
+	res.send('Hello, your Express server is working!');
+});
+
 // Enable CORS
 app.use(cors(corsOptions));
 // app.use(cors({ credentials: true }));
