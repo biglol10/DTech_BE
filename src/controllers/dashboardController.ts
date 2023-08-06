@@ -1,6 +1,6 @@
-import asyncHandler from '@src/middleware/async';
-import { queryExecutorResult2 } from '@src/util/queryExecutorResult';
-import ErrorResponse from '@src/util/errorResponse';
+import asyncHandler from '../middleware/async';
+import ErrorResponse from '../util/errorResponse';
+import { queryExecutorResult2 } from '../util/queryExecutorResult';
 
 export const getTeamSkillsets = asyncHandler(async (req, res, next) => {
 	const teamSkillSetSql = `SELECT T1.TECH_CD, T2.TECH_NM, T2.TECH_DETAIL, T2.TECH_PAGE_URL, count(*) AS TECH_CNT from USER_TECH AS T1 INNER JOIN TECH T2 ON T1.TECH_CD = T2.TECH_CD GROUP BY TECH_CD;`;

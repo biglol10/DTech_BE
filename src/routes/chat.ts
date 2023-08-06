@@ -8,8 +8,8 @@ import {
 	uploadChatImg,
 	insertPrivateChatMessage,
 	insertGroupChatMessage,
-} from '@src/controllers/chatController';
-import { uploadImg } from '@src/util/s3Connect';
+} from '../controllers/chatController';
+import { uploadImg } from '../util/s3Connect';
 
 const router = Router();
 

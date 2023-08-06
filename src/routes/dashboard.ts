@@ -1,6 +1,5 @@
 import { Router } from 'express';
-import { protectedApi } from '@src/middleware/auth';
-import { getTeamSkillsets, getUserSkillFilter } from '@src/controllers/dashboardController';
+import { getTeamSkillsets, getUserSkillFilter } from '../controllers/dashboardController';
 
 const router = Router();
 

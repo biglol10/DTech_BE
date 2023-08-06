@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMetadata, insertErrLog, utilTest } from '@src/controllers/utilsController';
+import { getMetadata, insertErrLog, utilTest } from '../controllers/utilsController';
 
 const router = Router();
 

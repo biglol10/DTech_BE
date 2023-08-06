@@ -9,9 +9,9 @@ import {
 	getUsersStatus,
 	getUsersInfo,
 	setProfileImage,
-} from '@src/controllers/authController';
-import { protectedApi } from '@src/middleware/auth';
-import { uploadImg } from '@src/util/s3Connect';
+} from '../controllers/authController';
+import { uploadImg } from '../util/s3Connect';
+import { protectedApi } from '../middleware/auth';
 
 const router = Router();
 

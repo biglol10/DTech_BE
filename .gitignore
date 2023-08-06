@@ -11,6 +11,10 @@ config.env
 
 awsconfig.json
 
+# /.env.local
+# /.env.production
+# src/config/s3.json
+# /config/s3.json
 
 /images/userImg
 

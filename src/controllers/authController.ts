@@ -1,11 +1,11 @@
-import asyncHandler from '@src/middleware/async';
-import { queryExecutorResult, queryExecutorResult2 } from '@src/util/queryExecutorResult';
-import ErrorResponse from '@src/util/errorResponse';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { generateUID } from '@src/util/customFunc';
-import dtechCommonProp from '@src/util/dtechCommon';
-import { dayjsKor } from '@src/util/dateFunc';
+import asyncHandler from '../middleware/async';
+import { dayjsKor } from '../util/dateFunc';
+import { generateUID } from '../util/customFunc';
+import { queryExecutorResult, queryExecutorResult2 } from '../util/queryExecutorResult';
+import ErrorResponse from '../util/errorResponse';
+import dtechCommonProp from '../util/dtechCommon';
 
 export const uploadUserImg = asyncHandler(async (req: any, res, next) => {
 	return res.status(200).json({

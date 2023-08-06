@@ -8,11 +8,11 @@ import {
 	chatRoute,
 	boardRoute,
 	infoRoute,
-} from '@src/routes/index';
+} from './routes/index';
 
 import cors from 'cors';
-import errorHandler from '@src/middleware/error';
-import dtechCommonProp from '@src/util/dtechCommon';
+import errorHandler from './middleware/error';
+import dtechCommonProp from './util/dtechCommon';
 import { app, server, io } from './util/serverInstance';
 
 const PORT = 3066;

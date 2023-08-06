@@ -1,8 +1,13 @@
 import multer from 'multer';
 import multerS3 from 'multer-s3';
 import aws from 'aws-sdk';
-import ErrorResponse from '@src/util/errorResponse';
-aws.config.loadFromPath(__dirname + '/../config/s3.json');
+import ErrorResponse from './errorResponse';
+
+aws.config.update({
+	accessKeyId: process.env.accessKeyId,
+	secretAccessKey: process.env.secretAccessKey,
+	region: process.env.region,
+});
 
 const s3: any = new aws.S3();
 

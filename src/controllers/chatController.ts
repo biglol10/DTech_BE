@@ -1,13 +1,13 @@
-import { io } from '@src/util/serverInstance';
-import asyncHandler from '@src/middleware/async';
-import { generateUID, LinkArrFetchMetadata } from '@src/util/customFunc';
-import ErrorResponse from '@src/util/errorResponse';
+import asyncHandler from '../middleware/async';
+import { LinkArrFetchMetadata, generateUID } from '../util/customFunc';
+import dtechCommonProp from '../util/dtechCommon';
+import ErrorResponse from '../util/errorResponse';
 import {
 	queryExecutorResult,
 	queryExecutorResult2,
 	queryExecutorResultProcedure,
-} from '@src/util/queryExecutorResult';
-import dtechCommonProp from '../util/dtechCommon';
+} from '../util/queryExecutorResult';
+import { io } from '../util/serverInstance';
 
 export const getPrivateChatList = asyncHandler(async (req, res, next) => {
 	const { fromUID, toUID, lastMsgId } = req.body;
