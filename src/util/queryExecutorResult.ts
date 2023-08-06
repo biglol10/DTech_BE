@@ -79,10 +79,7 @@ const queryExecutorResult2 = async (sql: string, val?: (number | string | null)[
  ********************************************************************************************
  * 예시: queryExecutorProcedure(프로시저 명, [param1, param2])
  ********************************************************************************************/
-const queryExecutorProcedure = (
-	procedureName: string,
-	param: null | (string | number)[],
-): Promise<IResultData | any> => {
+const queryExecutorProcedure = (procedureName: string, param: null | (string | number)[]): Promise<IResultData | any> => {
 	return new Promise((resolve, reject) => {
 		if (param) {
 			const tempString = param.reduce((previouseValue, currentValue, currentIndex) => {
@@ -119,10 +116,7 @@ const queryExecutorProcedure = (
 	});
 };
 
-const queryExecutorResultProcedure = async (
-	procedureName: string,
-	param: (string | number)[] | null = null,
-): Promise<IResultData> => {
+const queryExecutorResultProcedure = async (procedureName: string, param: (string | number)[] | null = null): Promise<IResultData> => {
 	let resultData: IResultData | null = null;
 
 	try {

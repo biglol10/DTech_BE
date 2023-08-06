@@ -19,3 +19,6 @@ awsconfig.json
 /images/userImg
 
 /.vscode
+
+.env.local
+.env.production

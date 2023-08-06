@@ -22,14 +22,10 @@ export const protectedApi = asyncHandler(async (req: any, res, next) => {
 	}
 
 	try {
-		const decoded: any = process.env.JWT_SECRET
-			? jwt.verify(token, process.env.JWT_SECRET)
-			: '';
+		const decoded: any = process.env.JWT_SECRET ? jwt.verify(token, process.env.JWT_SECRET) : '';
 		if (decoded) {
 			const sql = `SELECT USER_UID, USER_ID, USER_NM, TEAM_CD, USER_TITLE, USER_ADMIN_YN, USER_IMG_URL FROM USER WHERE USER_ID = '${decoded.id}'`;
-			const { status: isQuerySuccess, queryResult: selectedUser } = await queryExecutorResult(
-				sql,
-			);
+			const { status: isQuerySuccess, queryResult: selectedUser } = await queryExecutorResult(sql);
 
 			if (isQuerySuccess === 'success') {
 				req.user = selectedUser[0];

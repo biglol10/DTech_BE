@@ -34,13 +34,10 @@ class dtechCommonProp {
 
 	static set userSocketRoom({ userId, socketId, roomId }: { [key: string]: string }) {
 		const usersSocketClone: IUserSocket[] = _.cloneDeep(this.usersSocket);
-		const user = usersSocketClone.find(
-			(user) => user.userId === userId && user.roomId === roomId,
-		);
+		const user = usersSocketClone.find((user) => user.userId === userId && user.roomId === roomId);
 
 		if (user && user.socketId === socketId) return;
-		if (user && user.socketId !== socketId)
-			this.removeUserSocketRoom = { socketId: user.socketId, roomId };
+		if (user && user.socketId !== socketId) this.removeUserSocketRoom = { socketId: user.socketId, roomId };
 
 		const newUserRoom = { userId, socketId, roomId };
 		usersSocketClone.push(newUserRoom);
@@ -75,9 +72,7 @@ class dtechCommonProp {
 	}
 
 	static getConnectedUserRoom(userId: string, roomID: string) {
-		const user = this.usersSocket.find(
-			(item) => item.userId === userId && item.roomId === roomID,
-		);
+		const user = this.usersSocket.find((item) => item.userId === userId && item.roomId === roomID);
 		return user;
 	}
 

@@ -30,9 +30,7 @@ export const setSubmitBoard = asyncHandler(async (req, res, next) => {
 				let sql3 = 'INSERT INTO BOARD_URL VALUES ';
 				const s3Url = `https://dcx-tech.s3.ap-northeast-2.amazonaws.com/`;
 				for (let i = 0; i < imgArr.length; i++) {
-					sql3 += `('${resultData2.queryResult[0].BOARD_CD}',${i + 1},'image','${
-						s3Url + imgArr[i]
-					}'),`;
+					sql3 += `('${resultData2.queryResult[0].BOARD_CD}',${i + 1},'image','${s3Url + imgArr[i]}'),`;
 				}
 				sql3 = sql3.slice(0, -1);
 				const resultData3 = await queryExecutorResult2(sql3, []);
@@ -87,10 +85,7 @@ export const setBoardLike = asyncHandler(async (req, res, next) => {
 	const resultData = await queryExecutorResult2(sql, [req.body.id, req.body.userUID]);
 
 	if (resultData.status === 'success') {
-		const sql2 =
-			'UPDATE BOARD SET LIKE_CNT = LIKE_CNT' +
-			(req.body.like ? ' + ' : ' - ') +
-			'1 WHERE BOARD_CD=?';
+		const sql2 = 'UPDATE BOARD SET LIKE_CNT = LIKE_CNT' + (req.body.like ? ' + ' : ' - ') + '1 WHERE BOARD_CD=?';
 		const resultData2 = await queryExecutorResult2(sql2, [req.body.id]);
 
 		if (resultData2.status === 'success') {
@@ -146,9 +141,7 @@ export const getBoardList = asyncHandler(async (req, res, next) => {
 
 	if (resultData.status === 'success' && resultImg.status === 'success') {
 		resultData.queryResult.map((board: any) => {
-			const tempResult = resultImg.queryResult.filter(
-				(img: any) => board.BOARD_CD === img.BOARD_CD,
-			);
+			const tempResult = resultImg.queryResult.filter((img: any) => board.BOARD_CD === img.BOARD_CD);
 			board.IMG_LIST = tempResult;
 		});
 
