@@ -1,6 +1,7 @@
 import ErrorResponse from '../util/errorResponse';
+import { Request, Response } from 'express';
 
-const errorHandler = (err: any, req: any, res: any) => {
+const errorHandler = (err: any, req: Request, res: Response) => {
 	// Log to console for dev
 	// console.log(err);
 
@@ -26,7 +27,7 @@ const errorHandler = (err: any, req: any, res: any) => {
 		error = new ErrorResponse(message, 400);
 	}
 
-	res.status(error.statusCode || 500).json({
+	return res.status(error.statusCode || 500).json({
 		success: false,
 		error: error.message || 'Server Error',
 	});
