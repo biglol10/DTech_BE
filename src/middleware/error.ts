@@ -1,7 +1,7 @@
 import ErrorResponse from '../util/errorResponse';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
-const errorHandler = (err: any, req: Request, res: Response) => {
+const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
 	// Log to console for dev
 	// console.log(err);
 
