@@ -1,13 +1,18 @@
 import asyncHandler from '../middleware/async';
 import { IGetUserAuthInfoRequest } from '../util/commTypes';
 import { queryExecutorResult } from '../util/queryExecutorResult';
+import conn from '../dbConn/dbConnection';
 
 export const getTestApi = asyncHandler(async (req, res) => {
-	const sql = 'select * from ttable';
+	const sql = 'select * from TEAM';
+	console.log('conn is');
+	console.log(conn);
 
 	let resultData: any = null;
 
 	resultData = await queryExecutorResult(sql);
+	console.log('resultData is');
+	console.log(resultData);
 
 	res.status(200).json({ success: true, data: 'sampleData', resultData });
 });
