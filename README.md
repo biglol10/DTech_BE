@@ -31,5 +31,14 @@
    - Axios, cheerio를 이용하여 url 메타데이터 확보 후 서버에 저장
 6. 🇦🇼 Infra
    - AWS EC2에 Docker Image 배포
-   - ACM, CloudFront를 이용하여 https적용 (https://www.youtube.com/watch?v=WS2n8mkrFaY)
+   - ACM, CloudFront를 이용하여 https적용 (참고 -> https://www.youtube.com/watch?v=WS2n8mkrFaY)
    - CloudWatch를 이용하여 EC2 Alive 시간 조절
+
+## 📝 Change Logs
+
+    - 2023/08/06
+    	- Backend server을 AWS EC2 대신 heroku hobby dyno로 변경
+    	- 절대경로 전부 제거
+    	- s3 bucket 신규로 생성 후 연결 재정의
+    	- s3 connect 방식 변경
+    		- ErrorHandler에 next 파라미터 추가
