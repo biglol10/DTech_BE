@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { axiosFetchMetadata } from '@src/controllers/utilsController';
+import { axiosFetchMetadata } from '../controllers/utilsController';
 
 const generateUID = () => {
 	return crypto.randomBytes(20).toString('hex').substring(0, 20);

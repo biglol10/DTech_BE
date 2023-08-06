@@ -1,6 +1,6 @@
-import asyncHandler from '@src/middleware/async';
-import { queryExecutorResult } from '@src/util/queryExecutorResult';
-import { IGetUserAuthInfoRequest } from '@src/util/commTypes';
+import asyncHandler from '../middleware/async';
+import { IGetUserAuthInfoRequest } from '../util/commTypes';
+import { queryExecutorResult } from '../util/queryExecutorResult';
 
 export const getTestApi = asyncHandler(async (req, res) => {
 	const sql = 'select * from ttable';

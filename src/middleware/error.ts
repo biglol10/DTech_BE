@@ -1,4 +1,4 @@
-import ErrorResponse from '@src/util/errorResponse';
+import ErrorResponse from '../util/errorResponse';
 
 const errorHandler = (err: any, req: any, res: any) => {
 	// Log to console for dev

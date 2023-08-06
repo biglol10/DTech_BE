@@ -1,6 +1,7 @@
 /* eslint-disable no-useless-escape */
-import asyncHandler from '@src/middleware/async';
-import { queryExecutorResult2 } from '@src/util/queryExecutorResult';
+
+import asyncHandler from '../middleware/async';
+import { queryExecutorResult2 } from '../util/queryExecutorResult';
 
 export const setSubmitBoard = asyncHandler(async (req, res, next) => {
 	let { tech } = req.body.postData;

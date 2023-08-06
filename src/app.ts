@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import express, { Request, Response } from 'express';
 
-import { authRoute, dashboardRoute, utilsRoute, chatRoute, boardRoute, infoRoute } from '@src/routes/index';
+import { authRoute, dashboardRoute, utilsRoute, chatRoute, boardRoute, infoRoute } from './routes/index';
 
 import cors from 'cors';
-import errorHandler from '@src/middleware/error';
-import dtechCommonProp from '@src/util/dtechCommon';
+import errorHandler from './middleware/error';
+import dtechCommonProp from './util/dtechCommon';
 import { app, server, io } from './util/serverInstance';
 
 const PORT = process.env.PORT || 3066;

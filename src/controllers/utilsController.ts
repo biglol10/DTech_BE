@@ -1,11 +1,11 @@
-import asyncHandler from '@src/middleware/async';
 import axios from 'axios';
 import https from 'https';
 import cheerio from 'cheerio';
-import { metadataStorage } from '@src/util/memoryStorage';
-import { generateUID } from '@src/util/customFunc';
-import { queryExecutorResult2 } from '@src/util/queryExecutorResult';
-import ErrorResponse from '@src/util/errorResponse';
+import asyncHandler from '../middleware/async';
+import { metadataStorage } from '../util/memoryStorage';
+import { generateUID } from '../util/customFunc';
+import { queryExecutorResult2 } from '../util/queryExecutorResult';
+import ErrorResponse from '../util/errorResponse';
 
 export const getMetadata = asyncHandler(async (req, res) => {
 	const linkList = req.query.linkList as string[];

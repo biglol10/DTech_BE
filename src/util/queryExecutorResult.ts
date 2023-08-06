@@ -1,4 +1,4 @@
-import conn from '@src/dbConn/dbConnection';
+import conn from '../dbConn/dbConnection';
 
 interface IResultData {
 	status: 'success' | 'error';

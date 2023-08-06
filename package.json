@@ -8,7 +8,9 @@
 	},
 	"scripts": {
 		"dev": "env-cmd -f .env.production nodemon --exec ts-node -r tsconfig-paths/register src/app.ts",
-		"build": "tsc -p tsconfig.json",
+		"start2": "env-cmd -f .env.production ts-node -r tsconfig-paths/register src/app.ts",
+		"build": "tsc",
+		"build2": "tsc -p tsconfig.json",
 		"startLocal": "env-cmd -f .env.local ts-node -r tsconfig-paths/register dist/app.js",
 		"startProduction": "env-cmd -f .env.production ts-node -r tsconfig-paths/register dist/app.js",
 		"dev2": "env-cmd -f .env.production nodemon --exec ts-node -r tsconfig-paths/register src/app.ts"
@@ -25,6 +27,7 @@
 		"cheerio": "^1.0.0-rc.12",
 		"cors": "^2.8.5",
 		"dayjs": "^1.11.3",
+		"env-cmd": "^10.1.0",
 		"express": "^4.18.1",
 		"jsonwebtoken": "^8.5.1",
 		"lodash": "^4.17.21",
@@ -47,7 +50,6 @@
 		"@types/node": "^17.0.39",
 		"@typescript-eslint/eslint-plugin": "^5.38.1",
 		"@typescript-eslint/parser": "^5.38.1",
-		"env-cmd": "^10.1.0",
 		"eslint": "^8.24.0",
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin-prettier": "^4.2.1",
