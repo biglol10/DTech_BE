@@ -3,7 +3,7 @@ import { IGetUserAuthInfoRequest } from '../util/commTypes';
 import { queryExecutorResult } from '../util/queryExecutorResult';
 
 export const getTestApi = asyncHandler(async (req, res) => {
-	const sql = 'select * from ttable';
+	const sql = 'select * from TEAM';
 
 	let resultData: any = null;
 

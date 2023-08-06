@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import express, { Request, Response } from 'express';
 
-import { authRoute, dashboardRoute, utilsRoute, chatRoute, boardRoute, infoRoute } from './routes/index';
+import { authRoute, dashboardRoute, utilsRoute, chatRoute, boardRoute, infoRoute, testRoute } from './routes/index';
 
 import cors from 'cors';
 import errorHandler from './middleware/error';
@@ -130,6 +130,7 @@ app.use('/api/chat', chatRoute);
 app.use('/api/utils', utilsRoute);
 app.use('/api/board', boardRoute);
 app.use('/api/info', infoRoute);
+app.use('/api/testRoute', testRoute);
 
 app.use(errorHandler);
 
