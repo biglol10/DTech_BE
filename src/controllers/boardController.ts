@@ -2,6 +2,7 @@
 
 import asyncHandler from '../middleware/async';
 import { queryExecutorResult2 } from '../util/queryExecutorResult';
+import { generateUID } from '../util/customFunc';
 
 export const setSubmitBoard = asyncHandler(async (req, res, next) => {
 	let { tech } = req.body.postData;
@@ -14,7 +15,7 @@ export const setSubmitBoard = asyncHandler(async (req, res, next) => {
 	}
 
 	const sql = `INSERT INTO BOARD VALUES
-	(NEXTVAL('BOARD'),?,current_timestamp(),
+	(BOARD_${generateUID},?,current_timestamp(),
 	?,?,?,0,0)`;
 	const resultData: any = await queryExecutorResult2(sql, [uuid, title, content, tech]);
 
@@ -72,7 +73,7 @@ export const setSubmitBoard = asyncHandler(async (req, res, next) => {
 export const setBoardLike = asyncHandler(async (req, res, next) => {
 	let sql = '';
 	if (req.body.like === true) {
-		sql = `INSERT INTO BOARD_COMMENT VALUES(NEXTVAL('CMNT'),
+		sql = `INSERT INTO BOARD_COMMENT VALUES(CMNT_${generateUID},
     ?,'like', ?, null,null,current_timestamp()); 
     `;
 	} else {
@@ -222,7 +223,7 @@ export const deleteBoard = asyncHandler(async (req, res, next) => {
 export const setComment = asyncHandler(async (req, res, next) => {
 	const reqParam = [req.body.brdId, req.body.uuid, req.body.commentArea];
 	const sql = `INSERT INTO BOARD_COMMENT VALUES
-	(NEXTVAL('CMNT'),?,'comment',?,
+	(CMNT_${generateUID},?,'comment',?,
 	?,null,current_timestamp())
 	`;
 
