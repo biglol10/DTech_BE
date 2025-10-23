@@ -4,8 +4,9 @@ import asyncHandler from '../middleware/async';
 import { dayjsKor } from '../util/dateFunc';
 import { generateUID } from '../util/customFunc';
 import { queryExecutorResult, queryExecutorResult2 } from '../util/queryExecutorResult';
-import ErrorResponse from '../util/errorResponse';
+import ErrorResponse, { ErrorCode } from '../util/errorResponse';
 import dtechCommonProp from '../util/dtechCommon';
+import { tokenService } from '../services/TokenService';
 
 export const uploadUserImg = asyncHandler(async (req: any, res, next) => {
 	return res.status(200).json({
@@ -76,28 +77,26 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 		}
 	}
 
-	if (process.env.JWT_SECRET) {
-		const { token, options } = tokenResponse(user_id, process.env.JWT_SECRET);
+	// Generate Access Token (15m) and Refresh Token (7d)
+	const { accessToken, refreshToken } = tokenService.generateTokenPair(user_id);
 
-		// io.emit('newUserCreated');
+	// Set refresh token as httpOnly cookie
+	const refreshTokenCookieOptions = tokenService.getRefreshTokenCookieOptions();
 
-		return res.status(200).cookie('token', token, options).json({
+	// io.emit('newUserCreated');
+
+	return res.status(201).cookie('refreshToken', refreshToken, refreshTokenCookieOptions).json({
+		success: true,
+		result: 'success',
+		accessToken,
+		user: {
 			name,
 			title,
 			user_id,
 			uuid,
 			time,
-			token,
-			result: 'success',
-		});
-	} else {
-		return res.status(401).json({
-			result: 'fail',
-			message: 'User register failed',
-			status: resultData.status || 'err from node',
-			sqlMessage: resultData.sqlMessage || 'check env var',
-		});
-	}
+		},
+	});
 });
 
 export const idCheck = asyncHandler(async (req, res) => {
@@ -202,22 +201,30 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('Update 쿼리에 문제가 발생했습니다', 401));
 	}
 
-	if (updateResult.affectedRows && process.env.JWT_SECRET) {
-		const { token, options } = tokenResponse(userId, process.env.JWT_SECRET);
+	if (updateResult.affectedRows) {
+		// Generate Access Token (15m) and Refresh Token (7d)
+		const { accessToken, refreshToken } = tokenService.generateTokenPair(userId);
+
+		// Set refresh token as httpOnly cookie
+		const refreshTokenCookieOptions = tokenService.getRefreshTokenCookieOptions();
 
 		const time = dayjsKor().format('YYYY-MM-DD HH:mm:ss');
 
-		return res.status(200).cookie('token', token, options).json({
-			name: selectedUser[0].USER_NM,
-			userId,
-			time,
-			token,
+		return res.status(200).cookie('refreshToken', refreshToken, refreshTokenCookieOptions).json({
+			success: true,
 			result: 'success',
-			userUID: selectedUser[0].USER_UID,
-			userProfileImg: selectedUser[0].USER_IMG_URL,
+			accessToken,
+			user: {
+				name: selectedUser[0].USER_NM,
+				userId,
+				userUID: selectedUser[0].USER_UID,
+				userProfileImg: selectedUser[0].USER_IMG_URL,
+				time,
+			},
 		});
 	} else {
 		return res.status(401).json({
+			success: false,
 			result: 'error',
 			message: 'User login failed',
 		});
@@ -321,6 +328,70 @@ const matchPassword = async (enteredPassword: string, dbPassword: string) => {
 	return await bcrypt.compare(enteredPassword, dbPassword);
 };
 
+/**
+ * Refresh Access Token
+ * Uses refresh token from cookie to generate new access token
+ */
+export const refreshAccessToken = asyncHandler(async (req, res, next) => {
+	// Get refresh token from cookie
+	const refreshToken = req.cookies?.refreshToken;
+
+	if (!refreshToken) {
+		return next(new ErrorResponse('Refresh token not found. Please login again.', 401, ErrorCode.REFRESH_TOKEN_EXPIRED));
+	}
+
+	try {
+		// Verify refresh token
+		const decoded = tokenService.verifyRefreshToken(refreshToken);
+
+		// Generate new access token
+		const newAccessToken = tokenService.generateAccessToken(decoded.id);
+
+		return res.status(200).json({
+			success: true,
+			accessToken: newAccessToken,
+			message: 'Access token refreshed successfully',
+		});
+	} catch (error: any) {
+		// Handle refresh token errors
+		if (error.message === 'REFRESH_TOKEN_EXPIRED') {
+			// Clear the expired refresh token cookie
+			res.clearCookie('refreshToken');
+			return next(new ErrorResponse('Refresh token has expired. Please login again.', 401, ErrorCode.REFRESH_TOKEN_EXPIRED));
+		}
+
+		if (error.message === 'INVALID_REFRESH_TOKEN') {
+			res.clearCookie('refreshToken');
+			return next(new ErrorResponse('Invalid refresh token. Please login again.', 401, ErrorCode.INVALID_REFRESH_TOKEN));
+		}
+
+		return next(new ErrorResponse('Token refresh failed', 401, ErrorCode.UNAUTHORIZED));
+	}
+});
+
+/**
+ * Logout
+ * Clears refresh token cookie
+ */
+export const logout = asyncHandler(async (req, res, next) => {
+	// Clear refresh token cookie
+	res.clearCookie('refreshToken', {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === 'production',
+		sameSite: 'strict',
+		path: '/',
+	});
+
+	return res.status(200).json({
+		success: true,
+		message: 'Logged out successfully',
+	});
+});
+
+/**
+ * @deprecated Legacy token response function - replaced by TokenService
+ * Kept for backward compatibility, but should not be used in new code
+ */
 const tokenResponse = (userId: string, jwt_secret: string) => {
 	const token = jwt.sign({ id: userId }, jwt_secret, {
 		expiresIn: process.env.JWT_EXPIRE,
@@ -330,12 +401,12 @@ const tokenResponse = (userId: string, jwt_secret: string) => {
 
 	const options = {
 		expires: new Date(Date.now() + cookie_expire * 24 * 60 * 60 * 1000),
-		httpOnly: true, // only want the cookie to be access through client side script
+		httpOnly: true,
 		secure: false,
 	};
 
 	if (process.env.NODE_ENV === 'production') {
-		options.secure = true; // https (production)
+		options.secure = true;
 	}
 
 	return { token, options };
