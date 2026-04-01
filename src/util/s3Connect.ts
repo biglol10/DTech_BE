@@ -33,8 +33,9 @@ const upload = multer({
 				imgArr.push(`${POSTDATA.dir}${file.originalname}`);
 				cb(null, `${POSTDATA.dir}${file.originalname}`);
 			} else {
-				imgArr.push(`${POSTDATA.dir}${file.originalname}`);
-				cb(null, `${POSTDATA.dir}${file.originalname}`);
+				const dateStr = Date.now();
+				imgArr.push(`${POSTDATA.dir}${dateStr}_${file.originalname}`);
+				cb(null, `${POSTDATA.dir}${dateStr}_${file.originalname}`);
 			}
 		},
 	}),

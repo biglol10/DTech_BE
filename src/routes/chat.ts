@@ -9,6 +9,7 @@ import {
 	insertPrivateChatMessage,
 	insertGroupChatMessage,
 } from '../controllers/chatController';
+import { protectedApi } from '../middleware/auth';
 import { uploadImg } from '../util/s3Connect';
 
 const router = Router();
@@ -18,7 +19,7 @@ router.post('/getGroupChatList', getGroupChatList);
 router.post('/getUnreadChatNoti', getUnReadChatNoti);
 router.post('/createChatGroup', createChatGroup);
 router.post('/getChatGroups', getChatGroups);
-router.post('/uploadChatImg', uploadImg, uploadChatImg);
+router.post('/uploadChatImg', protectedApi, uploadImg, uploadChatImg);
 router.post('/insertPrivateChatMessage', insertPrivateChatMessage);
 router.post('/insertGroupChatMessage', insertGroupChatMessage);
 
